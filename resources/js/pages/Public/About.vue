@@ -107,8 +107,14 @@ function formatDate(date: string): string {
                         :key="skill.id"
                         class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4"
                     >
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
-                            {{ skill.icon || '🔧' }}
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                            <img
+                                v-if="skill.icon && (skill.icon.startsWith('http') || skill.icon.startsWith('/'))"
+                                :src="skill.icon"
+                                :alt="skill.name"
+                                class="h-6 w-6 object-contain"
+                            />
+                            <span v-else class="text-lg">{{ skill.icon || '🔧' }}</span>
                         </div>
                         <div class="min-w-0 flex-1">
                             <p class="truncate font-medium">{{ skill.name }}</p>

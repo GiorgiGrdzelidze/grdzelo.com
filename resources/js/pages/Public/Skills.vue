@@ -53,9 +53,20 @@ const grouped = computed(() => {
                         :key="skill.id"
                         class="rounded-lg border border-border/40 p-4 transition-colors hover:bg-accent"
                     >
-                        <div class="flex items-center justify-between">
-                            <p class="font-medium">{{ skill.name }}</p>
-                            <span v-if="skill.proficiency_label" class="text-xs text-muted-foreground">{{ skill.proficiency_label }}</span>
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                                <img
+                                    v-if="skill.icon && (skill.icon.startsWith('http') || skill.icon.startsWith('/'))"
+                                    :src="skill.icon"
+                                    :alt="skill.name"
+                                    class="h-6 w-6 object-contain"
+                                />
+                                <span v-else class="text-lg">{{ skill.icon || '🔧' }}</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="font-medium">{{ skill.name }}</p>
+                                <span v-if="skill.proficiency_label" class="text-xs text-muted-foreground">{{ skill.proficiency_label }}</span>
+                            </div>
                         </div>
                         <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
                             <div
