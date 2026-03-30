@@ -18,6 +18,26 @@ interface Props {
 
 const props = defineProps<Props>();
 
+function isUrl(icon: string | null): boolean {
+    return !!icon && (icon.startsWith('http') || icon.startsWith('/'));
+}
+
+function getDeviconClass(icon: string): string | null {
+    // Extract class from HTML tag like <i class="devicon-php-plain"></i>
+    const match = icon.match(/class="([^"]+)"/);
+
+    if (match) {
+        return match[1];
+    }
+
+    // Already a class string like "devicon-php-plain"
+    if (icon.startsWith('devicon-')) {
+        return icon;
+    }
+
+    return null;
+}
+
 const grouped = computed(() => {
     const groups: Record<string, SkillItem[]> = {};
 
@@ -54,14 +74,15 @@ const grouped = computed(() => {
                         class="rounded-lg border border-border/40 p-4 transition-colors hover:bg-accent"
                     >
                         <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl">
                                 <img
-                                    v-if="skill.icon && (skill.icon.startsWith('http') || skill.icon.startsWith('/'))"
-                                    :src="skill.icon"
+                                    v-if="isUrl(skill.icon)"
+                                    :src="skill.icon ?? ''"
                                     :alt="skill.name"
                                     class="h-6 w-6 object-contain"
                                 />
-                                <span v-else class="text-lg">{{ skill.icon || '🔧' }}</span>
+                                <i v-else-if="skill.icon && getDeviconClass(skill.icon)" :class="getDeviconClass(skill.icon)" />
+                                <span v-else class="text-lg">🔧</span>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="font-medium">{{ skill.name }}</p>
