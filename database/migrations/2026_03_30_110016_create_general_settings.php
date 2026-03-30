@@ -13,7 +13,7 @@ return new class extends SettingsMigration
         $this->migrator->add('general.phone', '');
         $this->migrator->add('general.location', '');
         $this->migrator->add('general.footer_text', '');
-        $this->migrator->add('general.copyright_text', '© ' . date('Y') . ' grdzelo.com. All rights reserved.');
+        $this->migrator->add('general.copyright_text', '© '.date('Y').' grdzelo.com. All rights reserved.');
         $this->migrator->add('general.analytics_id', '');
         $this->migrator->add('general.verification_tags', '');
         $this->migrator->add('general.default_cta_text', "Let's Work Together");

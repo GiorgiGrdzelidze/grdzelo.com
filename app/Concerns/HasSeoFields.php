@@ -2,8 +2,6 @@
 
 namespace App\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
-
 trait HasSeoFields
 {
     public function getSeoTitle(): string

@@ -29,9 +29,19 @@ interface ExperienceItem {
     logo: string | null;
 }
 
+interface HobbyItem {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    icon: string | null;
+    is_featured: boolean;
+}
+
 interface Props {
     skills: SkillItem[];
     experiences: ExperienceItem[];
+    hobbies: HobbyItem[];
 }
 
 defineProps<Props>();
@@ -148,6 +158,46 @@ function formatDate(date: string): string {
                                 <div v-if="exp.technologies?.length" class="mt-3 flex flex-wrap gap-1">
                                     <Badge v-for="tech in exp.technologies" :key="tech" variant="outline" class="text-xs">{{ tech }}</Badge>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hobbies & Interests -->
+        <section v-if="hobbies.length" class="border-t border-border/40 bg-muted/30 py-20">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div class="flex items-end justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight">Hobbies & Interests</h2>
+                        <p class="mt-2 text-muted-foreground">What I enjoy outside of work</p>
+                    </div>
+                    <Button as-child variant="ghost" size="sm">
+                        <Link href="/hobbies">
+                            View All
+                            <ArrowRight class="ml-1 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </div>
+                <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div
+                        v-for="hobby in hobbies.slice(0, 6)"
+                        :key="hobby.id"
+                        class="rounded-lg border border-border/40 bg-background p-5"
+                    >
+                        <div class="flex items-start gap-3">
+                            <div v-if="hobby.icon" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
+                                {{ hobby.icon }}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-medium">{{ hobby.name }}</h3>
+                                    <Badge v-if="hobby.is_featured" variant="secondary" class="text-xs">Featured</Badge>
+                                </div>
+                                <p v-if="hobby.description" class="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                    {{ hobby.description }}
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -5,9 +5,9 @@ namespace App\Filament\Resources\SubscriptionResource\RelationManagers;
 use App\Enums\SubscriptionEventType;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 

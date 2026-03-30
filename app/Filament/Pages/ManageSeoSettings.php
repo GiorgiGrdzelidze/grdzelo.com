@@ -4,15 +4,15 @@ namespace App\Filament\Pages;
 
 use App\Settings\SeoSettings;
 use Filament\Forms;
+use Filament\Pages\SettingsPage;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Pages\SettingsPage;
 
 class ManageSeoSettings extends SettingsPage
 {
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 2;
 

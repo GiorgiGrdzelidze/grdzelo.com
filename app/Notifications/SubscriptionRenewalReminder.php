@@ -27,10 +27,10 @@ class SubscriptionRenewalReminder extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject("Subscription Renewal: {$sub->title}")
-            ->greeting("Subscription Renewal Reminder")
+            ->greeting('Subscription Renewal Reminder')
             ->line("Your subscription **{$sub->title}** is due for renewal.")
             ->line("**Provider:** {$sub->provider}")
-            ->line("**Amount:** {$sub->currency->symbol()}" . number_format((float) $sub->amount, 2))
+            ->line("**Amount:** {$sub->currency->symbol()}".number_format((float) $sub->amount, 2))
             ->line("**Billing Date:** {$sub->next_billing_date->format('M j, Y')}")
             ->line("**Interval:** {$sub->billing_interval->label()}")
             ->action('Manage Subscriptions', url('/admin/subscriptions'))

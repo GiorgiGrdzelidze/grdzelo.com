@@ -9,9 +9,9 @@ use App\Models\SalaryRecord;
 use App\Settings\FinanceSettings;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,9 +19,9 @@ class SalaryRecordResource extends Resource
 {
     protected static ?string $model = SalaryRecord::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?int $navigationSort = 4;
 
@@ -90,12 +90,12 @@ class SalaryRecordResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('employer')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('gross_amount')
-                    ->formatStateUsing(fn (SalaryRecord $record) => $record->currency->symbol() . number_format((float) $record->gross_amount, 2))
+                    ->formatStateUsing(fn (SalaryRecord $record) => $record->currency->symbol().number_format((float) $record->gross_amount, 2))
                     ->sortable()
                     ->label('Gross'),
                 Tables\Columns\TextColumn::make('tax_percentage')->suffix('%')->sortable()->label('Tax %'),
                 Tables\Columns\TextColumn::make('net_amount')
-                    ->formatStateUsing(fn (SalaryRecord $record) => $record->currency->symbol() . number_format((float) $record->net_amount, 2))
+                    ->formatStateUsing(fn (SalaryRecord $record) => $record->currency->symbol().number_format((float) $record->net_amount, 2))
                     ->sortable()
                     ->label('Net'),
                 Tables\Columns\TextColumn::make('pay_frequency')

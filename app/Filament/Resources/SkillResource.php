@@ -6,9 +6,9 @@ use App\Filament\Resources\SkillResource\Pages;
 use App\Models\Skill;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -17,9 +17,9 @@ class SkillResource extends Resource
 {
     protected static ?string $model = Skill::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cpu-chip';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cpu-chip';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Profile';
+    protected static string|\UnitEnum|null $navigationGroup = 'Profile';
 
     protected static ?int $navigationSort = 1;
 

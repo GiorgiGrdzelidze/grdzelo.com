@@ -28,6 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->profile()
+            ->passwordReset()
             ->brandName('grdzelo.com')
             ->colors([
                 'primary' => Color::Zinc,

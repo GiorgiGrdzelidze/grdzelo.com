@@ -8,9 +8,9 @@ use App\Filament\Resources\ExpenseResource\Pages;
 use App\Models\Expense;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -18,9 +18,9 @@ class ExpenseResource extends Resource
 {
     protected static ?string $model = Expense::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-credit-card';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?int $navigationSort = 2;
 
@@ -61,7 +61,7 @@ class ExpenseResource extends Resource
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.title')->sortable()->badge(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->formatStateUsing(fn (Expense $record) => $record->currency->symbol() . number_format((float) $record->amount, 2))
+                    ->formatStateUsing(fn (Expense $record) => $record->currency->symbol().number_format((float) $record->amount, 2))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')->date()->sortable(),
                 Tables\Columns\IconColumn::make('is_recurring')->boolean()->label('Recurring'),

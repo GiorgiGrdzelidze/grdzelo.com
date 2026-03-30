@@ -130,7 +130,7 @@ return [
     |
     */
 
-    'views' => true,
+    'views' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -141,12 +141,15 @@ return [
     | by removing them from this array. You're free to only remove some of
     | these features, or you can even remove all of these if you need to.
     |
+    | Note: Public registration is disabled. Admin login is handled by Filament.
+    | 2FA is kept enabled for Filament panel authentication.
+    |
     */
 
     'features' => [
-        Features::registration(),
-        Features::resetPasswords(),
-        Features::emailVerification(),
+        // Features::registration(), // Disabled - no public registration
+        // Features::resetPasswords(), // Disabled - admin uses Filament
+        // Features::emailVerification(), // Disabled - admin uses Filament
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,

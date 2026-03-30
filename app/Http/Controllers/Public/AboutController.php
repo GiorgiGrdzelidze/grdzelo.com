@@ -35,6 +35,11 @@ class AboutController extends BasePublicController
             ->with('skills:id,name,slug')
             ->get();
 
+        $hobbies = Hobby::query()
+            ->visible()
+            ->ordered()
+            ->get(['id', 'name', 'slug', 'description', 'icon', 'is_featured']);
+
         return Inertia::render('Public/About', [
             ...$this->sharedProps(),
             'seo' => $this->seoFor(null, 'About'),
@@ -42,6 +47,7 @@ class AboutController extends BasePublicController
             'experiences' => $experiences,
             'education' => $education,
             'certifications' => $certifications,
+            'hobbies' => $hobbies,
         ]);
     }
 

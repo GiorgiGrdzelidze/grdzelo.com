@@ -6,9 +6,9 @@ use App\Filament\Resources\SocialLinkResource\Pages;
 use App\Models\SocialLink;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -16,9 +16,9 @@ class SocialLinkResource extends Resource
 {
     protected static ?string $model = SocialLink::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-link';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-link';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Social';
+    protected static string|\UnitEnum|null $navigationGroup = 'Social';
 
     protected static ?int $navigationSort = 1;
 

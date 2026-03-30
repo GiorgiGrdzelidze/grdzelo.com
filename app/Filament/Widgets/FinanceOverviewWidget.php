@@ -52,19 +52,19 @@ class FinanceOverviewWidget extends StatsOverviewWidget
             ->sum(fn (Subscription $s) => $s->monthly_amount);
 
         return [
-            Stat::make('Monthly Income', $symbol . number_format($totalIncome, 2))
-                ->description('In ' . $baseCurrency)
+            Stat::make('Monthly Income', $symbol.number_format($totalIncome, 2))
+                ->description('In '.$baseCurrency)
                 ->icon('heroicon-o-arrow-trending-up')
                 ->color('success'),
-            Stat::make('Monthly Expenses', $symbol . number_format($totalExpenses, 2))
-                ->description('In ' . $baseCurrency)
+            Stat::make('Monthly Expenses', $symbol.number_format($totalExpenses, 2))
+                ->description('In '.$baseCurrency)
                 ->icon('heroicon-o-arrow-trending-down')
                 ->color('danger'),
-            Stat::make('Net Income', $symbol . number_format($netIncome, 2))
+            Stat::make('Net Income', $symbol.number_format($netIncome, 2))
                 ->icon('heroicon-o-banknotes')
                 ->color($netIncome >= 0 ? 'success' : 'danger'),
             Stat::make('Active Subscriptions', (string) $activeSubscriptions)
-                ->description($symbol . number_format($monthlySubCost, 2) . '/mo')
+                ->description($symbol.number_format($monthlySubCost, 2).'/mo')
                 ->icon('heroicon-o-arrow-path')
                 ->color('info'),
         ];

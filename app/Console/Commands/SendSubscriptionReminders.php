@@ -47,6 +47,7 @@ class SendSubscriptionReminders extends Command
         foreach ($reminders as $reminder) {
             if (! $reminder->subscription || ! $reminder->subscription->reminders_enabled) {
                 $reminder->markAsSent();
+
                 continue;
             }
 

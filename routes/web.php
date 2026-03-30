@@ -43,10 +43,6 @@ Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 |--------------------------------------------------------------------------
 | Authenticated Routes
 |--------------------------------------------------------------------------
+| Note: Admin authentication is handled by Filament at /admin.
+| No public auth routes are exposed.
 */
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
-});
-
-require __DIR__.'/settings.php';

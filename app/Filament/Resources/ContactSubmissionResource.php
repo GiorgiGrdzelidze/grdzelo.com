@@ -6,9 +6,9 @@ use App\Filament\Resources\ContactSubmissionResource\Pages;
 use App\Models\ContactSubmission;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -16,9 +16,9 @@ class ContactSubmissionResource extends Resource
 {
     protected static ?string $model = ContactSubmission::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-inbox';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-inbox';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Leads';
+    protected static string|\UnitEnum|null $navigationGroup = 'Leads';
 
     protected static ?int $navigationSort = 1;
 

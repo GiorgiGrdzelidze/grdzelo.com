@@ -10,9 +10,9 @@ use App\Filament\Resources\SubscriptionResource\RelationManagers;
 use App\Models\Subscription;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -20,9 +20,9 @@ class SubscriptionResource extends Resource
 {
     protected static ?string $model = Subscription::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-arrow-path';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-path';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?int $navigationSort = 3;
 
@@ -90,10 +90,10 @@ class SubscriptionResource extends Resource
                         ->content(fn (?Subscription $record) => $record?->ended_at?->format('M j, Y') ?? '—'),
                     Forms\Components\Placeholder::make('monthly_cost')
                         ->label('Monthly Cost')
-                        ->content(fn (?Subscription $record) => $record ? ($record->currency->value . ' ' . number_format($record->monthly_amount, 2)) : '—'),
+                        ->content(fn (?Subscription $record) => $record ? ($record->currency->value.' '.number_format($record->monthly_amount, 2)) : '—'),
                     Forms\Components\Placeholder::make('yearly_cost')
                         ->label('Yearly Cost')
-                        ->content(fn (?Subscription $record) => $record ? ($record->currency->value . ' ' . number_format($record->yearly_amount, 2)) : '—'),
+                        ->content(fn (?Subscription $record) => $record ? ($record->currency->value.' '.number_format($record->yearly_amount, 2)) : '—'),
                 ]),
             ])->columnSpanFull(),
         ]);
@@ -106,7 +106,7 @@ class SubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('provider')->searchable()->toggleable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->formatStateUsing(fn (Subscription $record) => $record->currency->symbol() . number_format((float) $record->amount, 2))
+                    ->formatStateUsing(fn (Subscription $record) => $record->currency->symbol().number_format((float) $record->amount, 2))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('billing_interval')
                     ->badge()

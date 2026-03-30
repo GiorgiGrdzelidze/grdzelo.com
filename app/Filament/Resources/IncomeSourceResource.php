@@ -6,12 +6,13 @@ use App\Enums\BillingInterval;
 use App\Enums\Currency;
 use App\Enums\IncomeType;
 use App\Filament\Resources\IncomeSourceResource\Pages;
+use App\Filament\Resources\IncomeSourceResource\RelationManagers\EntriesRelationManager;
 use App\Models\IncomeSource;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,9 +20,9 @@ class IncomeSourceResource extends Resource
 {
     protected static ?string $model = IncomeSource::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?int $navigationSort = 1;
 
@@ -67,7 +68,7 @@ class IncomeSourceResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn (IncomeType $state) => $state->label()),
                 Tables\Columns\TextColumn::make('amount')
-                    ->formatStateUsing(fn (IncomeSource $record) => $record->currency->symbol() . number_format((float) $record->amount, 2))
+                    ->formatStateUsing(fn (IncomeSource $record) => $record->currency->symbol().number_format((float) $record->amount, 2))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('interval')->toggleable(),
                 Tables\Columns\IconColumn::make('is_recurring')->boolean()->label('Recurring'),
@@ -86,7 +87,7 @@ class IncomeSourceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\IncomeSourceResource\RelationManagers\EntriesRelationManager::class,
+            EntriesRelationManager::class,
         ];
     }
 

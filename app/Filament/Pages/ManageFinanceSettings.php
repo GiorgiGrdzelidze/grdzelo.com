@@ -5,15 +5,15 @@ namespace App\Filament\Pages;
 use App\Enums\Currency;
 use App\Settings\FinanceSettings;
 use Filament\Forms;
+use Filament\Pages\SettingsPage;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Pages\SettingsPage;
 
 class ManageFinanceSettings extends SettingsPage
 {
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calculator';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calculator';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 3;
 
