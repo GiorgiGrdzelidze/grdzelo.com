@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Models;
+
+use App\Concerns\HasSeoFields;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class Hobby extends Model implements HasMedia
+{
+    use HasFactory, HasSeoFields, InteractsWithMedia;
+
+    protected $guarded = ['id'];
+
+    protected function casts(): array
+    {
+        return [
+            'gallery' => 'array',
+            'is_featured' => 'boolean',
+            'is_visible' => 'boolean',
+        ];
+    }
+
+    public function scopeVisible($query)
+    {
+        return $query->where('is_visible', true);
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
+        $this->addMediaCollection('gallery');
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+}

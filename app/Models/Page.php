@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use App\Concerns\HasPublishState;
+use App\Concerns\HasSeoFields;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class Page extends Model implements HasMedia
+{
+    use HasFactory, HasPublishState, HasSeoFields, InteractsWithMedia;
+
+    protected $guarded = ['id'];
+
+    protected function casts(): array
+    {
+        return [
+            'gallery' => 'array',
+            'schema_json' => 'array',
+            'publish_at' => 'datetime',
+            'nav_visible' => 'boolean',
+            'noindex' => 'boolean',
+            'nofollow' => 'boolean',
+        ];
+    }
+
+    public function scopeNavigable($query)
+    {
+        return $query->where('nav_visible', true)->orderBy('sort_order');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('featured_image')->singleFile();
+        $this->addMediaCollection('gallery');
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+}
