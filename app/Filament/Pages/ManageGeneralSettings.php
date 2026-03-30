@@ -56,6 +56,28 @@ class ManageGeneralSettings extends SettingsPage
                         ->rows(4)
                         ->helperText('Paste verification meta tags here'),
                 ]),
+                Schemas\Components\Tabs\Tab::make('Branding')->schema([
+                    Forms\Components\FileUpload::make('logo')
+                        ->label('Main Logo')
+                        ->image()
+                        ->directory('branding')
+                        ->helperText('Primary logo for light backgrounds'),
+                    Forms\Components\FileUpload::make('logo_dark')
+                        ->label('Dark Mode Logo')
+                        ->image()
+                        ->directory('branding')
+                        ->helperText('Logo variant for dark backgrounds'),
+                    Forms\Components\FileUpload::make('logo_icon')
+                        ->label('Icon/Mark')
+                        ->image()
+                        ->directory('branding')
+                        ->helperText('Square icon or logomark'),
+                    Forms\Components\FileUpload::make('favicon')
+                        ->label('Favicon')
+                        ->image()
+                        ->directory('branding')
+                        ->helperText('Site favicon (recommended: 32x32 or 64x64)'),
+                ]),
             ])->columnSpanFull(),
         ]);
     }

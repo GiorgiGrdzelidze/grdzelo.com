@@ -73,8 +73,8 @@ class ExpenseResource extends Resource
                     ->label('Category'),
                 Tables\Filters\TernaryFilter::make('is_recurring')->label('Recurring'),
             ])
-            ->actions([Actions\EditAction::make()])
-            ->bulkActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
+            ->recordActions([Actions\EditAction::make()])
+            ->toolbarActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
     }
 
     public static function getPages(): array

@@ -5,6 +5,8 @@ use App\Http\Controllers\Public\ArticleController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
+use App\Http\Controllers\Public\GalleryController;
+use App\Http\Controllers\Public\RepositoryController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,11 @@ Route::get('/blog', [ArticleController::class, 'index'])->name('blog.index');
 Route::get('/blog/{article}', [ArticleController::class, 'show'])->name('blog.show');
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+
+Route::get('/repositories', [RepositoryController::class, 'index'])->name('repositories.index');
+
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('/gallery/{album}', [GalleryController::class, 'show'])->name('gallery.show');
 
 Route::get('/about', [AboutController::class, 'about'])->name('about');
 Route::get('/skills', [AboutController::class, 'skills'])->name('skills');

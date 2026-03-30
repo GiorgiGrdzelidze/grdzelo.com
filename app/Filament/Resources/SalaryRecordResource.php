@@ -108,8 +108,8 @@ class SalaryRecordResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
             ])
-            ->actions([Actions\EditAction::make()])
-            ->bulkActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
+            ->recordActions([Actions\EditAction::make()])
+            ->toolbarActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
     }
 
     public static function getPages(): array

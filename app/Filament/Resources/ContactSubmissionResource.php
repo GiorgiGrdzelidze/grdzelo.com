@@ -98,7 +98,7 @@ class ContactSubmissionResource extends Resource
                         'spam' => 'Spam',
                     ]),
             ])
-            ->actions([
+            ->recordActions([
                 Actions\EditAction::make(),
                 Actions\Action::make('markRead')
                     ->label('Mark Read')
@@ -107,7 +107,7 @@ class ContactSubmissionResource extends Resource
                     ->visible(fn (ContactSubmission $record) => $record->status === 'new')
                     ->requiresConfirmation(false),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make(),
                     Actions\BulkAction::make('markSpam')

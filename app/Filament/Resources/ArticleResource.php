@@ -146,8 +146,8 @@ class ArticleResource extends Resource
                     ->label('Category'),
                 Tables\Filters\TernaryFilter::make('is_featured')->label('Featured'),
             ])
-            ->actions([Actions\EditAction::make()])
-            ->bulkActions([
+            ->recordActions([Actions\EditAction::make()])
+            ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
     }

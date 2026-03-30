@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\Currency;
 use App\Models\Expense;
 use App\Models\IncomeEntry;
+use App\Models\SalaryRecord;
 use App\Models\Subscription;
 use App\Settings\FinanceSettings;
 use Filament\Widgets\StatsOverviewWidget;
@@ -22,51 +23,81 @@ class FinanceOverviewWidget extends StatsOverviewWidget
 
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
+        $startOfYear = Carbon::now()->startOfYear();
 
-        $monthlyIncome = IncomeEntry::whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->where('currency', $baseCurrency)
-            ->sum('amount');
+        $monthlyIncome = $this->sumWithConversion(
+            IncomeEntry::whereBetween('date', [$startOfMonth, $endOfMonth])->where('is_received', true),
+            $baseCurrency
+        );
 
-        $monthlyIncomeConverted = IncomeEntry::whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->where('currency', '!=', $baseCurrency)
-            ->whereNotNull('base_amount')
-            ->sum('base_amount');
+        $monthlyExpenses = $this->sumWithConversion(
+            Expense::whereBetween('date', [$startOfMonth, $endOfMonth]),
+            $baseCurrency
+        );
 
-        $totalIncome = $monthlyIncome + $monthlyIncomeConverted;
+        $netIncome = $monthlyIncome - $monthlyExpenses;
 
-        $monthlyExpenses = Expense::whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->where('currency', $baseCurrency)
-            ->sum('amount');
+        $ytdIncome = $this->sumWithConversion(
+            IncomeEntry::whereBetween('date', [$startOfYear, $endOfMonth])->where('is_received', true),
+            $baseCurrency
+        );
 
-        $monthlyExpensesConverted = Expense::whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->where('currency', '!=', $baseCurrency)
-            ->whereNotNull('base_amount')
-            ->sum('base_amount');
-
-        $totalExpenses = $monthlyExpenses + $monthlyExpensesConverted;
-        $netIncome = $totalIncome - $totalExpenses;
+        $ytdExpenses = $this->sumWithConversion(
+            Expense::whereBetween('date', [$startOfYear, $endOfMonth]),
+            $baseCurrency
+        );
 
         $activeSubscriptions = Subscription::active()->count();
-        $monthlySubCost = Subscription::active()
-            ->get()
-            ->sum(fn (Subscription $s) => $s->monthly_amount);
+        $upcomingRenewals = Subscription::upcomingRenewal(7)->count();
+
+        $activeSalaryTax = SalaryRecord::active()
+            ->where('currency', $baseCurrency)
+            ->sum('tax_amount');
 
         return [
-            Stat::make('Monthly Income', $symbol.number_format($totalIncome, 2))
-                ->description('In '.$baseCurrency)
+            Stat::make('Monthly Income', $symbol . number_format($monthlyIncome, 2))
+                ->description('Received this month')
                 ->icon('heroicon-o-arrow-trending-up')
                 ->color('success'),
-            Stat::make('Monthly Expenses', $symbol.number_format($totalExpenses, 2))
-                ->description('In '.$baseCurrency)
+
+            Stat::make('Monthly Expenses', $symbol . number_format($monthlyExpenses, 2))
+                ->description('Spent this month')
                 ->icon('heroicon-o-arrow-trending-down')
                 ->color('danger'),
-            Stat::make('Net Income', $symbol.number_format($netIncome, 2))
+
+            Stat::make('Monthly Net', $symbol . number_format($netIncome, 2))
+                ->description($netIncome >= 0 ? 'Positive cash flow' : 'Negative cash flow')
                 ->icon('heroicon-o-banknotes')
                 ->color($netIncome >= 0 ? 'success' : 'danger'),
-            Stat::make('Active Subscriptions', (string) $activeSubscriptions)
-                ->description($symbol.number_format($monthlySubCost, 2).'/mo')
+
+            Stat::make('YTD Net', $symbol . number_format($ytdIncome - $ytdExpenses, 2))
+                ->description('Year-to-date')
+                ->icon('heroicon-o-calendar')
+                ->color(($ytdIncome - $ytdExpenses) >= 0 ? 'success' : 'danger'),
+
+            Stat::make('Subscriptions', (string) $activeSubscriptions)
+                ->description($upcomingRenewals > 0 ? $upcomingRenewals . ' renewing soon' : 'Active')
                 ->icon('heroicon-o-arrow-path')
-                ->color('info'),
+                ->color($upcomingRenewals > 0 ? 'warning' : 'info'),
+
+            Stat::make('Monthly Tax', $symbol . number_format($activeSalaryTax, 2))
+                ->description('From active salaries')
+                ->icon('heroicon-o-receipt-percent')
+                ->color('gray'),
         ];
+    }
+
+    protected function sumWithConversion($query, string $baseCurrency): float
+    {
+        $baseSum = (clone $query)
+            ->where('currency', $baseCurrency)
+            ->sum('amount');
+
+        $convertedSum = (clone $query)
+            ->where('currency', '!=', $baseCurrency)
+            ->whereNotNull('base_amount')
+            ->sum('base_amount');
+
+        return (float) $baseSum + (float) $convertedSum;
     }
 }

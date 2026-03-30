@@ -236,10 +236,10 @@ class ProjectResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label('Featured'),
             ])
-            ->actions([
+            ->recordActions([
                 Actions\EditAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make(),
                 ]),

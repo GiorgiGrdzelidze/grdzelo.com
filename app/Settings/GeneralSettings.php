@@ -36,6 +36,14 @@ class GeneralSettings extends Settings
 
     public array $budget_ranges;
 
+    public string $logo;
+
+    public string $logo_dark;
+
+    public string $logo_icon;
+
+    public string $favicon;
+
     public static function group(): string
     {
         return 'general';

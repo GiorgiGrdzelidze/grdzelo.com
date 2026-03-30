@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\SocialLink;
 use App\Settings\GeneralSettings;
 use App\Settings\SeoSettings;
 
@@ -26,7 +27,11 @@ abstract class BasePublicController extends Controller
                 'default_cta_text' => $general->default_cta_text,
                 'default_cta_url' => $general->default_cta_url,
                 'contact_form_enabled' => $general->contact_form_enabled,
+                'logo' => $general->logo,
+                'logo_dark' => $general->logo_dark,
+                'logo_icon' => $general->logo_icon,
             ],
+            'socialLinks' => SocialLink::visible()->ordered()->get(['platform', 'label', 'url', 'username', 'icon']),
             'seoDefaults' => [
                 'title' => $seo->default_title,
                 'title_template' => $seo->title_template,

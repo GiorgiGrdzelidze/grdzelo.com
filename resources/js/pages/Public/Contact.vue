@@ -14,6 +14,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
+interface SocialLinkItem {
+    platform: string;
+    label: string | null;
+    url: string;
+    username: string | null;
+    icon: string | null;
+}
+
 interface Props {
     settings: Record<string, any>;
     budgetRanges: string[] | null;
@@ -23,6 +31,7 @@ defineProps<Props>();
 const page = usePage();
 
 const flash = computed(() => (page.props.flash as Record<string, string> | undefined));
+const socialLinks = computed(() => page.props.socialLinks as SocialLinkItem[] | undefined);
 
 const form = useForm({
     name: '',
@@ -90,6 +99,25 @@ function submit() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    <!-- Social Links -->
+                    <div v-if="socialLinks?.length" class="pt-4">
+                        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">Connect</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <a
+                                v-for="link in socialLinks"
+                                :key="link.url"
+                                :href="link.url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-2 rounded-lg border border-border/40 bg-background px-4 py-2.5 text-sm transition-colors hover:bg-accent"
+                                :aria-label="link.label || link.platform"
+                            >
+                                <i v-if="link.icon" :class="link.icon" class="text-lg" />
+                                <span>{{ link.label || link.platform }}</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Contact Form -->

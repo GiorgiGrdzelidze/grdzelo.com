@@ -126,7 +126,7 @@ class SubscriptionResource extends Resource
                 Tables\Filters\SelectFilter::make('currency')
                     ->options(Currency::options()),
             ])
-            ->actions([
+            ->recordActions([
                 Actions\EditAction::make(),
                 Actions\Action::make('pause')
                     ->icon('heroicon-o-pause')
@@ -147,7 +147,7 @@ class SubscriptionResource extends Resource
                     ->visible(fn (Subscription $record) => in_array($record->status, [SubscriptionStatus::Active, SubscriptionStatus::Paused]))
                     ->action(fn (Subscription $record) => $record->cancel()),
             ])
-            ->bulkActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
+            ->toolbarActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
     }
 
     public static function getRelations(): array

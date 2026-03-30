@@ -38,7 +38,7 @@ class EntriesRelationManager extends RelationManager
             ])
             ->defaultSort('date', 'desc')
             ->headerActions([Actions\CreateAction::make()])
-            ->actions([Actions\EditAction::make(), Actions\DeleteAction::make()])
-            ->bulkActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
+            ->recordActions([Actions\EditAction::make(), Actions\DeleteAction::make()])
+            ->toolbarActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
     }
 }

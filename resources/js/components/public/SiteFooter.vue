@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { Github, Linkedin, Twitter } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+
+interface SocialLinkItem {
+    platform: string;
+    label: string | null;
+    url: string;
+    username: string | null;
+    icon: string | null;
+}
 
 interface Props {
     settings?: Record<string, any>;
 }
 
 defineProps<Props>();
+
+const page = usePage();
+const socialLinks = page.props.socialLinks as SocialLinkItem[] | undefined;
 
 const footerNav = [
     {
@@ -71,33 +81,18 @@ const footerNav = [
                     {{ settings?.copyright_text || `© ${new Date().getFullYear()} grdzelo.com. All rights reserved.` }}
                 </p>
 
-                <div class="flex items-center gap-3">
+                <div v-if="socialLinks?.length" class="flex items-center gap-3">
                     <a
-                        href="https://github.com"
+                        v-for="link in socialLinks"
+                        :key="link.url"
+                        :href="link.url"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="text-muted-foreground transition-colors hover:text-foreground"
-                        aria-label="GitHub"
+                        :aria-label="link.label || link.platform"
                     >
-                        <Github class="h-4 w-4" />
-                    </a>
-                    <a
-                        href="https://linkedin.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-muted-foreground transition-colors hover:text-foreground"
-                        aria-label="LinkedIn"
-                    >
-                        <Linkedin class="h-4 w-4" />
-                    </a>
-                    <a
-                        href="https://twitter.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-muted-foreground transition-colors hover:text-foreground"
-                        aria-label="Twitter"
-                    >
-                        <Twitter class="h-4 w-4" />
+                        <i v-if="link.icon" :class="link.icon" class="text-base" />
+                        <span v-else class="text-sm">{{ link.platform }}</span>
                     </a>
                 </div>
             </div>
