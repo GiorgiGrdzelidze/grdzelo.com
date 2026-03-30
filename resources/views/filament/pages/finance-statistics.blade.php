@@ -72,7 +72,7 @@
                     </div>
                     <div>
                         <p class="fi-stat-label">Monthly Income</p>
-                        <p class="fi-stat-value fi-text-success">{{ $baseSymbol }}{{ number_format($monthlyStats['income'], 2) }}</p>
+                        <p class="fi-stat-value fi-text-success">{{ $baseCurrencyEnum?->format($monthlyStats['income']) ?? number_format($monthlyStats['income'], 2) }}</p>
                     </div>
                 </div>
             </x-filament::section>
@@ -84,7 +84,7 @@
                     </div>
                     <div>
                         <p class="fi-stat-label">Monthly Expenses</p>
-                        <p class="fi-stat-value fi-text-danger">{{ $baseSymbol }}{{ number_format($monthlyStats['expenses'], 2) }}</p>
+                        <p class="fi-stat-value fi-text-danger">{{ $baseCurrencyEnum?->format($monthlyStats['expenses']) ?? number_format($monthlyStats['expenses'], 2) }}</p>
                     </div>
                 </div>
             </x-filament::section>
@@ -96,7 +96,7 @@
                     </div>
                     <div>
                         <p class="fi-stat-label">Monthly Net</p>
-                        <p class="fi-stat-value {{ $monthlyStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseSymbol }}{{ number_format($monthlyStats['net'], 2) }}</p>
+                        <p class="fi-stat-value {{ $monthlyStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($monthlyStats['net']) ?? number_format($monthlyStats['net'], 2) }}</p>
                     </div>
                 </div>
             </x-filament::section>
@@ -109,7 +109,7 @@
                     <div>
                         <p class="fi-stat-label">Active Subscriptions</p>
                         <p class="fi-stat-value">{{ $subscriptionStats['active_count'] }}</p>
-                        <p class="fi-stat-desc">{{ $baseSymbol }}{{ number_format($subscriptionStats['monthly_total'], 2) }}/mo</p>
+                        <p class="fi-stat-desc">{{ $baseCurrencyEnum?->format($subscriptionStats['monthly_total']) ?? number_format($subscriptionStats['monthly_total'], 2) }}/mo</p>
                     </div>
                 </div>
             </x-filament::section>
@@ -127,15 +127,15 @@
             <div class="fi-grid-3">
                 <div class="fi-text-center">
                     <p class="fi-stat-label">Total Income</p>
-                    <p class="fi-stat-value-lg fi-text-success">{{ $baseSymbol }}{{ number_format($yearlyStats['income'], 2) }}</p>
+                    <p class="fi-stat-value-lg fi-text-success">{{ $baseCurrencyEnum?->format($yearlyStats['income']) }}</p>
                 </div>
                 <div class="fi-text-center">
                     <p class="fi-stat-label">Total Expenses</p>
-                    <p class="fi-stat-value-lg fi-text-danger">{{ $baseSymbol }}{{ number_format($yearlyStats['expenses'], 2) }}</p>
+                    <p class="fi-stat-value-lg fi-text-danger">{{ $baseCurrencyEnum?->format($yearlyStats['expenses']) }}</p>
                 </div>
                 <div class="fi-text-center">
                     <p class="fi-stat-label">Net Income</p>
-                    <p class="fi-stat-value-lg {{ $yearlyStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseSymbol }}{{ number_format($yearlyStats['net'], 2) }}</p>
+                    <p class="fi-stat-value-lg {{ $yearlyStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($yearlyStats['net']) }}</p>
                 </div>
             </div>
         </x-filament::section>
@@ -155,7 +155,7 @@
                         @foreach($incomeByType as $item)
                             <div class="fi-flex-between">
                                 <span class="fi-badge fi-badge-primary">{{ $item['type'] }}</span>
-                                <span class="fi-font-semibold">{{ $baseSymbol }}{{ number_format($item['amount'], 2) }}</span>
+                                <span class="fi-font-semibold">{{ $baseCurrencyEnum?->format($item['amount']) }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -176,15 +176,15 @@
                 <div class="fi-space-y-4">
                     <div class="fi-flex-between fi-text-sm">
                         <span class="fi-text-muted">Expected</span>
-                        <span class="fi-font-medium">{{ $baseSymbol }}{{ number_format($expectedVsReceived['expected'], 2) }}</span>
+                        <span class="fi-font-medium">{{ $baseCurrencyEnum?->format($expectedVsReceived['expected']) }}</span>
                     </div>
                     <div class="fi-flex-between fi-text-sm">
                         <span class="fi-text-muted">Received</span>
-                        <span class="fi-font-medium fi-text-success">{{ $baseSymbol }}{{ number_format($expectedVsReceived['received'], 2) }}</span>
+                        <span class="fi-font-medium fi-text-success">{{ $baseCurrencyEnum?->format($expectedVsReceived['received']) }}</span>
                     </div>
                     <div class="fi-flex-between fi-text-sm">
                         <span class="fi-text-muted">Outstanding</span>
-                        <span class="fi-font-medium {{ $expectedVsReceived['outstanding'] > 0 ? 'fi-text-warning' : 'fi-text-success' }}">{{ $baseSymbol }}{{ number_format($expectedVsReceived['outstanding'], 2) }}</span>
+                        <span class="fi-font-medium {{ $expectedVsReceived['outstanding'] > 0 ? 'fi-text-warning' : 'fi-text-success' }}">{{ $baseCurrencyEnum?->format($expectedVsReceived['outstanding']) }}</span>
                     </div>
                     <div>
                         <div class="fi-flex-between fi-text-xs fi-text-muted" style="margin-bottom: 0.25rem;">
@@ -217,15 +217,15 @@
                                 <div class="fi-grid-3 fi-text-center">
                                     <div>
                                         <p class="fi-text-xs fi-text-muted">Gross</p>
-                                        <p class="fi-font-semibold">{{ \App\Enums\Currency::tryFrom($currency)?->symbol() }}{{ number_format($amounts['gross'], 2) }}</p>
+                                        <p class="fi-font-semibold">{{ \App\Enums\Currency::tryFrom($currency)?->format($amounts['gross']) }}</p>
                                     </div>
                                     <div>
                                         <p class="fi-text-xs fi-text-muted">Tax</p>
-                                        <p class="fi-font-semibold fi-text-danger">{{ \App\Enums\Currency::tryFrom($currency)?->symbol() }}{{ number_format($amounts['tax'], 2) }}</p>
+                                        <p class="fi-font-semibold fi-text-danger">{{ \App\Enums\Currency::tryFrom($currency)?->format($amounts['tax']) }}</p>
                                     </div>
                                     <div>
                                         <p class="fi-text-xs fi-text-muted">Net</p>
-                                        <p class="fi-font-semibold fi-text-success">{{ \App\Enums\Currency::tryFrom($currency)?->symbol() }}{{ number_format($amounts['net'], 2) }}</p>
+                                        <p class="fi-font-semibold fi-text-success">{{ \App\Enums\Currency::tryFrom($currency)?->format($amounts['net']) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -261,15 +261,28 @@
                         </div>
                     </div>
 
-                    @if(count($subscriptionStats['monthly_by_currency']) > 0)
+                    @if(isset($subscriptionStats['total_spent_since_start']) && $subscriptionStats['total_spent_since_start'] > 0)
                         <div class="fi-border-t">
-                            <p class="fi-text-sm fi-font-medium fi-text-muted" style="margin-bottom: 0.5rem;">Monthly Cost by Currency</p>
-                            @foreach($subscriptionStats['monthly_by_currency'] as $currency => $amount)
+                            <div class="fi-flex-between fi-text-sm">
+                                <span class="fi-text-muted">Total Spent (All Time)</span>
+                                <span class="fi-font-bold fi-text-danger">{{ $baseCurrencyEnum?->format($subscriptionStats['total_spent_since_start']) }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if(count($subscriptionStats['monthly_by_currency_converted'] ?? []) > 0)
+                        <div class="fi-border-t">
+                            <p class="fi-text-sm fi-font-medium fi-text-muted" style="margin-bottom: 0.5rem;">Monthly Cost (in {{ $baseCurrency }})</p>
+                            @foreach($subscriptionStats['monthly_by_currency_converted'] as $currency => $data)
                                 <div class="fi-flex-between fi-text-sm">
                                     <span>{{ $currency }}</span>
-                                    <span class="fi-font-medium">{{ \App\Enums\Currency::tryFrom($currency)?->symbol() }}{{ number_format($amount, 2) }}/mo</span>
+                                    <span class="fi-font-medium">{{ $baseCurrencyEnum?->format($data['converted']) }}/mo</span>
                                 </div>
                             @endforeach
+                            <div class="fi-flex-between fi-text-sm fi-font-bold" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(107, 114, 128, 0.2);">
+                                <span>Total</span>
+                                <span class="fi-text-danger">{{ $baseCurrencyEnum?->format($subscriptionStats['monthly_total']) ?? number_format($subscriptionStats['monthly_total'], 2) }}/mo</span>
+                            </div>
                         </div>
                     @endif
 
@@ -300,7 +313,7 @@
                                 <p class="fi-font-medium">{{ $item['category'] }}</p>
                                 <p class="fi-text-xs fi-text-muted">{{ $item['count'] }} expense(s)</p>
                             </div>
-                            <span class="fi-font-semibold fi-text-danger">{{ $baseSymbol }}{{ number_format($item['amount'], 2) }}</span>
+                            <span class="fi-font-semibold fi-text-danger">{{ $baseCurrencyEnum?->format($item['amount']) }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -332,9 +345,9 @@
                         @foreach($monthlyTrend as $month)
                             <tr>
                                 <td class="fi-font-medium">{{ $month['month'] }}</td>
-                                <td class="fi-text-right fi-text-success">{{ $baseSymbol }}{{ number_format($month['income'], 2) }}</td>
-                                <td class="fi-text-right fi-text-danger">{{ $baseSymbol }}{{ number_format($month['expenses'], 2) }}</td>
-                                <td class="fi-text-right fi-font-semibold {{ $month['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseSymbol }}{{ number_format($month['net'], 2) }}</td>
+                                <td class="fi-text-right fi-text-success">{{ $baseCurrencyEnum?->format($month['income']) }}</td>
+                                <td class="fi-text-right fi-text-danger">{{ $baseCurrencyEnum?->format($month['expenses']) }}</td>
+                                <td class="fi-text-right fi-font-semibold {{ $month['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($month['net']) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

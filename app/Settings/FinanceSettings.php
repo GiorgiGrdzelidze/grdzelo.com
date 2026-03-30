@@ -8,6 +8,8 @@ class FinanceSettings extends Settings
 {
     public string $base_currency;
 
+    public ?string $statistics_currency;
+
     public array $supported_currencies;
 
     public float $default_tax_percentage;

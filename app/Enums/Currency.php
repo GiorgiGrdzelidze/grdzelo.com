@@ -26,6 +26,25 @@ enum Currency: string
         };
     }
 
+    public function symbolPosition(): string
+    {
+        return match ($this) {
+            self::GEL => 'right',
+            self::USD => 'left',
+            self::EUR => 'left',
+        };
+    }
+
+    public function format(float $amount, int $decimals = 2): string
+    {
+        $formatted = number_format($amount, $decimals);
+
+        return match ($this->symbolPosition()) {
+            'right' => $formatted . ' ' . $this->symbol(),
+            default => $this->symbol() . $formatted,
+        };
+    }
+
     public static function options(): array
     {
         return collect(self::cases())

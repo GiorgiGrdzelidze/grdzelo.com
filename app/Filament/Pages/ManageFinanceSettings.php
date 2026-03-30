@@ -28,7 +28,11 @@ class ManageFinanceSettings extends SettingsPage
                 Forms\Components\Select::make('base_currency')
                     ->options(Currency::options())
                     ->required()
-                    ->helperText('All reporting will be normalized to this currency'),
+                    ->helperText('Default currency for new entries'),
+                Forms\Components\Select::make('statistics_currency')
+                    ->options(Currency::options())
+                    ->default('GEL')
+                    ->helperText('Currency used for statistics page (all amounts will be converted to this)'),
                 Forms\Components\TagsInput::make('supported_currencies')
                     ->placeholder('Add currency code (e.g. USD)')
                     ->helperText('Currencies available for selection in finance forms'),
