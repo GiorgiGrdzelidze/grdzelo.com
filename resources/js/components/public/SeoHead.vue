@@ -55,12 +55,8 @@ const schemaScript = props.schema
         <meta v-if="twitter?.image" name="twitter:image" :content="twitter.image" />
 
         <!-- JSON-LD -->
-        <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
-        <component
-            v-if="schemaScript"
-            :is="'script'"
-            type="application/ld+json"
-            v-text="schemaScript"
-        />
+        <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+        <component v-if="schemaScript" :is="'script'" type="application/ld+json" v-text="schemaScript" />
+        <!-- eslint-enable vue/no-v-text-v-html-on-component -->
     </Head>
 </template>

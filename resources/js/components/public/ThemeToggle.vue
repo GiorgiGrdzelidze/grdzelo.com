@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAppearance } from '@/composables/useAppearance';
 import { Monitor, Moon, Sun } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,8 +7,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAppearance } from '@/composables/useAppearance';
 
-const { appearance, updateAppearance } = useAppearance();
+const { updateAppearance } = useAppearance();
 </script>
 
 <template>

@@ -3,7 +3,7 @@ import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import SettingsLayout from '@/layouts/settings/Layout.vue'; // eslint-disable-line import/order
+import SettingsLayout from '@/layouts/settings/Layout.vue';  
 
 const appName = import.meta.env.VITE_APP_NAME || 'grdzelo.com';
 
