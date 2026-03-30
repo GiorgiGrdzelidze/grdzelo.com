@@ -170,3 +170,15 @@
         @apply bg-background text-foreground;
     }
 }
+
+@font-face {
+    font-family: 'Rammstein';
+    src: url('../fonts/rammstein.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+.font-rammstein {
+    font-family: 'Rammstein', sans-serif;
+}
