@@ -107,13 +107,14 @@ function formatDate(date: string): string {
                         :key="skill.id"
                         class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4"
                     >
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
-                            {{ skill.proficiency_score }}%
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
+                            {{ skill.icon || '🔧' }}
                         </div>
-                        <div class="min-w-0">
+                        <div class="min-w-0 flex-1">
                             <p class="truncate font-medium">{{ skill.name }}</p>
                             <p v-if="skill.category" class="truncate text-xs text-muted-foreground">{{ skill.category }}</p>
                         </div>
+                        <span class="text-xs font-medium text-muted-foreground">{{ skill.proficiency_score }}%</span>
                     </div>
                 </div>
             </div>
