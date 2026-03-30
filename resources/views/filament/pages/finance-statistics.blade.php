@@ -60,9 +60,54 @@
         .dark .fi-alert-warning { color: rgb(252, 211, 77); }
         .fi-border-t { border-top: 1px solid rgb(229, 231, 235); padding-top: 1rem; margin-top: 1rem; }
         .dark .fi-border-t { border-color: rgb(55, 65, 81); }
+        .fi-period-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(99, 102, 241, 0.1); color: rgb(99, 102, 241); border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .fi-filter-input { width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.375rem; border: 1px solid rgb(209, 213, 219); background: rgb(255, 255, 255); color: rgb(17, 24, 39); font-size: 0.875rem; }
+        .fi-filter-input:focus { outline: none; border-color: rgb(99, 102, 241); box-shadow: 0 0 0 1px rgb(99, 102, 241); }
+        .dark .fi-filter-input { background: rgb(55, 65, 81); border-color: rgb(75, 85, 99); color: rgb(243, 244, 246); }
+        .dark .fi-filter-input:focus { border-color: rgb(99, 102, 241); }
+        .dark .fi-filter-input option { background: rgb(55, 65, 81); color: rgb(243, 244, 246); }
     </style>
 
     <div class="fi-space-y-6">
+        {{-- Filters --}}
+        <x-filament::section>
+            <x-slot name="heading">
+                <span class="fi-section-heading">
+                    <x-filament::icon icon="heroicon-o-funnel" />
+                    Filters
+                </span>
+            </x-slot>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; align-items: end;">
+                <div>
+                    <label class="fi-text-sm fi-font-medium fi-text-muted" style="display: block; margin-bottom: 0.5rem;">Period</label>
+                    <select wire:model.live="period" class="fi-filter-input">
+                        @foreach($this->getPeriodOptions() as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                @if($this->period === 'custom')
+                    <div>
+                        <label class="fi-text-sm fi-font-medium fi-text-muted" style="display: block; margin-bottom: 0.5rem;">From</label>
+                        <input type="date" wire:model.live="dateFrom" class="fi-filter-input">
+                    </div>
+                    <div>
+                        <label class="fi-text-sm fi-font-medium fi-text-muted" style="display: block; margin-bottom: 0.5rem;">To</label>
+                        <input type="date" wire:model.live="dateTo" class="fi-filter-input">
+                    </div>
+                @endif
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <span class="fi-period-badge">
+                    <x-filament::icon icon="heroicon-o-calendar" style="width: 1rem; height: 1rem;" />
+                    {{ $periodLabel }}: {{ $periodStart }} - {{ $periodEnd }}
+                </span>
+            </div>
+        </x-filament::section>
+
         {{-- Top Summary Cards --}}
         <div class="fi-stats-grid">
             <x-filament::section>
@@ -71,8 +116,8 @@
                         <x-filament::icon icon="heroicon-o-arrow-trending-up" class="fi-text-success" />
                     </div>
                     <div>
-                        <p class="fi-stat-label">Monthly Income</p>
-                        <p class="fi-stat-value fi-text-success">{{ $baseCurrencyEnum?->format($monthlyStats['income']) ?? number_format($monthlyStats['income'], 2) }}</p>
+                        <p class="fi-stat-label">Income ({{ $periodLabel }})</p>
+                        <p class="fi-stat-value fi-text-success">{{ $baseCurrencyEnum?->format($periodStats['income']) }}</p>
                     </div>
                 </div>
             </x-filament::section>
@@ -83,20 +128,20 @@
                         <x-filament::icon icon="heroicon-o-arrow-trending-down" class="fi-text-danger" />
                     </div>
                     <div>
-                        <p class="fi-stat-label">Monthly Expenses</p>
-                        <p class="fi-stat-value fi-text-danger">{{ $baseCurrencyEnum?->format($monthlyStats['expenses']) ?? number_format($monthlyStats['expenses'], 2) }}</p>
+                        <p class="fi-stat-label">Expenses ({{ $periodLabel }})</p>
+                        <p class="fi-stat-value fi-text-danger">{{ $baseCurrencyEnum?->format($periodStats['expenses']) }}</p>
                     </div>
                 </div>
             </x-filament::section>
 
             <x-filament::section>
                 <div class="fi-stat-card">
-                    <div class="fi-stat-icon {{ $monthlyStats['net'] >= 0 ? 'fi-bg-success' : 'fi-bg-danger' }}">
-                        <x-filament::icon icon="heroicon-o-banknotes" class="{{ $monthlyStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}" />
+                    <div class="fi-stat-icon {{ $periodStats['net'] >= 0 ? 'fi-bg-success' : 'fi-bg-danger' }}">
+                        <x-filament::icon icon="heroicon-o-banknotes" class="{{ $periodStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}" />
                     </div>
                     <div>
-                        <p class="fi-stat-label">Monthly Net</p>
-                        <p class="fi-stat-value {{ $monthlyStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($monthlyStats['net']) ?? number_format($monthlyStats['net'], 2) }}</p>
+                        <p class="fi-stat-label">Net ({{ $periodLabel }})</p>
+                        <p class="fi-stat-value {{ $periodStats['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($periodStats['net']) }}</p>
                     </div>
                 </div>
             </x-filament::section>
@@ -141,12 +186,12 @@
         </x-filament::section>
 
         <div class="fi-stats-grid-2">
-            {{-- Income by Type (YTD) --}}
+            {{-- Income by Type --}}
             <x-filament::section>
                 <x-slot name="heading">
                     <span class="fi-section-heading">
                         <x-filament::icon icon="heroicon-o-chart-pie" />
-                        Income by Type (YTD)
+                        Income by Type ({{ $periodLabel }})
                     </span>
                 </x-slot>
 
@@ -160,7 +205,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p class="fi-text-muted fi-text-sm">No income recorded this year.</p>
+                    <p class="fi-text-muted fi-text-sm">No income recorded for this period.</p>
                 @endif
             </x-filament::section>
 
@@ -169,7 +214,7 @@
                 <x-slot name="heading">
                     <span class="fi-section-heading">
                         <x-filament::icon icon="heroicon-o-check-badge" />
-                        Expected vs Received (This Month)
+                        Expected vs Received ({{ $periodLabel }})
                     </span>
                 </x-slot>
 
@@ -301,7 +346,7 @@
             <x-slot name="heading">
                 <span class="fi-section-heading">
                     <x-filament::icon icon="heroicon-o-tag" />
-                    Expenses by Category (This Month)
+                    Expenses by Category ({{ $periodLabel }})
                 </span>
             </x-slot>
 
@@ -318,7 +363,7 @@
                     @endforeach
                 </div>
             @else
-                <p class="fi-text-muted fi-text-sm">No expenses recorded this month.</p>
+                <p class="fi-text-muted fi-text-sm">No expenses recorded for this period.</p>
             @endif
         </x-filament::section>
 
@@ -327,7 +372,7 @@
             <x-slot name="heading">
                 <span class="fi-section-heading">
                     <x-filament::icon icon="heroicon-o-chart-bar" />
-                    6-Month Trend ({{ $baseCurrency }})
+                    12-Month Trend ({{ $baseCurrency }})
                 </span>
             </x-slot>
 
@@ -345,9 +390,9 @@
                         @foreach($monthlyTrend as $month)
                             <tr>
                                 <td class="fi-font-medium">{{ $month['month'] }}</td>
-                                <td class="fi-text-right fi-text-success">{{ $baseCurrencyEnum?->format($month['income']) }}</td>
-                                <td class="fi-text-right fi-text-danger">{{ $baseCurrencyEnum?->format($month['expenses']) }}</td>
-                                <td class="fi-text-right fi-font-semibold {{ $month['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($month['net']) }}</td>
+                                <td class="fi-text-success">{{ $baseCurrencyEnum?->format($month['income']) }}</td>
+                                <td class="fi-text-danger">{{ $baseCurrencyEnum?->format($month['expenses']) }}</td>
+                                <td class="fi-font-semibold {{ $month['net'] >= 0 ? 'fi-text-success' : 'fi-text-danger' }}">{{ $baseCurrencyEnum?->format($month['net']) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -361,7 +406,7 @@
                 <x-slot name="heading">
                     <span class="fi-section-heading">
                         <x-filament::icon icon="heroicon-o-arrow-down-tray" />
-                        Recent Income
+                        Income ({{ $periodLabel }})
                     </span>
                 </x-slot>
 
@@ -383,7 +428,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p class="fi-text-muted fi-text-sm">No recent income entries.</p>
+                    <p class="fi-text-muted fi-text-sm">No income entries for this period.</p>
                 @endif
             </x-filament::section>
 
@@ -392,7 +437,7 @@
                 <x-slot name="heading">
                     <span class="fi-section-heading">
                         <x-filament::icon icon="heroicon-o-arrow-up-tray" />
-                        Recent Expenses
+                        Expenses ({{ $periodLabel }})
                     </span>
                 </x-slot>
 
@@ -409,7 +454,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p class="fi-text-muted fi-text-sm">No recent expenses.</p>
+                    <p class="fi-text-muted fi-text-sm">No expenses for this period.</p>
                 @endif
             </x-filament::section>
         </div>

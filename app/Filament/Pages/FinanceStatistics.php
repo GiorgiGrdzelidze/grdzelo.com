@@ -29,36 +29,164 @@ class FinanceStatistics extends Page
 
     protected string $view = 'filament.pages.finance-statistics';
 
+    public ?string $period = 'this_month';
+
+    public ?string $dateFrom = null;
+
+    public ?string $dateTo = null;
+
+    public function updatedPeriod(): void
+    {
+        if ($this->period !== 'custom') {
+            $this->dateFrom = null;
+            $this->dateTo = null;
+        }
+    }
+
+    public function getPeriodOptions(): array
+    {
+        return [
+            'today' => 'Today',
+            'yesterday' => 'Yesterday',
+            'this_week' => 'This Week',
+            'last_week' => 'Last Week',
+            'this_month' => 'This Month',
+            'last_month' => 'Last Month',
+            'this_quarter' => 'This Quarter',
+            'last_quarter' => 'Last Quarter',
+            'this_year' => 'This Year',
+            'last_year' => 'Last Year',
+            'all_time' => 'All Time',
+            'custom' => 'Custom Range',
+        ];
+    }
+
+    protected function getDateRange(): array
+    {
+        $now = Carbon::now();
+
+        return match ($this->period) {
+            'today' => [
+                'start' => $now->copy()->startOfDay(),
+                'end' => $now->copy()->endOfDay(),
+                'label' => 'Today',
+            ],
+            'yesterday' => [
+                'start' => $now->copy()->subDay()->startOfDay(),
+                'end' => $now->copy()->subDay()->endOfDay(),
+                'label' => 'Yesterday',
+            ],
+            'this_week' => [
+                'start' => $now->copy()->startOfWeek(),
+                'end' => $now->copy()->endOfWeek(),
+                'label' => 'This Week',
+            ],
+            'last_week' => [
+                'start' => $now->copy()->subWeek()->startOfWeek(),
+                'end' => $now->copy()->subWeek()->endOfWeek(),
+                'label' => 'Last Week',
+            ],
+            'this_month' => [
+                'start' => $now->copy()->startOfMonth(),
+                'end' => $now->copy()->endOfMonth(),
+                'label' => 'This Month',
+            ],
+            'last_month' => [
+                'start' => $now->copy()->subMonth()->startOfMonth(),
+                'end' => $now->copy()->subMonth()->endOfMonth(),
+                'label' => 'Last Month',
+            ],
+            'this_quarter' => [
+                'start' => $now->copy()->startOfQuarter(),
+                'end' => $now->copy()->endOfQuarter(),
+                'label' => 'This Quarter',
+            ],
+            'last_quarter' => [
+                'start' => $now->copy()->subQuarter()->startOfQuarter(),
+                'end' => $now->copy()->subQuarter()->endOfQuarter(),
+                'label' => 'Last Quarter',
+            ],
+            'this_year' => [
+                'start' => $now->copy()->startOfYear(),
+                'end' => $now->copy()->endOfYear(),
+                'label' => 'This Year',
+            ],
+            'last_year' => [
+                'start' => $now->copy()->subYear()->startOfYear(),
+                'end' => $now->copy()->subYear()->endOfYear(),
+                'label' => 'Last Year',
+            ],
+            'all_time' => [
+                'start' => Carbon::create(2000, 1, 1),
+                'end' => $now->copy()->endOfDay(),
+                'label' => 'All Time',
+            ],
+            'custom' => [
+                'start' => $this->dateFrom ? Carbon::parse($this->dateFrom)->startOfDay() : $now->copy()->startOfMonth(),
+                'end' => $this->dateTo ? Carbon::parse($this->dateTo)->endOfDay() : $now->copy()->endOfDay(),
+                'label' => 'Custom Range',
+            ],
+            default => [
+                'start' => $now->copy()->startOfMonth(),
+                'end' => $now->copy()->endOfMonth(),
+                'label' => 'This Month',
+            ],
+        };
+    }
+
     public function getViewData(): array
     {
         $settings = app(FinanceSettings::class);
         $baseCurrency = $settings->statistics_currency ?? $settings->base_currency ?? 'GEL';
         $baseSymbol = Currency::tryFrom($baseCurrency)?->symbol() ?? $baseCurrency;
+        $baseCurrencyEnum = Currency::tryFrom($baseCurrency);
+
+        $dateRange = $this->getDateRange();
+        $start = $dateRange['start'];
+        $end = $dateRange['end'];
+        $periodLabel = $dateRange['label'];
 
         $now = Carbon::now();
-        $startOfMonth = $now->copy()->startOfMonth();
-        $endOfMonth = $now->copy()->endOfMonth();
         $startOfYear = $now->copy()->startOfYear();
         $endOfYear = $now->copy()->endOfYear();
-
-        $baseCurrencyEnum = Currency::tryFrom($baseCurrency);
 
         return [
             'baseCurrency' => $baseCurrency,
             'baseSymbol' => $baseSymbol,
             'baseCurrencyEnum' => $baseCurrencyEnum,
-            'monthlyStats' => $this->getMonthlyStats($baseCurrency, $startOfMonth, $endOfMonth),
+            'periodLabel' => $periodLabel,
+            'periodStart' => $start->format('M j, Y'),
+            'periodEnd' => $end->format('M j, Y'),
+            'periodStats' => $this->getPeriodStats($baseCurrency, $start, $end),
             'yearlyStats' => $this->getYearlyStats($baseCurrency, $startOfYear, $endOfYear),
-            'incomeByType' => $this->getIncomeByType($baseCurrency, $startOfYear, $endOfYear),
-            'incomeByTypeMTD' => $this->getIncomeByType($baseCurrency, $startOfMonth, $endOfMonth),
+            'incomeByType' => $this->getIncomeByType($baseCurrency, $start, $end),
             'subscriptionStats' => $this->getSubscriptionStats($baseCurrency),
             'salaryStats' => $this->getSalaryStats($baseCurrency),
-            'expectedVsReceived' => $this->getExpectedVsReceived($baseCurrency, $startOfMonth, $endOfMonth),
-            'recentIncome' => $this->getRecentIncome(10),
-            'recentExpenses' => $this->getRecentExpenses(null, $baseCurrency),
+            'expectedVsReceived' => $this->getExpectedVsReceived($baseCurrency, $start, $end),
+            'recentIncome' => $this->getRecentIncome(10, $start, $end),
+            'recentExpenses' => $this->getRecentExpenses(null, $baseCurrency, $start, $end),
             'upcomingRenewals' => $this->getUpcomingRenewals(7),
-            'expensesByCategory' => $this->getExpensesByCategory($baseCurrency, $startOfMonth, $endOfMonth),
-            'monthlyTrend' => $this->getMonthlyTrend($baseCurrency, 6),
+            'expensesByCategory' => $this->getExpensesByCategory($baseCurrency, $start, $end),
+            'monthlyTrend' => $this->getMonthlyTrend($baseCurrency, 12),
+        ];
+    }
+
+    protected function getPeriodStats(string $baseCurrency, Carbon $start, Carbon $end): array
+    {
+        $income = $this->sumWithConversion(
+            IncomeEntry::whereBetween('date', [$start, $end])->where('is_received', true),
+            $baseCurrency
+        );
+
+        $expenses = $this->sumWithConversion(
+            Expense::whereBetween('date', [$start, $end]),
+            $baseCurrency
+        );
+
+        return [
+            'income' => $income,
+            'expenses' => $expenses,
+            'net' => $income - $expenses,
         ];
     }
 
@@ -238,11 +366,15 @@ class FinanceStatistics extends Page
         ];
     }
 
-    protected function getRecentIncome(int $limit): Collection
+    protected function getRecentIncome(int $limit, ?Carbon $start = null, ?Carbon $end = null): Collection
     {
-        return IncomeEntry::with('source')
-            ->orderByDesc('date')
-            ->limit($limit)
+        $query = IncomeEntry::with('source')->orderByDesc('date');
+
+        if ($start && $end) {
+            $query->whereBetween('date', [$start, $end]);
+        }
+
+        return $query->limit($limit)
             ->get()
             ->map(fn (IncomeEntry $entry) => [
                 'id' => $entry->id,
@@ -254,9 +386,13 @@ class FinanceStatistics extends Page
             ]);
     }
 
-    protected function getRecentExpenses(?int $limit = null, ?string $baseCurrency = null): Collection
+    protected function getRecentExpenses(?int $limit = null, ?string $baseCurrency = null, ?Carbon $start = null, ?Carbon $end = null): Collection
     {
         $query = Expense::with('category')->orderByDesc('date');
+
+        if ($start && $end) {
+            $query->whereBetween('date', [$start, $end]);
+        }
 
         if ($limit) {
             $query->limit($limit);
