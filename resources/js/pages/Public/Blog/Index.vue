@@ -151,6 +151,7 @@ function formatDate(date: string): string {
             <!-- Pagination -->
             <nav v-if="articles.last_page > 1" class="mt-12 flex items-center justify-center gap-2">
                 <template v-for="link in articles.links" :key="link.label">
+                    <!-- eslint-disable vue/no-v-text-v-html-on-component -->
                     <component
                         :is="link.url ? Link : 'span'"
                         :href="link.url ?? undefined"
@@ -161,6 +162,7 @@ function formatDate(date: string): string {
                         ]"
                         v-html="link.label"
                     />
+                    <!-- eslint-enable vue/no-v-text-v-html-on-component -->
                 </template>
             </nav>
         </div>
