@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight, Briefcase, Calendar } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -44,7 +45,23 @@ interface Props {
     hobbies: HobbyItem[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const groupedSkills = computed(() => {
+    const groups: Record<string, SkillItem[]> = {};
+
+    for (const skill of props.skills) {
+        const cat = skill.category || 'Other';
+
+        if (!groups[cat]) {
+            groups[cat] = [];
+        }
+
+        groups[cat].push(skill);
+    }
+
+    return groups;
+});
 
 function isUrl(icon: string | null): boolean {
     return !!icon && (icon.startsWith('http') || icon.startsWith('/'));
@@ -107,7 +124,7 @@ function formatDate(date: string): string {
         </section>
 
         <!-- Skills Preview -->
-        <section v-if="skills.length" class="border-t border-border/40 bg-muted/30 py-20">
+        <section v-if="props.skills.length" class="border-t border-border/40 bg-muted/30 py-20">
             <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                 <div class="flex items-end justify-between">
                     <div>
@@ -121,27 +138,30 @@ function formatDate(date: string): string {
                         </Link>
                     </Button>
                 </div>
-                <div class="mt-10 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    <div
-                        v-for="skill in skills.slice(0, 12)"
-                        :key="skill.id"
-                        class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4"
-                    >
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl">
-                            <img
-                                v-if="isUrl(skill.icon)"
-                                :src="skill.icon ?? ''"
-                                :alt="skill.name"
-                                class="h-6 w-6 object-contain"
-                            />
-                            <i v-else-if="skill.icon && getDeviconClass(skill.icon)" :class="getDeviconClass(skill.icon)" />
-                            <span v-else class="text-lg">🔧</span>
+
+                <div v-for="(skills, category) in groupedSkills" :key="category" class="mt-8">
+                    <h3 class="mb-4 text-lg font-semibold">{{ category }}</h3>
+                    <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        <div
+                            v-for="skill in skills"
+                            :key="skill.id"
+                            class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4"
+                        >
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl">
+                                <img
+                                    v-if="isUrl(skill.icon)"
+                                    :src="skill.icon ?? ''"
+                                    :alt="skill.name"
+                                    class="h-6 w-6 object-contain"
+                                />
+                                <i v-else-if="skill.icon && getDeviconClass(skill.icon)" :class="getDeviconClass(skill.icon)" />
+                                <span v-else class="text-lg">🔧</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate font-medium">{{ skill.name }}</p>
+                                <!-- <span class="text-xs text-muted-foreground">{{ skill.proficiency_score }}%</span> -->
+                            </div>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="truncate font-medium">{{ skill.name }}</p>
-                            <p v-if="skill.category" class="truncate text-xs text-muted-foreground">{{ skill.category }}</p>
-                        </div>
-                        <span class="text-xs font-medium text-muted-foreground">{{ skill.proficiency_score }}%</span>
                     </div>
                 </div>
             </div>

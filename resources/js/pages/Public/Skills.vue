@@ -89,6 +89,7 @@ const grouped = computed(() => {
                                 <span v-if="skill.proficiency_label" class="text-xs text-muted-foreground">{{ skill.proficiency_label }}</span>
                             </div>
                         </div>
+                        <!-- Proficiency score temporarily hidden
                         <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
                             <div
                                 class="h-full rounded-full bg-primary transition-all"
@@ -99,6 +100,7 @@ const grouped = computed(() => {
                             <span>{{ skill.proficiency_score }}%</span>
                             <span v-if="skill.years_experience">{{ skill.years_experience }} yrs</span>
                         </div>
+                        -->
                     </div>
                 </div>
             </div>
