@@ -31,9 +31,9 @@ interface ExperienceItem {
 
 interface HobbyItem {
     id: number;
-    name: string;
+    title: string;
     slug: string;
-    description: string | null;
+    summary: string | null;
     icon: string | null;
     is_featured: boolean;
 }
@@ -192,11 +192,11 @@ function formatDate(date: string): string {
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="font-medium">{{ hobby.name }}</h3>
+                                    <h3 class="font-medium">{{ hobby.title }}</h3>
                                     <Badge v-if="hobby.is_featured" variant="secondary" class="text-xs">Featured</Badge>
                                 </div>
-                                <p v-if="hobby.description" class="mt-1 text-sm text-muted-foreground line-clamp-2">
-                                    {{ hobby.description }}
+                                <p v-if="hobby.summary" class="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                    {{ hobby.summary }}
                                 </p>
                             </div>
                         </div>

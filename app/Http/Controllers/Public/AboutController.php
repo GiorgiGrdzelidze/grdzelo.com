@@ -38,7 +38,7 @@ class AboutController extends BasePublicController
         $hobbies = Hobby::query()
             ->visible()
             ->ordered()
-            ->get(['id', 'name', 'slug', 'description', 'icon', 'is_featured']);
+            ->get(['id', 'title', 'slug', 'summary', 'icon', 'is_featured']);
 
         return Inertia::render('Public/About', [
             ...$this->sharedProps(),
