@@ -41,6 +41,7 @@ const navItems: NavItem[] = [
             { label: 'Skills', href: '/skills', description: 'Technologies & expertise' },
             { label: 'Experience', href: '/experience', description: 'Work history' },
             { label: 'Education', href: '/education', description: 'Academic background' },
+            { label: 'Hobbies', href: '/hobbies', description: 'Interests & passions' },
         ],
     },
     { label: 'Gallery', href: '/gallery' },

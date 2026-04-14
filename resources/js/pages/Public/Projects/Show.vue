@@ -103,14 +103,6 @@ defineProps<Props>();
                 <img :src="`/storage/${project.cover_image}`" :alt="project.title" class="w-full" />
             </div>
 
-            <!-- Metrics -->
-            <div v-if="project.metrics?.length" class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div v-for="metric in project.metrics" :key="metric.label" class="rounded-lg border border-border/40 p-4 text-center">
-                    <p class="text-2xl font-bold">{{ metric.value }}</p>
-                    <p class="mt-1 text-xs text-muted-foreground">{{ metric.label }}</p>
-                </div>
-            </div>
-
             <Separator class="my-10" />
 
             <!-- Description -->
@@ -128,6 +120,21 @@ defineProps<Props>();
             <div v-if="project.process" class="mt-8">
                 <h2 class="text-2xl font-bold">The Process</h2>
                 <p class="mt-3 text-muted-foreground leading-relaxed">{{ project.process }}</p>
+            </div>
+
+              <!-- Metrics -->
+            <div v-if="project.metrics?.length" class="mt-12">
+                <h2 class="text-2xl font-bold">Project Highlights</h2>
+                <div class="mt-4 divide-y divide-border/50 rounded-xl border border-border/50">
+                    <div
+                        v-for="metric in project.metrics"
+                        :key="metric.label"
+                        class="flex items-start gap-4 p-4 sm:items-center sm:gap-6"
+                    >
+                        <span class="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground sm:w-40">{{ metric.label }}</span>
+                        <span class="text-sm text-foreground">{{ metric.value }}</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Tech Stack -->
@@ -171,6 +178,8 @@ defineProps<Props>();
                     </div>
                 </div>
             </div>
+
+
         </div>
 
         <!-- Related Projects -->
