@@ -39,9 +39,66 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
-        <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
-        </x-inertia::head>
+        @php
+            $seo = $page['props']['seo'] ?? [];
+            $seoDefaults = $page['props']['seoDefaults'] ?? [];
+            $seoTitle = $seo['title'] ?? null;
+            $seoDescription = $seo['description'] ?? null;
+            $seoCanonical = $seo['canonical'] ?? null;
+            $seoRobots = $seo['robots'] ?? null;
+            $og = $seo['og'] ?? [];
+            $twitter = $seo['twitter'] ?? [];
+            $schema = $seo['schema'] ?? null;
+            $appName = config('app.name', 'Grdzelo');
+            $twitterHandle = $seoDefaults['twitter_handle'] ?? null;
+        @endphp
+        <title>{{ $seoTitle ? "{$seoTitle} — {$appName}" : $appName }}</title>
+        @if($seoDescription)
+            <meta name="description" content="{{ $seoDescription }}">
+        @endif
+        @if($seoRobots)
+            <meta name="robots" content="{{ $seoRobots }}">
+        @endif
+        @if($seoCanonical)
+            <link rel="canonical" href="{{ $seoCanonical }}">
+        @endif
+        {{-- Open Graph --}}
+        <meta property="og:site_name" content="{{ $appName }}">
+        @if($og['title'] ?? null)
+            <meta property="og:title" content="{{ $og['title'] }}">
+        @endif
+        @if($og['description'] ?? null)
+            <meta property="og:description" content="{{ $og['description'] }}">
+        @endif
+        @if($og['image'] ?? null)
+            <meta property="og:image" content="{{ $og['image'] }}">
+        @endif
+        @if($og['type'] ?? null)
+            <meta property="og:type" content="{{ $og['type'] }}">
+        @endif
+        @if($seoCanonical)
+            <meta property="og:url" content="{{ $seoCanonical }}">
+        @endif
+        {{-- Twitter Card --}}
+        @if($twitter['card'] ?? null)
+            <meta name="twitter:card" content="{{ $twitter['card'] }}">
+        @endif
+        @if($twitterHandle)
+            <meta name="twitter:site" content="@{{ $twitterHandle }}">
+        @endif
+        @if($twitter['title'] ?? null)
+            <meta name="twitter:title" content="{{ $twitter['title'] }}">
+        @endif
+        @if($twitter['description'] ?? null)
+            <meta name="twitter:description" content="{{ $twitter['description'] }}">
+        @endif
+        @if($twitter['image'] ?? null)
+            <meta name="twitter:image" content="{{ $twitter['image'] }}">
+        @endif
+        {{-- JSON-LD Schema --}}
+        @if($schema)
+            <script type="application/ld+json">{!! json_encode($schema) !!}</script>
+        @endif
     </head>
     <body class="font-sans antialiased">
         <x-inertia::app />
