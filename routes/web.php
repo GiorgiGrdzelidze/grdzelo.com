@@ -36,6 +36,7 @@ Route::get('/about', [AboutController::class, 'about'])->name('about');
 Route::get('/skills', [AboutController::class, 'skills'])->name('skills');
 Route::get('/experience', [AboutController::class, 'experience'])->name('experience');
 Route::get('/hobbies', [AboutController::class, 'hobbies'])->name('hobbies');
+Route::get('/hobbies/{hobby}', [AboutController::class, 'hobby'])->name('hobbies.show');
 Route::get('/social', [AboutController::class, 'social'])->name('social');
 Route::get('/education', [AboutController::class, 'education'])->name('education');
 Route::get('/certifications', [AboutController::class, 'certifications'])->name('certifications');

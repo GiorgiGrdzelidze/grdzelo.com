@@ -337,31 +337,140 @@ class ContentSeeder extends Seeder
             [
                 'title' => 'Photography',
                 'slug' => 'photography',
-                'summary' => 'Capturing moments and landscapes. I enjoy street photography and architectural shots that tell stories.',
+                'summary' => 'Capturing moments and landscapes through the lens. I specialize in street photography and architectural compositions.',
+                'description' => '<p>Photography has been my creative outlet for over a decade. I started with a simple DSLR and have since explored various styles and techniques.</p><p>My favorite subjects include:</p><ul><li>Street photography - capturing candid moments in urban environments</li><li>Architecture - the interplay of light, shadow, and geometric forms</li><li>Landscapes - particularly the dramatic scenery of the Caucasus mountains</li><li>Portrait photography - focusing on natural expressions</li></ul><p>I shoot primarily with Sony mirrorless cameras and edit in Lightroom. My work has been featured in several local exhibitions and online publications.</p>',
+                'icon' => 'camera',
                 'is_featured' => true,
                 'is_visible' => true,
                 'sort_order' => 1,
+                'meta_title' => 'Photography - Capturing Moments & Landscapes',
+                'meta_description' => 'Explore my photography journey featuring street photography, architectural shots, and landscapes from Georgia and beyond.',
             ],
             [
                 'title' => 'Hiking & Nature',
                 'slug' => 'hiking-nature',
-                'summary' => 'Exploring mountain trails and national parks. Georgia has some of the most stunning landscapes in the Caucasus.',
+                'summary' => 'Exploring mountain trails and pristine wilderness. Georgia offers some of the most breathtaking landscapes in the Caucasus region.',
+                'description' => '<p>There is nothing quite like standing on a mountain peak after a long hike. The combination of physical challenge and natural beauty is unbeatable.</p><p>Favorite hiking destinations:</p><ul><li>Kazbegi - the iconic Gergeti Trinity Church trek</li><li>Svaneti - medieval towers against mountain backdrops</li><li>Tusheti - remote villages and alpine meadows</li><li>Lagodekhi - lush forests and waterfalls</li></ul><p>I typically hike from spring through autumn, ranging from day trips to multi-day expeditions. Each trail offers unique perspectives and photographic opportunities.</p>',
+                'icon' => 'mountain',
                 'is_featured' => true,
                 'is_visible' => true,
                 'sort_order' => 2,
+                'meta_title' => 'Hiking & Nature - Exploring the Caucasus',
+                'meta_description' => 'Join me on adventures through Georgia’s stunning mountain trails, from Kazbegi to Tusheti and beyond.',
             ],
             [
                 'title' => 'Reading',
                 'slug' => 'reading',
-                'summary' => 'Technical books, science fiction, and philosophy. Always reading at least two books simultaneously.',
+                'summary' => 'Technical books, science fiction, and philosophy. Currently juggling multiple books across different genres.',
+                'description' => '<p>Reading is my primary form of learning and relaxation. I maintain a diverse reading list that spans multiple genres and subjects.</p><p>Current favorites:</p><ul><li>Technical: "Clean Architecture" by Robert C. Martin, "Designing Data-Intensive Applications" by Martin Kleppmann</li><li>Science Fiction: Works by Ted Chiang, Liu Cixin, and classic Asimov</li><li>Philosophy: Stoicism (Marcus Aurelius, Seneca), modern thinkers like Naval Ravikant</li><li>Biographies: Stories of entrepreneurs and innovators</li></ul><p>I use Goodreads to track my reading and typically aim for 20-30 books per year. I also maintain a personal knowledge base of notes and insights from my reading.</p>',
+                'icon' => 'book-open',
                 'is_featured' => true,
                 'is_visible' => true,
                 'sort_order' => 3,
+                'meta_title' => 'Reading - Books That Shape My Thinking',
+                'meta_description' => 'A curated list of technical books, science fiction, and philosophy that influences my work and worldview.',
+            ],
+            [
+                'title' => 'Travel',
+                'slug' => 'travel',
+                'summary' => 'Exploring new cultures, cuisines, and perspectives. Travel broadens the mind and inspires creativity.',
+                'description' => '<p>Travel is both a passion and a source of inspiration for my work. Experiencing different cultures helps me build more inclusive and globally-aware products.</p><p>Recent destinations include:</p><ul><li>Japan - efficiency meets tradition</li><li>Portugal - laid-back culture and beautiful coastlines</li><li>Balkans - rich history and emerging tech scenes</li><li>Central Asia - the ancient Silk Road cities</li></ul><p>I enjoy slow travel - spending weeks rather than days in a place to truly understand local culture. Each trip informs my perspective on design, architecture, and human-centered products.</p>',
+                'icon' => 'plane',
+                'is_featured' => false,
+                'is_visible' => true,
+                'sort_order' => 4,
+                'meta_title' => 'Travel - Exploring the World',
+                'meta_description' => 'Stories and insights from traveling across cultures and continents.',
+            ],
+            [
+                'title' => 'Music Production',
+                'slug' => 'music-production',
+                'summary' => 'Creating electronic music and experimenting with sound design. A different kind of creative coding.',
+                'description' => '<p>Music production is where my technical and creative sides meet. I produce electronic music in my home studio, experimenting with synthesizers, sampling, and digital audio workstations.</p><p>My setup includes:</p><ul><li>Ableton Live as my primary DAW</li><li>Hardware synths (Novation Peak, Elektron Digitone)</li><li>Field recording for unique sound textures</li><li>Modular synthesis experimentation</li></ul><p>I find that the constraints and creative problem-solving in music production often translate to better approaches in software engineering.</p>',
+                'icon' => 'music',
+                'is_featured' => false,
+                'is_visible' => true,
+                'sort_order' => 5,
+                'meta_title' => 'Music Production - Sound Design & Synthesis',
+                'meta_description' => 'Electronic music production, synthesizers, and the creative process behind sound design.',
             ],
         ];
 
         foreach ($hobbies as $hobby) {
             Hobby::create($hobby);
+        }
+
+        // Education
+        $education = [
+            [
+                'institution' => 'Tbilisi State University',
+                'degree' => 'Bachelor of Computer Science',
+                'field_of_study' => 'Computer Science',
+                'start_date' => '2013-09-01',
+                'end_date' => '2017-06-30',
+                'is_current' => false,
+                'description' => 'Focus on software engineering, algorithms, and database systems. Graduated with honors.',
+                'is_visible' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'institution' => 'Laravel Certification Program',
+                'degree' => 'Professional Certification',
+                'field_of_study' => 'Laravel & PHP',
+                'start_date' => '2020-01-01',
+                'end_date' => '2020-06-30',
+                'is_current' => false,
+                'description' => 'Advanced Laravel certification covering testing, performance optimization, and architecture patterns.',
+                'is_visible' => true,
+                'sort_order' => 2,
+            ],
+        ];
+
+        foreach ($education as $edu) {
+            \App\Models\Education::create($edu);
+        }
+
+        // Certifications
+        $certifications = [
+            [
+                'name' => 'AWS Certified Solutions Architect',
+                'issuing_organization' => 'Amazon Web Services',
+                'issue_date' => '2022-03-15',
+                'expiry_date' => '2025-03-15',
+                'credential_id' => 'AWS-12345-ABC',
+                'credential_url' => 'https://aws.amazon.com/certification',
+                'description' => 'Professional certification for designing distributed systems on AWS.',
+                'is_visible' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'name' => 'Docker Certified Associate',
+                'issuing_organization' => 'Docker',
+                'issue_date' => '2021-08-20',
+                'expiry_date' => '2024-08-20',
+                'credential_id' => 'DCA-67890-XYZ',
+                'credential_url' => 'https://docker.com/certification',
+                'description' => 'Demonstrates expertise in containerization and Docker ecosystem.',
+                'is_visible' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'name' => 'Vue.js Certification',
+                'issuing_organization' => 'Vue School',
+                'issue_date' => '2020-11-10',
+                'credential_id' => 'VUE-CERT-2020',
+                'credential_url' => 'https://vueschool.io/certification',
+                'description' => 'Advanced Vue.js patterns, performance optimization, and ecosystem mastery.',
+                'is_visible' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($certifications as $cert) {
+            $certification = \App\Models\Certification::create($cert);
+            $certification->skills()->attach(
+                collect($skills)->only(['laravel', 'vuejs', 'docker'])->pluck('id')
+            );
         }
     }
 }

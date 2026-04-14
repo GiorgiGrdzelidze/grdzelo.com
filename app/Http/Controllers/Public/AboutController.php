@@ -92,6 +92,17 @@ class AboutController extends BasePublicController
         ]);
     }
 
+    public function hobby(Hobby $hobby): Response
+    {
+        abort_if(! $hobby->is_visible, 404);
+
+        return Inertia::render('Public/Hobbies/Show', [
+            ...$this->sharedProps(),
+            'seo' => $this->seoFor($hobby),
+            'hobby' => $hobby,
+        ]);
+    }
+
     public function social(): Response
     {
         $socialLinks = SocialLink::query()

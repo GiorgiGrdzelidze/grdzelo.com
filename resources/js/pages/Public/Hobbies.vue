@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
 import { Heart } from 'lucide-vue-next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -30,20 +31,27 @@ defineProps<Props>();
             </div>
 
             <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                <Card v-for="hobby in hobbies" :key="hobby.id" class="overflow-hidden">
-                    <div v-if="hobby.image" class="aspect-video overflow-hidden">
-                        <img :src="`/storage/${hobby.image}`" :alt="hobby.title" class="h-full w-full object-cover" />
-                    </div>
-                    <div v-else class="flex aspect-video items-center justify-center bg-muted">
-                        <Heart class="h-10 w-10 text-muted-foreground" />
-                    </div>
-                    <CardHeader>
-                        <CardTitle>{{ hobby.title }}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p v-if="hobby.summary" class="text-sm text-muted-foreground leading-relaxed">{{ hobby.summary }}</p>
-                    </CardContent>
-                </Card>
+                <Link
+                    v-for="hobby in hobbies"
+                    :key="hobby.id"
+                    :href="`/hobbies/${hobby.slug}`"
+                    class="group"
+                >
+                    <Card class="h-full overflow-hidden transition-all hover:shadow-lg hover:border-foreground/20">
+                        <div v-if="hobby.image" class="aspect-video overflow-hidden">
+                            <img :src="`/storage/${hobby.image}`" :alt="hobby.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                        </div>
+                        <div v-else class="flex aspect-video items-center justify-center bg-muted">
+                            <Heart class="h-10 w-10 text-muted-foreground" />
+                        </div>
+                        <CardHeader>
+                            <CardTitle class="group-hover:text-primary/80 transition-colors">{{ hobby.title }}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p v-if="hobby.summary" class="text-sm text-muted-foreground leading-relaxed">{{ hobby.summary }}</p>
+                        </CardContent>
+                    </Card>
+                </Link>
             </div>
 
             <div v-if="!hobbies.length" class="mt-14 text-center">
