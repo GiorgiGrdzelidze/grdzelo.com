@@ -67,19 +67,19 @@ interface Props {
 const props = defineProps<Props>();
 
 const statusStyles: Record<string, string> = {
-    active: 'bg-emerald-500/10 text-emerald-700 ring-emerald-500/20 dark:text-emerald-300 dark:ring-emerald-400/30',
+    active: 'bg-emerald-500/10 text-emerald-800 ring-emerald-500/20 dark:text-emerald-300 dark:ring-emerald-400/30',
     experimental:
-        'bg-amber-500/10 text-amber-700 ring-amber-500/20 dark:text-amber-300 dark:ring-amber-400/30',
+        'bg-amber-500/10 text-amber-800 ring-amber-500/20 dark:text-amber-300 dark:ring-amber-400/30',
     archived:
-        'bg-zinc-500/10 text-zinc-700 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30',
+        'bg-zinc-500/10 text-zinc-800 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30',
     deprecated:
-        'bg-rose-500/10 text-rose-700 ring-rose-500/20 dark:text-rose-300 dark:ring-rose-400/30',
+        'bg-rose-500/10 text-rose-800 ring-rose-500/20 dark:text-rose-300 dark:ring-rose-400/30',
 };
 
 function statusClass(status: string): string {
     return (
         statusStyles[status] ??
-        'bg-zinc-500/10 text-zinc-700 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30'
+        'bg-zinc-500/10 text-zinc-800 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30'
     );
 }
 
@@ -316,12 +316,12 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
             <!-- Cover -->
             <div
                 v-if="repository.thumbnail"
-                class="mt-12 overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5"
+                class="mt-12 aspect-video overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5"
             >
                 <img
                     :src="thumbnailUrl(repository.thumbnail) ?? ''"
                     :alt="`${repository.name} preview`"
-                    class="w-full"
+                    class="h-full w-full object-cover"
                     fetchpriority="high"
                     decoding="async"
                 />
@@ -359,7 +359,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                             </span>
                             <button
                                 type="button"
-                                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                                 :aria-label="`Copy ${snippet.label} install command`"
                                 @click="copy(snippet.command)"
                             >
@@ -439,12 +439,12 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                     <div
                         v-for="(src, idx) in repository.screenshots"
                         :key="idx"
-                        class="overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm transition-shadow hover:shadow-md"
+                        class="aspect-video overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm transition-shadow hover:shadow-md"
                     >
                         <img
                             :src="src"
                             :alt="`${repository.name} screenshot ${idx + 1}`"
-                            class="w-full"
+                            class="h-full w-full object-cover"
                             loading="lazy"
                             decoding="async"
                         />

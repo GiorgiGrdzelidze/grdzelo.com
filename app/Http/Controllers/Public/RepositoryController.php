@@ -91,12 +91,7 @@ class RepositoryController extends BasePublicController
     {
         $seo = $repository->toSeoArray();
 
-        $base = rtrim(
-            app(SeoSettings::class)->canonical_base
-                ?: config('app.url')
-                ?: request()->getSchemeAndHttpHost(),
-            '/'
-        );
+        $base = app(SeoSettings::class)->canonicalBase();
 
         if (empty($seo['canonical'])) {
             $seo['canonical'] = $base.route('repositories.show', $repository, false);
@@ -104,6 +99,7 @@ class RepositoryController extends BasePublicController
 
         if (empty($seo['og']['image']) && $repository->thumbnail) {
             $seo['og']['image'] = $this->absoluteImageUrl($repository->thumbnail, $base);
+            $seo['og']['image_alt'] ??= $repository->name;
         }
         if (empty($seo['twitter']['image']) && ! empty($seo['og']['image'])) {
             $seo['twitter']['image'] = $seo['og']['image'];

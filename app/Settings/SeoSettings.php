@@ -42,4 +42,11 @@ class SeoSettings extends Settings
     {
         return 'seo';
     }
+
+    public function canonicalBase(): string
+    {
+        $base = $this->canonical_base ?: config('app.url') ?: 'https://grdzelo.com';
+
+        return rtrim((string) $base, '/');
+    }
 }

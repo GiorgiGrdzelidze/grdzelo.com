@@ -19,7 +19,7 @@ class SitemapController extends Controller
             abort(404);
         }
 
-        $base = rtrim($seo->canonical_base ?: config('app.url'), '/');
+        $base = $seo->canonicalBase();
 
         $urls = collect();
 
@@ -86,7 +86,7 @@ class SitemapController extends Controller
     public function robots(): Response
     {
         $seo = app(SeoSettings::class);
-        $base = rtrim($seo->canonical_base ?: config('app.url'), '/');
+        $base = $seo->canonicalBase();
 
         $lines = [
             'User-agent: *',
