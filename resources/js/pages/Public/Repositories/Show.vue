@@ -333,7 +333,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                             class="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-4 py-2 text-xs"
                         >
                             <span
-                                class="inline-flex items-center gap-1.5 font-medium tracking-wider text-zinc-400 uppercase"
+                                class="inline-flex items-center gap-1.5 font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 <span
                                     class="h-2 w-2 rounded-full bg-emerald-400/80"
