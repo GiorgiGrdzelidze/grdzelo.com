@@ -91,12 +91,7 @@ class RepositoryController extends BasePublicController
     {
         $seo = $repository->toSeoArray();
 
-        $base = rtrim(
-            app(SeoSettings::class)->canonical_base
-                ?: config('app.url')
-                ?: request()->getSchemeAndHttpHost(),
-            '/'
-        );
+        $base = app(SeoSettings::class)->canonicalBase();
 
         if (empty($seo['canonical'])) {
             $seo['canonical'] = $base.route('repositories.show', $repository, false);
