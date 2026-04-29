@@ -8,6 +8,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -30,5 +35,28 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            if ($request->is('admin', 'admin/*') || $request->is('api/*')) {
+                return $response;
+            }
+
+            if (! $request->expectsJson() && $exception instanceof NotFoundHttpException) {
+                return Inertia::render('Public/NotFound', [
+                    'status' => 404,
+                ])->toResponse($request)->setStatusCode(404);
+            }
+
+            if (
+                ! $request->expectsJson()
+                && $exception instanceof HttpExceptionInterface
+                && in_array($exception->getStatusCode(), [403, 419, 500, 503], true)
+            ) {
+                return Inertia::render('Public/NotFound', [
+                    'status' => $exception->getStatusCode(),
+                    'message' => $exception->getMessage() ?: null,
+                ])->toResponse($request)->setStatusCode($exception->getStatusCode());
+            }
+
+            return $response;
+        });
     })->create();
