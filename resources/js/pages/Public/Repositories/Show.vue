@@ -359,7 +359,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                             </span>
                             <button
                                 type="button"
-                                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                                 :aria-label="`Copy ${snippet.label} install command`"
                                 @click="copy(snippet.command)"
                             >
