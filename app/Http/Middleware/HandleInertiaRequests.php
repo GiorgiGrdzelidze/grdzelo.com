@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,6 +37,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $locale = App::getLocale();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -42,6 +46,40 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'locale' => $locale,
+            'translations' => fn () => $this->loadTranslations($locale),
+            'availableLocales' => [
+                ['code' => 'en', 'label' => 'EN', 'name' => 'English'],
+                ['code' => 'ka', 'label' => 'KA', 'name' => 'ქართული'],
+                ['code' => 'ru', 'label' => 'RU', 'name' => 'Русский'],
+            ],
         ];
+    }
+
+    /**
+     * Load the JSON file for the active locale (lang/{locale}.json).
+     * English fills any gaps so partial translations degrade gracefully.
+     *
+     * @return array<string, string>
+     */
+    private function loadTranslations(string $locale): array
+    {
+        $fallbackPath = base_path('lang/en.json');
+        $base = File::exists($fallbackPath)
+            ? json_decode(File::get($fallbackPath), true) ?? []
+            : [];
+
+        if ($locale === 'en') {
+            return $base;
+        }
+
+        $path = base_path("lang/{$locale}.json");
+        if (! File::exists($path)) {
+            return $base;
+        }
+
+        $localized = json_decode(File::get($path), true) ?? [];
+
+        return array_merge($base, $localized);
     }
 }
