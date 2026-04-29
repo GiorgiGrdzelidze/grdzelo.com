@@ -4,6 +4,7 @@ import { ExternalLink, GitFork, Github, Star } from 'lucide-vue-next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { repositoryStatusClass } from '@/lib/repository-status';
 
 interface RepositoryItem {
     id: number;
@@ -28,21 +29,6 @@ interface Props {
 }
 
 defineProps<Props>();
-
-function getStatusColor(status: string): string {
-    switch (status) {
-        case 'active':
-            return 'bg-green-500/10 text-green-600 dark:text-green-400';
-        case 'experimental':
-            return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400';
-        case 'archived':
-            return 'bg-gray-500/10 text-gray-600 dark:text-gray-400';
-        case 'deprecated':
-            return 'bg-red-500/10 text-red-600 dark:text-red-400';
-        default:
-            return 'bg-gray-500/10 text-gray-600';
-    }
-}
 </script>
 
 <template>
@@ -91,7 +77,9 @@ function getStatusColor(status: string): string {
                                         </p>
                                     </div>
                                     <Badge
-                                        :class="getStatusColor(repo.status)"
+                                        :class="
+                                            repositoryStatusClass(repo.status)
+                                        "
                                         variant="secondary"
                                     >
                                         {{ repo.status }}
