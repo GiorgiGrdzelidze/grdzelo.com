@@ -54,7 +54,9 @@ export function useArticleSchema(options: {
     };
 }
 
-export function useBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
+export function useBreadcrumbSchema(
+    items: Array<{ name: string; url: string }>,
+) {
     return {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',

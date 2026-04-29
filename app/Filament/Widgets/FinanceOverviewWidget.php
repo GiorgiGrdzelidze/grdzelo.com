@@ -55,32 +55,32 @@ class FinanceOverviewWidget extends StatsOverviewWidget
             ->sum('tax_amount');
 
         return [
-            Stat::make('Monthly Income', $symbol . number_format($monthlyIncome, 2))
+            Stat::make('Monthly Income', $symbol.number_format($monthlyIncome, 2))
                 ->description('Received this month')
                 ->icon('heroicon-o-arrow-trending-up')
                 ->color('success'),
 
-            Stat::make('Monthly Expenses', $symbol . number_format($monthlyExpenses, 2))
+            Stat::make('Monthly Expenses', $symbol.number_format($monthlyExpenses, 2))
                 ->description('Spent this month')
                 ->icon('heroicon-o-arrow-trending-down')
                 ->color('danger'),
 
-            Stat::make('Monthly Net', $symbol . number_format($netIncome, 2))
+            Stat::make('Monthly Net', $symbol.number_format($netIncome, 2))
                 ->description($netIncome >= 0 ? 'Positive cash flow' : 'Negative cash flow')
                 ->icon('heroicon-o-banknotes')
                 ->color($netIncome >= 0 ? 'success' : 'danger'),
 
-            Stat::make('YTD Net', $symbol . number_format($ytdIncome - $ytdExpenses, 2))
+            Stat::make('YTD Net', $symbol.number_format($ytdIncome - $ytdExpenses, 2))
                 ->description('Year-to-date')
                 ->icon('heroicon-o-calendar')
                 ->color(($ytdIncome - $ytdExpenses) >= 0 ? 'success' : 'danger'),
 
             Stat::make('Subscriptions', (string) $activeSubscriptions)
-                ->description($upcomingRenewals > 0 ? $upcomingRenewals . ' renewing soon' : 'Active')
+                ->description($upcomingRenewals > 0 ? $upcomingRenewals.' renewing soon' : 'Active')
                 ->icon('heroicon-o-arrow-path')
                 ->color($upcomingRenewals > 0 ? 'warning' : 'info'),
 
-            Stat::make('Monthly Tax', $symbol . number_format($activeSalaryTax, 2))
+            Stat::make('Monthly Tax', $symbol.number_format($activeSalaryTax, 2))
                 ->description('From active salaries')
                 ->icon('heroicon-o-receipt-percent')
                 ->color('gray'),

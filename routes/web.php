@@ -3,9 +3,9 @@
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ArticleController;
 use App\Http\Controllers\Public\ContactController;
+use App\Http\Controllers\Public\GalleryController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
-use App\Http\Controllers\Public\GalleryController;
 use App\Http\Controllers\Public\RepositoryController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
@@ -28,6 +28,7 @@ Route::get('/blog/{article}', [ArticleController::class, 'show'])->name('blog.sh
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 
 Route::get('/repositories', [RepositoryController::class, 'index'])->name('repositories.index');
+Route::get('/repositories/{repository}', [RepositoryController::class, 'show'])->name('repositories.show');
 
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 Route::get('/gallery/{album}', [GalleryController::class, 'show'])->name('gallery.show');

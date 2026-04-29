@@ -28,20 +28,52 @@ const navItems: NavItem[] = [
     {
         label: 'Work',
         children: [
-            { label: 'Projects', href: '/projects', description: 'Featured work & case studies' },
-            { label: 'Repositories', href: '/repositories', description: 'Open source & GitHub' },
-            { label: 'Services', href: '/services', description: 'What I can help with' },
+            {
+                label: 'Projects',
+                href: '/projects',
+                description: 'Featured work & case studies',
+            },
+            {
+                label: 'Repositories',
+                href: '/repositories',
+                description: 'Open source & GitHub',
+            },
+            {
+                label: 'Services',
+                href: '/services',
+                description: 'What I can help with',
+            },
         ],
     },
     { label: 'Blog', href: '/blog' },
     {
         label: 'About',
         children: [
-            { label: 'About Me', href: '/about', description: 'Background & story' },
-            { label: 'Skills', href: '/skills', description: 'Technologies & expertise' },
-            { label: 'Experience', href: '/experience', description: 'Work history' },
-            { label: 'Education', href: '/education', description: 'Academic background' },
-            { label: 'Hobbies', href: '/hobbies', description: 'Interests & passions' },
+            {
+                label: 'About Me',
+                href: '/about',
+                description: 'Background & story',
+            },
+            {
+                label: 'Skills',
+                href: '/skills',
+                description: 'Technologies & expertise',
+            },
+            {
+                label: 'Experience',
+                href: '/experience',
+                description: 'Work history',
+            },
+            {
+                label: 'Education',
+                href: '/education',
+                description: 'Academic background',
+            },
+            {
+                label: 'Hobbies',
+                href: '/hobbies',
+                description: 'Interests & passions',
+            },
         ],
     },
     { label: 'Gallery', href: '/gallery' },
@@ -78,11 +110,20 @@ function toggleDropdown(label: string) {
 </script>
 
 <template>
-    <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-        <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header
+        class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60"
+    >
+        <div
+            class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8"
+        >
             <!-- Brand -->
-            <Link href="/" class="flex items-center gap-2 font-semibold tracking-tight transition-colors hover:text-foreground/80">
-                <span class="text-lg">{{ settings?.brand_name || 'grdzelo' }}</span>
+            <Link
+                href="/"
+                class="flex items-center gap-2 font-semibold tracking-tight transition-colors hover:text-foreground/80"
+            >
+                <span class="text-lg">{{
+                    settings?.brand_name || 'grdzelo'
+                }}</span>
             </Link>
 
             <!-- Desktop Nav -->
@@ -113,10 +154,16 @@ function toggleDropdown(label: string) {
                             ]"
                         >
                             {{ item.label }}
-                            <ChevronDown class="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
+                            <ChevronDown
+                                class="h-3.5 w-3.5 transition-transform group-hover:rotate-180"
+                            />
                         </button>
-                        <div class="invisible absolute left-0 top-full z-50 min-w-[220px] pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
-                            <div class="rounded-lg border border-border/60 bg-popover p-2 shadow-lg">
+                        <div
+                            class="invisible absolute top-full left-0 z-50 min-w-[220px] pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100"
+                        >
+                            <div
+                                class="rounded-lg border border-border/60 bg-popover p-2 shadow-lg"
+                            >
                                 <Link
                                     v-for="child in item.children"
                                     :key="child.href"
@@ -128,8 +175,14 @@ function toggleDropdown(label: string) {
                                             : '',
                                     ]"
                                 >
-                                    <span class="block text-sm font-medium">{{ child.label }}</span>
-                                    <span v-if="child.description" class="block text-xs text-muted-foreground">{{ child.description }}</span>
+                                    <span class="block text-sm font-medium">{{
+                                        child.label
+                                    }}</span>
+                                    <span
+                                        v-if="child.description"
+                                        class="block text-xs text-muted-foreground"
+                                        >{{ child.description }}</span
+                                    >
                                 </Link>
                             </div>
                         </div>
@@ -142,7 +195,12 @@ function toggleDropdown(label: string) {
                 <ThemeToggle />
 
                 <!-- CTA Button (desktop) -->
-                <Button as-child variant="default" size="sm" class="hidden md:inline-flex">
+                <Button
+                    as-child
+                    variant="default"
+                    size="sm"
+                    class="hidden md:inline-flex"
+                >
                     <Link href="/contact">
                         {{ settings?.default_cta_text || "Let's Talk" }}
                     </Link>
@@ -171,7 +229,10 @@ function toggleDropdown(label: string) {
             leave-from-class="max-h-96 opacity-100"
             leave-to-class="max-h-0 opacity-0"
         >
-            <div v-if="isMobileMenuOpen" class="overflow-hidden border-t border-border/40 md:hidden">
+            <div
+                v-if="isMobileMenuOpen"
+                class="overflow-hidden border-t border-border/40 md:hidden"
+            >
                 <nav class="flex flex-col gap-1 px-4 py-3">
                     <template v-for="item in navItems" :key="item.label">
                         <!-- Simple link -->
@@ -203,12 +264,15 @@ function toggleDropdown(label: string) {
                                 {{ item.label }}
                                 <ChevronDown
                                     class="h-4 w-4 transition-transform"
-                                    :class="{ 'rotate-180': openDropdown === item.label }"
+                                    :class="{
+                                        'rotate-180':
+                                            openDropdown === item.label,
+                                    }"
                                 />
                             </button>
                             <div
                                 v-if="openDropdown === item.label"
-                                class="ml-3 mt-1 flex flex-col gap-1 border-l border-border/40 pl-3"
+                                class="mt-1 ml-3 flex flex-col gap-1 border-l border-border/40 pl-3"
                             >
                                 <Link
                                     v-for="child in item.children"
@@ -229,7 +293,12 @@ function toggleDropdown(label: string) {
                     </template>
 
                     <div class="mt-3 border-t border-border/40 pt-3">
-                        <Button as-child variant="default" size="sm" class="w-full">
+                        <Button
+                            as-child
+                            variant="default"
+                            size="sm"
+                            class="w-full"
+                        >
                             <Link href="/contact" @click="closeMobile">
                                 {{ settings?.default_cta_text || "Let's Talk" }}
                             </Link>

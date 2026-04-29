@@ -8,7 +8,9 @@ import SiteHeader from '@/components/public/SiteHeader.vue';
 const page = usePage();
 
 const seo = computed(() => page.props.seo as Record<string, any> | undefined);
-const settings = computed(() => page.props.settings as Record<string, any> | undefined);
+const settings = computed(
+    () => page.props.settings as Record<string, any> | undefined,
+);
 </script>
 
 <template>

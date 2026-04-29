@@ -59,34 +59,55 @@ const grouped = computed(() => {
     <section class="py-20">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
-                <h1 class="text-4xl font-bold tracking-tight">Skills & Expertise</h1>
+                <h1 class="text-4xl font-bold tracking-tight">
+                    Skills & Expertise
+                </h1>
                 <p class="mt-4 text-lg text-muted-foreground">
-                    A comprehensive overview of technologies, tools, and methodologies I work with.
+                    A comprehensive overview of technologies, tools, and
+                    methodologies I work with.
                 </p>
             </div>
 
-            <div v-for="(skills, category) in grouped" :key="category" class="mt-12">
+            <div
+                v-for="(skills, category) in grouped"
+                :key="category"
+                class="mt-12"
+            >
                 <h2 class="text-xl font-semibold">{{ category }}</h2>
-                <div class="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div
+                    class="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                >
                     <div
                         v-for="skill in skills"
                         :key="skill.id"
                         class="rounded-lg border border-border/40 p-4 transition-colors hover:bg-accent"
                     >
                         <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl">
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl"
+                            >
                                 <img
                                     v-if="isUrl(skill.icon)"
                                     :src="skill.icon ?? ''"
                                     :alt="skill.name"
                                     class="h-6 w-6 object-contain"
                                 />
-                                <i v-else-if="skill.icon && getDeviconClass(skill.icon)" :class="getDeviconClass(skill.icon)" />
+                                <i
+                                    v-else-if="
+                                        skill.icon &&
+                                        getDeviconClass(skill.icon)
+                                    "
+                                    :class="getDeviconClass(skill.icon)"
+                                />
                                 <span v-else class="text-lg">🔧</span>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="font-medium">{{ skill.name }}</p>
-                                <span v-if="skill.proficiency_label" class="text-xs text-muted-foreground">{{ skill.proficiency_label }}</span>
+                                <span
+                                    v-if="skill.proficiency_label"
+                                    class="text-xs text-muted-foreground"
+                                    >{{ skill.proficiency_label }}</span
+                                >
                             </div>
                         </div>
                         <!-- Proficiency score temporarily hidden
