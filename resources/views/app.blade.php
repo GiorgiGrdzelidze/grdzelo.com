@@ -22,22 +22,26 @@
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: #FCFCFC;
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: #0F1115;
             }
         </style>
 
-        {{-- Adaptive SVG favicon: respects prefers-color-scheme --}}
+        {{-- Adaptive SVG favicon: single asset that responds to prefers-color-scheme --}}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        {{-- Per-scheme variants for browsers that prefer media-targeted icons --}}
+        <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)">
+        <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)">
         {{-- Legacy raster fallback --}}
         <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" sizes="any">
         {{-- Safari pinned-tab silhouette --}}
-        <link rel="mask-icon" href="/favicon.svg" color="#36D399">
-        {{-- iOS home-screen --}}
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="mask-icon" href="/favicon.svg" color="#136D37">
+        {{-- iOS home-screen — SVG with raster fallback --}}
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
         {{-- Theme color, paired with prefers-color-scheme --}}
         <meta name="theme-color" content="#FCFCFC" media="(prefers-color-scheme: light)">
         <meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">

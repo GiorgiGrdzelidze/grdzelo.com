@@ -229,15 +229,15 @@
     --secondary-foreground: 220 14% 8%;
     --muted: 40 6% 94%;
     --muted-foreground: 220 9% 38%;
-    --accent: 145 75% 38%;
+    --accent: 145 75% 32%;
     --accent-foreground: 0 0% 99.2%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 99.2%;
     --border: 220 13% 90%;
     --input: 220 13% 88%;
-    --ring: 145 75% 38%;
+    --ring: 145 75% 32%;
 
-    --chart-1: 145 75% 38%;
+    --chart-1: 145 75% 32%;
     --chart-2: 220 14% 8%;
     --chart-3: 40 6% 70%;
     --chart-4: 220 9% 38%;
@@ -252,7 +252,7 @@
     --sidebar-accent: 40 6% 94%;
     --sidebar-accent-foreground: 220 14% 8%;
     --sidebar-border: 220 13% 90%;
-    --sidebar-ring: 145 75% 38%;
+    --sidebar-ring: 145 75% 32%;
 }
 
 .dark {
@@ -319,11 +319,33 @@
         color: hsl(var(--foreground));
     }
 
-    /* Focus ring — green, always visible */
+    /* Focus ring — green, always visible. No border-radius override:
+       the focused element keeps its own corner geometry so the ring
+       traces the actual hit-target instead of a square mask. */
     :focus-visible {
         outline: 2px solid hsl(var(--accent));
         outline-offset: 2px;
-        border-radius: 2px;
+    }
+}
+
+/* Honor reduced-motion preference: kill ambient/reveal animation. */
+@media (prefers-reduced-motion: reduce) {
+    .status-dot,
+    .cursor-blink,
+    .reveal,
+    .reveal-1,
+    .reveal-2,
+    .reveal-3,
+    .reveal-4 {
+        animation: none !important;
+    }
+    .reveal,
+    .reveal-1,
+    .reveal-2,
+    .reveal-3,
+    .reveal-4 {
+        opacity: 1 !important;
+        transform: none !important;
     }
 }
 

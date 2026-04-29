@@ -1,7 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  
-  
-
-  <text x="16" y="22.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-weight="700" font-size="22" letter-spacing="-0.04em" class="g">g</text>
+  <style>
+    .g { fill: #0A0A0A; }
+    .dot { fill: #136D37; }
+    @media (prefers-color-scheme: dark) {
+      .g { fill: #FAFAFA; }
+      .dot { fill: #3FCB7A; }
+    }
+  </style>
+  <text x="16" y="22.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="22" letter-spacing="-0.04em" class="g">g</text>
   <circle cx="24" cy="21" r="2" class="dot"></circle>
 </svg>
