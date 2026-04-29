@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  
+  <rect width="1200" height="630" fill="#0A0A0A"></rect>
+
+  
+  <g stroke="#1F1F1F" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"></line>
+    <line x1="0" y1="525" x2="1200" y2="525"></line>
+    <line x1="80" y1="0" x2="80" y2="630"></line>
+    <line x1="1120" y1="0" x2="1120" y2="630"></line>
+  </g>
+
+  
+  <g transform="translate(80,80)">
+    <circle cx="6" cy="6" r="6" fill="#36D399"></circle>
+    <text x="24" y="11" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, monospace" font-size="14" font-weight="500" letter-spacing="0.16em" text-transform="uppercase" fill="#A1A1AA">TBILISI · AVAILABLE FOR WORK</text>
+  </g>
+
+  
+  <g transform="translate(80,250)">
+    <text x="0" y="0" font-family="Instrument Sans, Instrument Serif, serif" font-size="120" font-weight="600" letter-spacing="-0.025em" fill="#FAFAFA">grdzelidze</text>
+    <text x="0" y="80" font-family="Instrument Sans, Instrument Serif, serif" font-size="56" font-weight="500" letter-spacing="-0.02em" fill="#71717A">Senior Web Developer</text>
+    <circle cx="800" cy="-22" r="14" fill="#36D399"></circle>
+  </g>
+
+  
+  <g transform="translate(80,560)">
+    <text x="0" y="0" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, monospace" font-size="16" font-weight="500" letter-spacing="0.12em" text-transform="uppercase" fill="#71717A">LARAVEL · VUE · TYPESCRIPT · POSTGRESQL</text>
+  </g>
+
+  
+  <g transform="translate(1010,470)">
+    <rect width="110" height="110" fill="#FAFAFA"></rect>
+    <text x="55" y="78" text-anchor="middle" font-family="Instrument Sans, Instrument Serif, serif" font-weight="600" font-size="72" letter-spacing="-0.02em" fill="#0A0A0A">g</text>
+    <circle cx="86" cy="73" r="6" fill="#36D399"></circle>
+  </g>
+</svg>

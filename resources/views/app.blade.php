@@ -30,12 +30,20 @@
             }
         </style>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        {{-- Adaptive SVG favicon: respects prefers-color-scheme --}}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        {{-- Legacy raster fallback --}}
+        <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+        {{-- Safari pinned-tab silhouette --}}
+        <link rel="mask-icon" href="/favicon.svg" color="#36D399">
+        {{-- iOS home-screen --}}
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        {{-- Theme color, paired with prefers-color-scheme --}}
+        <meta name="theme-color" content="#FCFCFC" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|jetbrains-mono:400,500|firago:400,500,600" rel="stylesheet" />
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])

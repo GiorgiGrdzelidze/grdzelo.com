@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-label="Grdzelo monogram">
+  
+  <rect width="64" height="64" fill="#0A0A0A"></rect>
+
+  
+  <g fill="#FAFAFA">
+    
+    <path d="&#xA;      M 28 16&#xA;      a 12 12 0 1 1 0 24&#xA;      a 12 12 0 1 1 0 -24&#xA;      Z&#xA;      M 28 22&#xA;      a 6 6 0 1 0 0 12&#xA;      a 6 6 0 1 0 0 -12&#xA;      Z&#xA;    " fill-rule="evenodd"></path>
+    
+    <rect x="34" y="16" width="6" height="32"></rect>
+    
+    <path d="&#xA;      M 16 42&#xA;      h 18&#xA;      v 6&#xA;      a 6 6 0 0 1 -6 6&#xA;      h -10&#xA;      a 4 4 0 0 1 -4 -4&#xA;      v -2&#xA;      a 6 6 0 0 1 2 -6&#xA;      Z&#xA;    "></path>
+  </g>
+
+  
+  <circle cx="48" cy="20" r="4" fill="#36D399"></circle>
+</svg>
