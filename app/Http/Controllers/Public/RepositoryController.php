@@ -94,7 +94,7 @@ class RepositoryController extends BasePublicController
         $base = app(SeoSettings::class)->canonicalBase();
 
         if (empty($seo['canonical'])) {
-            $seo['canonical'] = $base.route('repositories.show', $repository, false);
+            $seo['canonical'] = $base.route('public.repositories.show', $repository, false);
         }
 
         if (empty($seo['og']['image']) && $repository->thumbnail) {

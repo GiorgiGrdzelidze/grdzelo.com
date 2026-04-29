@@ -15,35 +15,42 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
+| Single locale-agnostic surface. Locale is resolved per-request by the
+| SetLocale middleware (registered in bootstrap/app.php) from session,
+| cookie, or Accept-Language header — see the LanguageSwitcher for the
+| user-facing toggle. Localized URL prefixes (e.g. /ka/about) can be
+| layered on as a separate concern later without renaming routes.
 */
 
-Route::get('/', HomeController::class)->name('home');
+Route::name('public.')->group(function () {
+    Route::get('/', HomeController::class)->name('home');
 
-Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 
-Route::get('/blog', [ArticleController::class, 'index'])->name('blog.index');
-Route::get('/blog/{article}', [ArticleController::class, 'show'])->name('blog.show');
+    Route::get('/blog', [ArticleController::class, 'index'])->name('blog.index');
+    Route::get('/blog/{article}', [ArticleController::class, 'show'])->name('blog.show');
 
-Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+    Route::get('/services', [ServiceController::class, 'index'])->name('services');
 
-Route::get('/repositories', [RepositoryController::class, 'index'])->name('repositories.index');
-Route::get('/repositories/{repository}', [RepositoryController::class, 'show'])->name('repositories.show');
+    Route::get('/repositories', [RepositoryController::class, 'index'])->name('repositories.index');
+    Route::get('/repositories/{repository}', [RepositoryController::class, 'show'])->name('repositories.show');
 
-Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
-Route::get('/gallery/{album}', [GalleryController::class, 'show'])->name('gallery.show');
+    Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+    Route::get('/gallery/{album}', [GalleryController::class, 'show'])->name('gallery.show');
 
-Route::get('/about', [AboutController::class, 'about'])->name('about');
-Route::get('/skills', [AboutController::class, 'skills'])->name('skills');
-Route::get('/experience', [AboutController::class, 'experience'])->name('experience');
-Route::get('/hobbies', [AboutController::class, 'hobbies'])->name('hobbies');
-Route::get('/hobbies/{hobby}', [AboutController::class, 'hobby'])->name('hobbies.show');
-Route::get('/social', [AboutController::class, 'social'])->name('social');
-Route::get('/education', [AboutController::class, 'education'])->name('education');
-Route::get('/certifications', [AboutController::class, 'certifications'])->name('certifications');
+    Route::get('/about', [AboutController::class, 'about'])->name('about');
+    Route::get('/skills', [AboutController::class, 'skills'])->name('skills');
+    Route::get('/experience', [AboutController::class, 'experience'])->name('experience');
+    Route::get('/hobbies', [AboutController::class, 'hobbies'])->name('hobbies');
+    Route::get('/hobbies/{hobby}', [AboutController::class, 'hobby'])->name('hobbies.show');
+    Route::get('/social', [AboutController::class, 'social'])->name('social');
+    Route::get('/education', [AboutController::class, 'education'])->name('education');
+    Route::get('/certifications', [AboutController::class, 'certifications'])->name('certifications');
 
-Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+    Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+});
 
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
