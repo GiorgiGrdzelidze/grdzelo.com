@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Project;
+use App\Models\Repository;
 use App\Settings\SeoSettings;
 use Illuminate\Http\Response;
 
@@ -28,6 +29,7 @@ class SitemapController extends Controller
             ['loc' => '/projects', 'priority' => '0.8', 'changefreq' => 'weekly'],
             ['loc' => '/blog', 'priority' => '0.8', 'changefreq' => 'daily'],
             ['loc' => '/services', 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['loc' => '/repositories', 'priority' => '0.7', 'changefreq' => 'monthly'],
             ['loc' => '/about', 'priority' => '0.7', 'changefreq' => 'monthly'],
             ['loc' => '/skills', 'priority' => '0.5', 'changefreq' => 'monthly'],
             ['loc' => '/experience', 'priority' => '0.5', 'changefreq' => 'monthly'],
@@ -60,6 +62,16 @@ class SitemapController extends Controller
                 'loc' => $base.'/blog/'.$article->slug,
                 'lastmod' => $article->updated_at->toAtomString(),
                 'priority' => '0.7',
+                'changefreq' => 'monthly',
+            ]);
+        });
+
+        // Repositories
+        Repository::visible()->ordered()->each(function ($repository) use ($urls, $base) {
+            $urls->push([
+                'loc' => $base.'/repositories/'.$repository->slug,
+                'lastmod' => $repository->updated_at->toAtomString(),
+                'priority' => '0.6',
                 'changefreq' => 'monthly',
             ]);
         });
