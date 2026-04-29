@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { useClipboard } from '@vueuse/core';
 import {
     ArrowLeft,
+    BookOpen,
+    Check,
+    Copy,
     ExternalLink,
     GitFork,
     Github,
     Star,
+    Terminal,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 
 interface RelatedProject {
     id: number;
@@ -49,26 +53,34 @@ interface RelatedArticle {
     publish_at: string | null;
 }
 
+interface InstallSnippet {
+    tool: string;
+    command: string;
+    label: string;
+}
+
 interface Props {
     repository: Repository;
     relatedArticles: RelatedArticle[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-function getStatusColor(status: string): string {
-    switch (status) {
-        case 'active':
-            return 'bg-green-500/10 text-green-600 dark:text-green-400';
-        case 'experimental':
-            return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400';
-        case 'archived':
-            return 'bg-gray-500/10 text-gray-600 dark:text-gray-400';
-        case 'deprecated':
-            return 'bg-red-500/10 text-red-600 dark:text-red-400';
-        default:
-            return 'bg-gray-500/10 text-gray-600';
-    }
+const statusStyles: Record<string, string> = {
+    active: 'bg-emerald-500/10 text-emerald-700 ring-emerald-500/20 dark:text-emerald-300 dark:ring-emerald-400/30',
+    experimental:
+        'bg-amber-500/10 text-amber-700 ring-amber-500/20 dark:text-amber-300 dark:ring-amber-400/30',
+    archived:
+        'bg-zinc-500/10 text-zinc-700 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30',
+    deprecated:
+        'bg-rose-500/10 text-rose-700 ring-rose-500/20 dark:text-rose-300 dark:ring-rose-400/30',
+};
+
+function statusClass(status: string): string {
+    return (
+        statusStyles[status] ??
+        'bg-zinc-500/10 text-zinc-700 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30'
+    );
 }
 
 function thumbnailUrl(path: string | null): string | null {
@@ -86,83 +98,207 @@ function thumbnailUrl(path: string | null): string | null {
 
     return `/storage/${path}`;
 }
+
+function formatNumber(value: number): string {
+    if (value >= 1000) {
+        return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k`;
+    }
+
+    return value.toString();
+}
+
+const repoPath = computed<string | null>(() => {
+    try {
+        const url = new URL(props.repository.url);
+        const path = url.pathname.replace(/^\/+|\/+$|\.git$/g, '');
+
+        return path || null;
+    } catch {
+        return null;
+    }
+});
+
+const installSnippets = computed<InstallSnippet[]>(() => {
+    const lang = props.repository.language?.toLowerCase() ?? '';
+    const techs = (props.repository.technologies ?? []).map((t) =>
+        t.toLowerCase(),
+    );
+    const path = repoPath.value;
+    const url = props.repository.url;
+
+    if (!path) {
+        return [];
+    }
+
+    const has = (...keys: string[]) =>
+        keys.some((k) => lang.includes(k) || techs.includes(k));
+
+    const pkgName = path.split('/').pop() ?? path;
+    const cloneCmd = `git clone ${url}${url.endsWith('.git') ? '' : '.git'}`;
+
+    if (has('php', 'laravel')) {
+        return [
+            {
+                tool: 'composer',
+                label: 'Composer',
+                command: `composer require ${path}`,
+            },
+            { tool: 'git', label: 'Clone', command: cloneCmd },
+        ];
+    }
+
+    if (has('typescript', 'javascript', 'ts', 'js', 'vue', 'react', 'node')) {
+        return [
+            { tool: 'npm', label: 'npm', command: `npm install ${pkgName}` },
+            { tool: 'pnpm', label: 'pnpm', command: `pnpm add ${pkgName}` },
+            { tool: 'git', label: 'Clone', command: cloneCmd },
+        ];
+    }
+
+    if (has('rust')) {
+        return [
+            { tool: 'cargo', label: 'Cargo', command: `cargo add ${pkgName}` },
+            { tool: 'git', label: 'Clone', command: cloneCmd },
+        ];
+    }
+
+    if (has('go', 'golang')) {
+        return [
+            { tool: 'go', label: 'Go', command: `go get ${path}` },
+            { tool: 'git', label: 'Clone', command: cloneCmd },
+        ];
+    }
+
+    if (has('python', 'py')) {
+        return [
+            { tool: 'pip', label: 'pip', command: `pip install ${pkgName}` },
+            { tool: 'git', label: 'Clone', command: cloneCmd },
+        ];
+    }
+
+    return [{ tool: 'git', label: 'Clone', command: cloneCmd }];
+});
+
+const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
 </script>
 
 <template>
-    <article class="py-12">
-        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <article class="relative pb-16">
+        <!-- Decorative gradient backdrop -->
+        <div
+            class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] overflow-hidden"
+            aria-hidden="true"
+        >
+            <div
+                class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background"
+            />
+            <div
+                class="absolute -top-32 left-1/2 h-72 w-[640px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
+            />
+        </div>
+
+        <div class="mx-auto max-w-4xl px-4 pt-10 sm:px-6 lg:px-8">
             <!-- Back Link -->
             <Link
                 href="/repositories"
-                class="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                class="group inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-                <ArrowLeft class="h-4 w-4" />
+                <ArrowLeft
+                    class="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+                />
                 Back to Repositories
             </Link>
 
-            <!-- Header -->
-            <header>
-                <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div class="min-w-0">
-                        <h1 class="text-4xl font-bold tracking-tight">
-                            {{ repository.name }}
-                        </h1>
-                        <p
-                            v-if="repository.owner"
-                            class="mt-2 text-sm text-muted-foreground"
-                        >
-                            {{ repository.owner }}
-                        </p>
-                    </div>
-                    <Badge
-                        :class="getStatusColor(repository.status)"
-                        variant="secondary"
+            <!-- Hero -->
+            <header class="mt-8">
+                <div class="flex flex-wrap items-center gap-3">
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset"
+                        :class="statusClass(repository.status)"
                     >
+                        <span
+                            class="h-1.5 w-1.5 rounded-full bg-current"
+                            aria-hidden="true"
+                        />
                         {{ repository.status }}
+                    </span>
+                    <Badge
+                        v-if="repository.language"
+                        variant="outline"
+                        class="text-xs font-medium"
+                    >
+                        {{ repository.language }}
                     </Badge>
+                    <span
+                        v-if="repository.is_featured"
+                        class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary ring-1 ring-primary/20 ring-inset"
+                    >
+                        <Star class="h-3 w-3 fill-current" />
+                        Featured
+                    </span>
                 </div>
+
+                <h1 class="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
+                    {{ repository.name }}
+                </h1>
+
+                <p
+                    v-if="repoPath"
+                    class="mt-3 font-mono text-sm text-muted-foreground"
+                >
+                    {{ repoPath }}
+                </p>
 
                 <p
                     v-if="repository.summary"
-                    class="mt-4 text-lg text-muted-foreground"
+                    class="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground"
                 >
                     {{ repository.summary }}
                 </p>
 
-                <div
-                    class="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground"
-                >
-                    <Badge v-if="repository.language" variant="outline">
-                        {{ repository.language }}
-                    </Badge>
-                    <span class="flex items-center gap-1">
-                        <Star class="h-4 w-4" />
-                        <span>{{ repository.stars }}</span>
-                    </span>
-                    <span class="flex items-center gap-1">
-                        <GitFork class="h-4 w-4" />
-                        <span>{{ repository.forks }}</span>
-                    </span>
-                </div>
+                <!-- Stats row -->
+                <dl class="mt-8 flex flex-wrap items-center gap-3">
+                    <div
+                        class="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-card/50 px-3 py-1.5 text-sm shadow-sm backdrop-blur"
+                    >
+                        <Star class="h-4 w-4 text-amber-500" />
+                        <dt class="sr-only">Stars</dt>
+                        <dd class="font-semibold tabular-nums">
+                            {{ formatNumber(repository.stars) }}
+                        </dd>
+                        <span class="text-xs text-muted-foreground">stars</span>
+                    </div>
+                    <div
+                        class="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-card/50 px-3 py-1.5 text-sm shadow-sm backdrop-blur"
+                    >
+                        <GitFork class="h-4 w-4 text-muted-foreground" />
+                        <dt class="sr-only">Forks</dt>
+                        <dd class="font-semibold tabular-nums">
+                            {{ formatNumber(repository.forks) }}
+                        </dd>
+                        <span class="text-xs text-muted-foreground">forks</span>
+                    </div>
+                </dl>
 
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <Button as-child size="sm">
+                <!-- CTAs -->
+                <div class="mt-6 flex flex-wrap gap-2">
+                    <Button as-child size="lg">
                         <a
                             :href="repository.url"
                             target="_blank"
                             rel="noopener noreferrer"
                             :aria-label="`View ${repository.name} on GitHub`"
                         >
-                            <Github class="mr-1.5 h-4 w-4" />
+                            <Github class="mr-2 h-4 w-4" />
                             View on GitHub
-                            <ExternalLink class="ml-1 h-3 w-3" />
+                            <ExternalLink class="ml-2 h-3.5 w-3.5 opacity-70" />
                         </a>
                     </Button>
                     <Button
                         v-if="repository.demo_url"
                         as-child
                         variant="outline"
-                        size="sm"
+                        size="lg"
                     >
                         <a
                             :href="repository.demo_url"
@@ -171,16 +307,16 @@ function thumbnailUrl(path: string | null): string | null {
                             :aria-label="`Open ${repository.name} live demo`"
                         >
                             Live Demo
-                            <ExternalLink class="ml-1 h-3 w-3" />
+                            <ExternalLink class="ml-2 h-3.5 w-3.5 opacity-70" />
                         </a>
                     </Button>
                 </div>
             </header>
 
-            <!-- Cover / first screenshot -->
+            <!-- Cover -->
             <div
                 v-if="repository.thumbnail"
-                class="mt-8 overflow-hidden rounded-xl"
+                class="mt-12 overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5"
             >
                 <img
                     :src="thumbnailUrl(repository.thumbnail) ?? ''"
@@ -191,61 +327,119 @@ function thumbnailUrl(path: string | null): string | null {
                 />
             </div>
 
-            <Separator class="my-10" />
+            <!-- Installation -->
+            <section v-if="installSnippets.length" class="mt-14">
+                <div class="flex items-center gap-2">
+                    <Terminal class="h-5 w-5 text-primary" />
+                    <h2 class="text-2xl font-bold tracking-tight">
+                        Installation
+                    </h2>
+                </div>
+                <p class="mt-2 text-sm text-muted-foreground">
+                    Pick the package manager you prefer.
+                </p>
 
-            <!-- Description body (rich-text from Filament) -->
-            <div
-                v-if="repository.description"
-                class="prose prose-neutral dark:prose-invert max-w-none"
-                v-html="repository.description"
-            />
+                <div class="mt-5 space-y-3">
+                    <div
+                        v-for="snippet in installSnippets"
+                        :key="snippet.tool"
+                        class="group relative overflow-hidden rounded-xl border border-border/60 bg-zinc-950 text-zinc-100 shadow-md ring-1 ring-black/5 dark:bg-zinc-900 dark:ring-white/10"
+                    >
+                        <div
+                            class="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-4 py-2 text-xs"
+                        >
+                            <span
+                                class="inline-flex items-center gap-1.5 font-medium tracking-wider text-zinc-400 uppercase"
+                            >
+                                <span
+                                    class="h-2 w-2 rounded-full bg-emerald-400/80"
+                                    aria-hidden="true"
+                                />
+                                {{ snippet.label }}
+                            </span>
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                :aria-label="`Copy ${snippet.label} install command`"
+                                @click="copy(snippet.command)"
+                            >
+                                <Check
+                                    v-if="copied"
+                                    class="h-3.5 w-3.5 text-emerald-400"
+                                />
+                                <Copy v-else class="h-3.5 w-3.5" />
+                                {{ copied ? 'Copied' : 'Copy' }}
+                            </button>
+                        </div>
+                        <pre
+                            class="overflow-x-auto px-4 py-4 font-mono text-sm leading-relaxed"
+                        ><code><span class="select-none text-emerald-400">$</span> {{ snippet.command }}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Description body -->
+            <section v-if="repository.description" class="mt-14">
+                <div class="flex items-center gap-2">
+                    <BookOpen class="h-5 w-5 text-primary" />
+                    <h2 class="text-2xl font-bold tracking-tight">About</h2>
+                </div>
+                <div
+                    class="prose prose-neutral dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-bold prose-h2:mt-10 prose-h2:text-2xl prose-h3:text-xl prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:rounded prose-code:border prose-code:border-border/60 prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[0.875em] prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-pre:overflow-x-auto prose-pre:rounded-xl prose-pre:border prose-pre:border-border/60 prose-pre:bg-zinc-950 prose-pre:p-4 prose-pre:text-zinc-100 prose-pre:shadow-md dark:prose-pre:bg-zinc-900 mt-5 max-w-none"
+                    v-html="repository.description"
+                />
+            </section>
 
             <!-- Tech stack -->
-            <div v-if="repository.technologies?.length" class="mt-10">
-                <h2 class="text-2xl font-bold">Tech Stack</h2>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <Badge
+            <section v-if="repository.technologies?.length" class="mt-14">
+                <h2 class="text-2xl font-bold tracking-tight">Tech Stack</h2>
+                <div class="mt-5 flex flex-wrap gap-2">
+                    <span
                         v-for="tech in repository.technologies"
                         :key="tech"
-                        variant="secondary"
+                        class="inline-flex items-center rounded-md border border-border/60 bg-card/60 px-2.5 py-1 text-sm font-medium text-foreground/80 transition-colors hover:border-primary/40 hover:text-foreground"
                     >
                         {{ tech }}
-                    </Badge>
+                    </span>
                 </div>
-            </div>
+            </section>
 
             <!-- Built for project -->
-            <div v-if="repository.project" class="mt-10">
-                <h2 class="text-2xl font-bold">Built for</h2>
+            <section v-if="repository.project" class="mt-14">
+                <h2 class="text-2xl font-bold tracking-tight">Built for</h2>
                 <Link
                     :href="`/projects/${repository.project.slug}`"
-                    class="mt-4 block"
+                    class="group mt-5 block overflow-hidden rounded-xl border border-border/60 bg-card/50 p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
                 >
-                    <Card
-                        class="transition-all hover:border-foreground/20 hover:shadow-md"
-                    >
-                        <CardHeader>
-                            <CardTitle class="text-base">{{
-                                repository.project.title
-                            }}</CardTitle>
-                        </CardHeader>
-                        <CardContent v-if="repository.project.summary">
-                            <p class="text-sm text-muted-foreground">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <p
+                                class="text-base font-semibold transition-colors group-hover:text-primary"
+                            >
+                                {{ repository.project.title }}
+                            </p>
+                            <p
+                                v-if="repository.project.summary"
+                                class="mt-2 line-clamp-2 text-sm text-muted-foreground"
+                            >
                                 {{ repository.project.summary }}
                             </p>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <ExternalLink
+                            class="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+                        />
+                    </div>
                 </Link>
-            </div>
+            </section>
 
             <!-- Screenshots -->
-            <div v-if="repository.screenshots?.length" class="mt-10">
-                <h2 class="text-2xl font-bold">Screenshots</h2>
-                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <section v-if="repository.screenshots?.length" class="mt-14">
+                <h2 class="text-2xl font-bold tracking-tight">Screenshots</h2>
+                <div class="mt-5 grid gap-4 sm:grid-cols-2">
                     <div
                         v-for="(src, idx) in repository.screenshots"
                         :key="idx"
-                        class="overflow-hidden rounded-lg border border-border/50"
+                        class="overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm transition-shadow hover:shadow-md"
                     >
                         <img
                             :src="src"
@@ -256,30 +450,41 @@ function thumbnailUrl(path: string | null): string | null {
                         />
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Related articles -->
-            <div v-if="relatedArticles.length" class="mt-12">
-                <h2 class="text-2xl font-bold">Related reading</h2>
+            <section v-if="relatedArticles.length" class="mt-14">
+                <h2 class="text-2xl font-bold tracking-tight">
+                    Related reading
+                </h2>
                 <ul
-                    class="mt-4 divide-y divide-border/50 rounded-xl border border-border/50"
+                    class="mt-5 divide-y divide-border/50 overflow-hidden rounded-xl border border-border/60 bg-card/40"
                 >
                     <li v-for="article in relatedArticles" :key="article.id">
                         <Link
                             :href="`/blog/${article.slug}`"
-                            class="block p-4 transition-colors hover:bg-muted/40"
+                            class="group flex items-start justify-between gap-4 p-5 transition-colors hover:bg-muted/40"
                         >
-                            <p class="font-medium">{{ article.title }}</p>
-                            <p
-                                v-if="article.excerpt"
-                                class="mt-1 line-clamp-2 text-sm text-muted-foreground"
-                            >
-                                {{ article.excerpt }}
-                            </p>
+                            <div class="min-w-0">
+                                <p
+                                    class="font-medium transition-colors group-hover:text-primary"
+                                >
+                                    {{ article.title }}
+                                </p>
+                                <p
+                                    v-if="article.excerpt"
+                                    class="mt-1 line-clamp-2 text-sm text-muted-foreground"
+                                >
+                                    {{ article.excerpt }}
+                                </p>
+                            </div>
+                            <ArrowLeft
+                                class="mt-1 h-4 w-4 shrink-0 rotate-[135deg] text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+                            />
                         </Link>
                     </li>
                 </ul>
-            </div>
+            </section>
         </div>
     </article>
 </template>
