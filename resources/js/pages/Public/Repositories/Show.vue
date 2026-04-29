@@ -316,12 +316,12 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
             <!-- Cover -->
             <div
                 v-if="repository.thumbnail"
-                class="mt-12 overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5"
+                class="mt-12 aspect-video overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5"
             >
                 <img
                     :src="thumbnailUrl(repository.thumbnail) ?? ''"
                     :alt="`${repository.name} preview`"
-                    class="w-full"
+                    class="h-full w-full object-cover"
                     fetchpriority="high"
                     decoding="async"
                 />
@@ -439,12 +439,12 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                     <div
                         v-for="(src, idx) in repository.screenshots"
                         :key="idx"
-                        class="overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm transition-shadow hover:shadow-md"
+                        class="aspect-video overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm transition-shadow hover:shadow-md"
                     >
                         <img
                             :src="src"
                             :alt="`${repository.name} screenshot ${idx + 1}`"
-                            class="w-full"
+                            class="h-full w-full object-cover"
                             loading="lazy"
                             decoding="async"
                         />
