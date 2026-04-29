@@ -103,6 +103,9 @@
         @endif
         @if($twitter['image'] ?? null)
             <meta name="twitter:image" content="{{ $twitter['image'] }}">
+            @if($twitter['image_alt'] ?? null)
+                <meta name="twitter:image:alt" content="{{ $twitter['image_alt'] }}">
+            @endif
         @endif
         {{-- JSON-LD Schema --}}
         @if($schema)

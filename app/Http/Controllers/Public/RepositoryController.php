@@ -106,6 +106,9 @@ class RepositoryController extends BasePublicController
         if (empty($seo['twitter']['image']) && ! empty($seo['og']['image'])) {
             $seo['twitter']['image'] = $seo['og']['image'];
         }
+        if (! empty($seo['twitter']['image'])) {
+            $seo['twitter']['image_alt'] ??= $seo['og']['image_alt'] ?? $repository->name;
+        }
 
         return $seo;
     }
