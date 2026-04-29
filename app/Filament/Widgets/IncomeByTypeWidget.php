@@ -2,9 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Enums\Currency;
 use App\Enums\IncomeType;
-use App\Models\IncomeEntry;
 use App\Models\IncomeSource;
 use App\Settings\FinanceSettings;
 use Filament\Widgets\ChartWidget;

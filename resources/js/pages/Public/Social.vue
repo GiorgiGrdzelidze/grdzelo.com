@@ -38,19 +38,37 @@ defineProps<Props>();
                     rel="noopener noreferrer"
                     class="group"
                 >
-                    <Card class="transition-all hover:shadow-md hover:border-foreground/20">
+                    <Card
+                        class="transition-all hover:border-foreground/20 hover:shadow-md"
+                    >
                         <CardContent class="flex items-center gap-4 py-5">
-                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <div
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+                            >
                                 <ExternalLink class="h-5 w-5" />
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2">
-                                    <p class="font-medium capitalize">{{ link.label || link.platform }}</p>
-                                    <Badge v-if="link.is_highlighted" variant="secondary" class="text-xs">Featured</Badge>
+                                    <p class="font-medium capitalize">
+                                        {{ link.label || link.platform }}
+                                    </p>
+                                    <Badge
+                                        v-if="link.is_highlighted"
+                                        variant="secondary"
+                                        class="text-xs"
+                                        >Featured</Badge
+                                    >
                                 </div>
-                                <p v-if="link.username" class="truncate text-sm text-muted-foreground">@{{ link.username }}</p>
+                                <p
+                                    v-if="link.username"
+                                    class="truncate text-sm text-muted-foreground"
+                                >
+                                    @{{ link.username }}
+                                </p>
                             </div>
-                            <ExternalLink class="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                            <ExternalLink
+                                class="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                            />
                         </CardContent>
                     </Card>
                 </a>

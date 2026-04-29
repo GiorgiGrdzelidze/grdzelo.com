@@ -40,8 +40,8 @@ enum Currency: string
         $formatted = number_format($amount, $decimals);
 
         return match ($this->symbolPosition()) {
-            'right' => $formatted . ' ' . $this->symbol(),
-            default => $this->symbol() . $formatted,
+            'right' => $formatted.' '.$this->symbol(),
+            default => $this->symbol().$formatted,
         };
     }
 

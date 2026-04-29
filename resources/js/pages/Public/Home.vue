@@ -114,12 +114,17 @@ function formatDate(date: string): string {
     <section class="relative overflow-hidden">
         <div class="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <h1 class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                    {{ settings?.tagline || 'Product-Minded Software Engineer' }}
+                <h1
+                    class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+                >
+                    {{
+                        settings?.tagline || 'Product-Minded Software Engineer'
+                    }}
                 </h1>
                 <p class="mt-6 text-lg leading-8 text-muted-foreground">
-                    I build elegant, scalable web applications with a focus on clean architecture,
-                    exceptional user experience, and measurable business impact.
+                    I build elegant, scalable web applications with a focus on
+                    clean architecture, exceptional user experience, and
+                    measurable business impact.
                 </p>
                 <div class="mt-10 flex items-center justify-center gap-4">
                     <Button as-child size="lg">
@@ -136,16 +141,25 @@ function formatDate(date: string): string {
                 </div>
             </div>
         </div>
-        <div class="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_60%,hsl(var(--primary)/0.04),transparent)]" />
+        <div
+            class="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_60%,hsl(var(--primary)/0.04),transparent)]"
+        />
     </section>
 
     <!-- Featured Projects -->
-    <section v-if="featuredProjects.length" class="border-t border-border/40 py-20">
+    <section
+        v-if="featuredProjects.length"
+        class="border-t border-border/40 py-20"
+    >
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="flex items-end justify-between">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight">Featured Projects</h2>
-                    <p class="mt-2 text-muted-foreground">Selected work that I'm proud of</p>
+                    <h2 class="text-3xl font-bold tracking-tight">
+                        Featured Projects
+                    </h2>
+                    <p class="mt-2 text-muted-foreground">
+                        Selected work that I'm proud of
+                    </p>
                 </div>
                 <Button as-child variant="ghost" size="sm">
                     <Link href="/projects">
@@ -161,30 +175,62 @@ function formatDate(date: string): string {
                     :href="`/projects/${project.slug}`"
                     class="group"
                 >
-                    <Card class="h-full transition-all duration-200 hover:shadow-lg hover:border-foreground/20">
-                        <div v-if="project.cover_image" class="aspect-video overflow-hidden rounded-t-lg">
+                    <Card
+                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-lg"
+                    >
+                        <div
+                            v-if="project.cover_image"
+                            class="aspect-video overflow-hidden rounded-t-lg"
+                        >
                             <img
                                 :src="`/storage/${project.cover_image}`"
                                 :alt="project.title"
                                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                             />
                         </div>
-                        <div v-else class="flex aspect-video items-center justify-center rounded-t-lg bg-muted">
+                        <div
+                            v-else
+                            class="flex aspect-video items-center justify-center rounded-t-lg bg-muted"
+                        >
                             <Code2 class="h-10 w-10 text-muted-foreground" />
                         </div>
                         <CardHeader>
                             <div class="flex items-center justify-between">
-                                <CardTitle class="text-lg group-hover:text-primary/80">{{ project.title }}</CardTitle>
-                                <ExternalLink class="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                                <CardTitle
+                                    class="text-lg group-hover:text-primary/80"
+                                    >{{ project.title }}</CardTitle
+                                >
+                                <ExternalLink
+                                    class="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                                />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <p class="line-clamp-2 text-sm text-muted-foreground">{{ project.summary }}</p>
-                            <div v-if="project.tech_stack?.length" class="mt-3 flex flex-wrap gap-1">
-                                <Badge v-for="tech in project.tech_stack.slice(0, 4)" :key="tech" variant="secondary" class="text-xs">
+                            <p
+                                class="line-clamp-2 text-sm text-muted-foreground"
+                            >
+                                {{ project.summary }}
+                            </p>
+                            <div
+                                v-if="project.tech_stack?.length"
+                                class="mt-3 flex flex-wrap gap-1"
+                            >
+                                <Badge
+                                    v-for="tech in project.tech_stack.slice(
+                                        0,
+                                        4,
+                                    )"
+                                    :key="tech"
+                                    variant="secondary"
+                                    class="text-xs"
+                                >
                                     {{ tech }}
                                 </Badge>
-                                <Badge v-if="project.tech_stack.length > 4" variant="secondary" class="text-xs">
+                                <Badge
+                                    v-if="project.tech_stack.length > 4"
+                                    variant="secondary"
+                                    class="text-xs"
+                                >
                                     +{{ project.tech_stack.length - 4 }}
                                 </Badge>
                             </div>
@@ -196,22 +242,37 @@ function formatDate(date: string): string {
     </section>
 
     <!-- Services -->
-    <section v-if="services.length" class="border-t border-border/40 bg-muted/30 py-20">
+    <section
+        v-if="services.length"
+        class="border-t border-border/40 bg-muted/30 py-20"
+    >
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="text-3xl font-bold tracking-tight">What I Do</h2>
-                <p class="mt-2 text-muted-foreground">Services I offer to help you build and grow</p>
+                <p class="mt-2 text-muted-foreground">
+                    Services I offer to help you build and grow
+                </p>
             </div>
             <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Card v-for="service in services" :key="service.id" class="text-center">
+                <Card
+                    v-for="service in services"
+                    :key="service.id"
+                    class="text-center"
+                >
                     <CardHeader>
-                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary"
+                        >
                             <Code2 class="h-6 w-6" />
                         </div>
-                        <CardTitle class="text-lg">{{ service.title }}</CardTitle>
+                        <CardTitle class="text-lg">{{
+                            service.title
+                        }}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p class="text-sm text-muted-foreground">{{ service.summary }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ service.summary }}
+                        </p>
                     </CardContent>
                 </Card>
             </div>
@@ -223,8 +284,12 @@ function formatDate(date: string): string {
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="flex items-end justify-between">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight">Skills & Expertise</h2>
-                    <p class="mt-2 text-muted-foreground">Technologies and tools I work with daily</p>
+                    <h2 class="text-3xl font-bold tracking-tight">
+                        Skills & Expertise
+                    </h2>
+                    <p class="mt-2 text-muted-foreground">
+                        Technologies and tools I work with daily
+                    </p>
                 </div>
                 <Button as-child variant="ghost" size="sm">
                     <Link href="/skills">
@@ -234,22 +299,35 @@ function formatDate(date: string): string {
                 </Button>
             </div>
 
-            <div v-for="(skills, category) in groupedSkills" :key="category" class="mt-8">
+            <div
+                v-for="(skills, category) in groupedSkills"
+                :key="category"
+                class="mt-8"
+            >
                 <h3 class="mb-4 text-lg font-semibold">{{ category }}</h3>
-                <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div
+                    class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                >
                     <div
                         v-for="skill in skills"
                         :key="skill.id"
                         class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4 transition-colors hover:bg-accent"
                     >
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl">
+                        <div
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl"
+                        >
                             <img
                                 v-if="isUrl(skill.icon)"
                                 :src="skill.icon ?? ''"
                                 :alt="skill.name"
                                 class="h-6 w-6 object-contain"
                             />
-                            <i v-else-if="skill.icon && getDeviconClass(skill.icon)" :class="getDeviconClass(skill.icon)" />
+                            <i
+                                v-else-if="
+                                    skill.icon && getDeviconClass(skill.icon)
+                                "
+                                :class="getDeviconClass(skill.icon)"
+                            />
                             <span v-else class="text-lg">🔧</span>
                         </div>
                         <div class="min-w-0">
@@ -262,37 +340,80 @@ function formatDate(date: string): string {
     </section>
 
     <!-- Testimonials -->
-    <section v-if="testimonials.length" class="border-t border-border/40 bg-muted/30 py-20">
+    <section
+        v-if="testimonials.length"
+        class="border-t border-border/40 bg-muted/30 py-20"
+    >
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
-                <h2 class="text-3xl font-bold tracking-tight">What People Say</h2>
-                <p class="mt-2 text-muted-foreground">Feedback from clients and colleagues</p>
+                <h2 class="text-3xl font-bold tracking-tight">
+                    What People Say
+                </h2>
+                <p class="mt-2 text-muted-foreground">
+                    Feedback from clients and colleagues
+                </p>
             </div>
             <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Card v-for="testimonial in testimonials" :key="testimonial.id" class="flex flex-col">
+                <Card
+                    v-for="testimonial in testimonials"
+                    :key="testimonial.id"
+                    class="flex flex-col"
+                >
                     <CardContent class="flex-1 pt-6">
-                        <div v-if="testimonial.rating" class="mb-3 flex gap-0.5">
+                        <div
+                            v-if="testimonial.rating"
+                            class="mb-3 flex gap-0.5"
+                        >
                             <Star
                                 v-for="i in testimonial.rating"
                                 :key="i"
                                 class="h-4 w-4 fill-amber-400 text-amber-400"
                             />
                         </div>
-                        <blockquote class="text-sm leading-relaxed text-muted-foreground">
+                        <blockquote
+                            class="text-sm leading-relaxed text-muted-foreground"
+                        >
                             "{{ testimonial.quote }}"
                         </blockquote>
                     </CardContent>
-                    <div class="flex items-center gap-3 border-t border-border/40 px-6 py-4">
-                        <div v-if="testimonial.avatar" class="h-10 w-10 overflow-hidden rounded-full">
-                            <img :src="`/storage/${testimonial.avatar}`" :alt="testimonial.author_name" class="h-full w-full object-cover" />
+                    <div
+                        class="flex items-center gap-3 border-t border-border/40 px-6 py-4"
+                    >
+                        <div
+                            v-if="testimonial.avatar"
+                            class="h-10 w-10 overflow-hidden rounded-full"
+                        >
+                            <img
+                                :src="`/storage/${testimonial.avatar}`"
+                                :alt="testimonial.author_name"
+                                class="h-full w-full object-cover"
+                            />
                         </div>
-                        <div v-else class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                        <div
+                            v-else
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary"
+                        >
                             {{ testimonial.author_name.charAt(0) }}
                         </div>
                         <div>
-                            <p class="text-sm font-medium">{{ testimonial.author_name }}</p>
-                            <p v-if="testimonial.author_role || testimonial.company" class="text-xs text-muted-foreground">
-                                {{ [testimonial.author_role, testimonial.company].filter(Boolean).join(' at ') }}
+                            <p class="text-sm font-medium">
+                                {{ testimonial.author_name }}
+                            </p>
+                            <p
+                                v-if="
+                                    testimonial.author_role ||
+                                    testimonial.company
+                                "
+                                class="text-xs text-muted-foreground"
+                            >
+                                {{
+                                    [
+                                        testimonial.author_role,
+                                        testimonial.company,
+                                    ]
+                                        .filter(Boolean)
+                                        .join(' at ')
+                                }}
                             </p>
                         </div>
                     </div>
@@ -302,12 +423,19 @@ function formatDate(date: string): string {
     </section>
 
     <!-- Latest Articles -->
-    <section v-if="latestArticles.length" class="border-t border-border/40 py-20">
+    <section
+        v-if="latestArticles.length"
+        class="border-t border-border/40 py-20"
+    >
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="flex items-end justify-between">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight">Latest Articles</h2>
-                    <p class="mt-2 text-muted-foreground">Thoughts on engineering, product, and craft</p>
+                    <h2 class="text-3xl font-bold tracking-tight">
+                        Latest Articles
+                    </h2>
+                    <p class="mt-2 text-muted-foreground">
+                        Thoughts on engineering, product, and craft
+                    </p>
                 </div>
                 <Button as-child variant="ghost" size="sm">
                     <Link href="/blog">
@@ -323,8 +451,13 @@ function formatDate(date: string): string {
                     :href="`/blog/${article.slug}`"
                     class="group"
                 >
-                    <Card class="h-full transition-all duration-200 hover:shadow-lg hover:border-foreground/20">
-                        <div v-if="article.cover_image" class="aspect-video overflow-hidden rounded-t-lg">
+                    <Card
+                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-lg"
+                    >
+                        <div
+                            v-if="article.cover_image"
+                            class="aspect-video overflow-hidden rounded-t-lg"
+                        >
                             <img
                                 :src="`/storage/${article.cover_image}`"
                                 :alt="article.title"
@@ -332,12 +465,23 @@ function formatDate(date: string): string {
                             />
                         </div>
                         <CardHeader>
-                            <CardTitle class="text-lg group-hover:text-primary/80">{{ article.title }}</CardTitle>
+                            <CardTitle
+                                class="text-lg group-hover:text-primary/80"
+                                >{{ article.title }}</CardTitle
+                            >
                         </CardHeader>
                         <CardContent>
-                            <p class="line-clamp-2 text-sm text-muted-foreground">{{ article.excerpt }}</p>
-                            <div class="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-                                <span>{{ formatDate(article.publish_at) }}</span>
+                            <p
+                                class="line-clamp-2 text-sm text-muted-foreground"
+                            >
+                                {{ article.excerpt }}
+                            </p>
+                            <div
+                                class="mt-3 flex items-center gap-3 text-xs text-muted-foreground"
+                            >
+                                <span>{{
+                                    formatDate(article.publish_at)
+                                }}</span>
                                 <span>{{ article.reading_time }} min read</span>
                             </div>
                         </CardContent>
@@ -348,11 +492,16 @@ function formatDate(date: string): string {
     </section>
 
     <!-- CTA Section -->
-    <section class="border-t border-border/40 bg-primary py-20 text-primary-foreground">
+    <section
+        class="border-t border-border/40 bg-primary py-20 text-primary-foreground"
+    >
         <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold tracking-tight">Ready to Build Something Great?</h2>
+            <h2 class="text-3xl font-bold tracking-tight">
+                Ready to Build Something Great?
+            </h2>
             <p class="mt-4 text-lg opacity-90">
-                I'm always interested in hearing about new projects and opportunities.
+                I'm always interested in hearing about new projects and
+                opportunities.
             </p>
             <div class="mt-8 flex items-center justify-center gap-4">
                 <Button as-child size="lg" variant="secondary">
