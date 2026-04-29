@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Article;
 use App\Models\ArticleCategory;
+use App\Models\Certification;
+use App\Models\Education;
 use App\Models\Experience;
 use App\Models\Hobby;
 use App\Models\Page;
@@ -427,7 +429,7 @@ class ContentSeeder extends Seeder
         ];
 
         foreach ($education as $edu) {
-            \App\Models\Education::create($edu);
+            Education::create($edu);
         }
 
         // Certifications
@@ -467,7 +469,7 @@ class ContentSeeder extends Seeder
         ];
 
         foreach ($certifications as $cert) {
-            $certification = \App\Models\Certification::create($cert);
+            $certification = Certification::create($cert);
             $certification->skills()->attach(
                 collect($skills)->only(['laravel', 'vuejs', 'docker'])->pluck('id')
             );

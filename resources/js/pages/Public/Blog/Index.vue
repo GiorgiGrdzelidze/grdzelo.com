@@ -53,7 +53,8 @@ function formatDate(date: string): string {
             <div class="mx-auto max-w-2xl text-center">
                 <h1 class="text-4xl font-bold tracking-tight">Blog</h1>
                 <p class="mt-4 text-lg text-muted-foreground">
-                    Thoughts on engineering, product design, architecture, and the craft of building software.
+                    Thoughts on engineering, product design, architecture, and
+                    the craft of building software.
                 </p>
             </div>
 
@@ -65,8 +66,13 @@ function formatDate(date: string): string {
                     :href="`/blog/${article.slug}`"
                     class="group"
                 >
-                    <Card class="h-full transition-all duration-200 hover:shadow-lg hover:border-foreground/20">
-                        <div v-if="article.cover_image" class="aspect-video overflow-hidden rounded-t-lg">
+                    <Card
+                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-lg"
+                    >
+                        <div
+                            v-if="article.cover_image"
+                            class="aspect-video overflow-hidden rounded-t-lg"
+                        >
                             <img
                                 :src="`/storage/${article.cover_image}`"
                                 :alt="article.title"
@@ -74,13 +80,26 @@ function formatDate(date: string): string {
                             />
                         </div>
                         <CardHeader>
-                            <Badge variant="secondary" class="w-fit text-xs">Featured</Badge>
-                            <CardTitle class="text-lg group-hover:text-primary/80">{{ article.title }}</CardTitle>
+                            <Badge variant="secondary" class="w-fit text-xs"
+                                >Featured</Badge
+                            >
+                            <CardTitle
+                                class="text-lg group-hover:text-primary/80"
+                                >{{ article.title }}</CardTitle
+                            >
                         </CardHeader>
                         <CardContent>
-                            <p class="line-clamp-2 text-sm text-muted-foreground">{{ article.excerpt }}</p>
-                            <div class="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-                                <span>{{ formatDate(article.publish_at) }}</span>
+                            <p
+                                class="line-clamp-2 text-sm text-muted-foreground"
+                            >
+                                {{ article.excerpt }}
+                            </p>
+                            <div
+                                class="mt-3 flex items-center gap-3 text-xs text-muted-foreground"
+                            >
+                                <span>{{
+                                    formatDate(article.publish_at)
+                                }}</span>
                                 <span class="flex items-center gap-1">
                                     <Clock class="h-3 w-3" />
                                     {{ article.reading_time }} min
@@ -92,9 +111,16 @@ function formatDate(date: string): string {
             </div>
 
             <!-- Categories -->
-            <div v-if="categories.length" class="mt-12 flex flex-wrap items-center gap-2">
-                <span class="text-sm font-medium text-muted-foreground">Filter:</span>
-                <Badge variant="outline" class="cursor-pointer hover:bg-accent">All</Badge>
+            <div
+                v-if="categories.length"
+                class="mt-12 flex flex-wrap items-center gap-2"
+            >
+                <span class="text-sm font-medium text-muted-foreground"
+                    >Filter:</span
+                >
+                <Badge variant="outline" class="cursor-pointer hover:bg-accent"
+                    >All</Badge
+                >
                 <Badge
                     v-for="cat in categories"
                     :key="cat.id"
@@ -113,8 +139,13 @@ function formatDate(date: string): string {
                     :href="`/blog/${article.slug}`"
                     class="group"
                 >
-                    <Card class="h-full transition-all duration-200 hover:shadow-md hover:border-foreground/20">
-                        <div v-if="article.cover_image" class="aspect-video overflow-hidden rounded-t-lg">
+                    <Card
+                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-md"
+                    >
+                        <div
+                            v-if="article.cover_image"
+                            class="aspect-video overflow-hidden rounded-t-lg"
+                        >
                             <img
                                 :src="`/storage/${article.cover_image}`"
                                 :alt="article.title"
@@ -122,15 +153,30 @@ function formatDate(date: string): string {
                             />
                         </div>
                         <CardHeader>
-                            <Badge v-if="article.category" variant="secondary" class="w-fit text-xs">
+                            <Badge
+                                v-if="article.category"
+                                variant="secondary"
+                                class="w-fit text-xs"
+                            >
                                 {{ article.category.name }}
                             </Badge>
-                            <CardTitle class="text-base group-hover:text-primary/80">{{ article.title }}</CardTitle>
+                            <CardTitle
+                                class="text-base group-hover:text-primary/80"
+                                >{{ article.title }}</CardTitle
+                            >
                         </CardHeader>
                         <CardContent>
-                            <p class="line-clamp-2 text-sm text-muted-foreground">{{ article.excerpt }}</p>
-                            <div class="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-                                <span>{{ formatDate(article.publish_at) }}</span>
+                            <p
+                                class="line-clamp-2 text-sm text-muted-foreground"
+                            >
+                                {{ article.excerpt }}
+                            </p>
+                            <div
+                                class="mt-3 flex items-center gap-3 text-xs text-muted-foreground"
+                            >
+                                <span>{{
+                                    formatDate(article.publish_at)
+                                }}</span>
                                 <span class="flex items-center gap-1">
                                     <Clock class="h-3 w-3" />
                                     {{ article.reading_time }} min
@@ -145,11 +191,16 @@ function formatDate(date: string): string {
             <div v-if="!articles.data.length" class="mt-14 text-center">
                 <BookOpen class="mx-auto h-12 w-12 text-muted-foreground" />
                 <p class="mt-4 text-lg font-medium">No articles yet</p>
-                <p class="mt-1 text-muted-foreground">Check back soon for new content.</p>
+                <p class="mt-1 text-muted-foreground">
+                    Check back soon for new content.
+                </p>
             </div>
 
             <!-- Pagination -->
-            <nav v-if="articles.last_page > 1" class="mt-12 flex items-center justify-center gap-2">
+            <nav
+                v-if="articles.last_page > 1"
+                class="mt-12 flex items-center justify-center gap-2"
+            >
                 <template v-for="link in articles.links" :key="link.label">
                     <!-- eslint-disable vue/no-v-text-v-html-on-component -->
                     <component
@@ -157,7 +208,9 @@ function formatDate(date: string): string {
                         :href="link.url ?? undefined"
                         class="inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-3 text-sm"
                         :class="[
-                            link.active ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-accent',
+                            link.active
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-border hover:bg-accent',
                             !link.url ? 'cursor-default opacity-50' : '',
                         ]"
                         v-html="link.label"
