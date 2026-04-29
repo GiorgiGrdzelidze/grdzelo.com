@@ -61,4 +61,9 @@ class Repository extends Model implements HasMedia
     {
         return 'slug';
     }
+
+    public function getSeoTitle(): string
+    {
+        return $this->meta_title ?? $this->name ?? '';
+    }
 }
