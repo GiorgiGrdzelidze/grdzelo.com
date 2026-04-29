@@ -2,5 +2,5 @@
   
   <rect width="32" height="32" fill="#FAFAFA"></rect>
   <text x="16" y="22.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-weight="700" font-size="22" letter-spacing="-0.04em" fill="#0A0A0A">g</text>
-  <circle cx="24" cy="21" r="2" fill="#36D399"></circle>
+  <circle cx="24" cy="21" r="2" fill="#1BA85A"></circle>
 </svg>

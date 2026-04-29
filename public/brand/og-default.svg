@@ -12,7 +12,7 @@
 
   
   <g transform="translate(80,80)">
-    <circle cx="6" cy="6" r="6" fill="#36D399"></circle>
+    <circle cx="6" cy="6" r="6" fill="#3FCB7B"></circle>
     <text x="24" y="11" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, monospace" font-size="14" font-weight="500" letter-spacing="0.16em" text-transform="uppercase" fill="#A1A1AA">TBILISI · AVAILABLE FOR WORK</text>
   </g>
 
@@ -20,7 +20,7 @@
   <g transform="translate(80,250)">
     <text x="0" y="0" font-family="Instrument Sans, Instrument Serif, serif" font-size="120" font-weight="600" letter-spacing="-0.025em" fill="#FAFAFA">grdzelidze</text>
     <text x="0" y="80" font-family="Instrument Sans, Instrument Serif, serif" font-size="56" font-weight="500" letter-spacing="-0.02em" fill="#71717A">Senior Web Developer</text>
-    <circle cx="800" cy="-22" r="14" fill="#36D399"></circle>
+    <circle cx="800" cy="-22" r="14" fill="#3FCB7B"></circle>
   </g>
 
   
@@ -32,6 +32,6 @@
   <g transform="translate(1010,470)">
     <rect width="110" height="110" fill="#FAFAFA"></rect>
     <text x="55" y="78" text-anchor="middle" font-family="Instrument Sans, Instrument Serif, serif" font-weight="600" font-size="72" letter-spacing="-0.02em" fill="#0A0A0A">g</text>
-    <circle cx="86" cy="73" r="6" fill="#36D399"></circle>
+    <circle cx="86" cy="73" r="6" fill="#1BA85A"></circle>
   </g>
 </svg>

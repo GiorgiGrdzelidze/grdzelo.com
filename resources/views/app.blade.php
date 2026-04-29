@@ -38,7 +38,7 @@
         {{-- Legacy raster fallback --}}
         <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" sizes="any">
         {{-- Safari pinned-tab silhouette --}}
-        <link rel="mask-icon" href="/favicon.svg" color="#136D37">
+        <link rel="mask-icon" href="/favicon.svg" color="#1BA85A">
         {{-- iOS home-screen — SVG with raster fallback --}}
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
