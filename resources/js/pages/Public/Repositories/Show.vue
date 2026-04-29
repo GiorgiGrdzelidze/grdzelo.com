@@ -15,6 +15,7 @@ import {
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { repositoryStatusClass } from '@/lib/repository-status';
 
 interface RelatedProject {
     id: number;
@@ -65,23 +66,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const statusStyles: Record<string, string> = {
-    active: 'bg-emerald-500/10 text-emerald-800 ring-emerald-500/20 dark:text-emerald-300 dark:ring-emerald-400/30',
-    experimental:
-        'bg-amber-500/10 text-amber-800 ring-amber-500/20 dark:text-amber-300 dark:ring-amber-400/30',
-    archived:
-        'bg-zinc-500/10 text-zinc-800 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30',
-    deprecated:
-        'bg-rose-500/10 text-rose-800 ring-rose-500/20 dark:text-rose-300 dark:ring-rose-400/30',
-};
-
-function statusClass(status: string): string {
-    return (
-        statusStyles[status] ??
-        'bg-zinc-500/10 text-zinc-800 ring-zinc-500/20 dark:text-zinc-300 dark:ring-zinc-400/30'
-    );
-}
 
 function thumbnailUrl(path: string | null): string | null {
     if (!path) {
@@ -214,7 +198,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                 <div class="flex flex-wrap items-center gap-3">
                     <span
                         class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset"
-                        :class="statusClass(repository.status)"
+                        :class="repositoryStatusClass(repository.status)"
                     >
                         <span
                             class="h-1.5 w-1.5 rounded-full bg-current"
@@ -349,7 +333,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                             class="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-4 py-2 text-xs"
                         >
                             <span
-                                class="inline-flex items-center gap-1.5 font-medium tracking-wider text-zinc-400 uppercase"
+                                class="inline-flex items-center gap-1.5 font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 <span
                                     class="h-2 w-2 rounded-full bg-emerald-400/80"
