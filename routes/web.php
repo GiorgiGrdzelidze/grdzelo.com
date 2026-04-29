@@ -5,6 +5,7 @@ use App\Http\Controllers\Public\ArticleController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\GalleryController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\LocaleController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\RepositoryController;
 use App\Http\Controllers\Public\ServiceController;
@@ -50,6 +51,10 @@ Route::name('public.')->group(function () {
 
     Route::get('/contact', [ContactController::class, 'show'])->name('contact');
     Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+    Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
+        ->where('locale', 'en|ka|ru')
+        ->name('locale.switch');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');

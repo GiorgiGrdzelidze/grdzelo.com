@@ -38,7 +38,13 @@ class SetLocale
         $response = $next($request);
 
         if (method_exists($response, 'cookie')) {
-            $response->cookie(self::COOKIE, $locale, 60 * 24 * 365); // 1 year
+            // Re-read session so an explicit switch by LocaleController during
+            // this request wins over the value resolved at handle() time.
+            $final = $request->session()->get('locale', $locale);
+            if (! in_array($final, self::SUPPORTED, true)) {
+                $final = $locale;
+            }
+            $response->cookie(self::COOKIE, $final, 60 * 24 * 365); // 1 year
         }
 
         return $response;
