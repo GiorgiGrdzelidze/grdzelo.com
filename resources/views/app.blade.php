@@ -72,6 +72,15 @@
         @endif
         @if($og['image'] ?? null)
             <meta property="og:image" content="{{ $og['image'] }}">
+            @if($og['image_width'] ?? null)
+                <meta property="og:image:width" content="{{ $og['image_width'] }}">
+            @endif
+            @if($og['image_height'] ?? null)
+                <meta property="og:image:height" content="{{ $og['image_height'] }}">
+            @endif
+            @if($og['image_alt'] ?? null)
+                <meta property="og:image:alt" content="{{ $og['image_alt'] }}">
+            @endif
         @endif
         @if($og['type'] ?? null)
             <meta property="og:type" content="{{ $og['type'] }}">
