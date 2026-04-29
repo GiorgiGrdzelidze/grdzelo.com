@@ -51,9 +51,15 @@ abstract class BasePublicController extends Controller
 
         $seo = app(SeoSettings::class);
 
+        $canonical = rtrim($seo->canonicalBase().request()->getPathInfo(), '/');
+        if ($canonical === '') {
+            $canonical = $seo->canonicalBase();
+        }
+
         return [
             'title' => $fallbackTitle ?: $seo->default_title,
             'description' => $seo->default_description,
+            'canonical' => $canonical,
             'og' => [
                 'title' => $fallbackTitle ?: $seo->default_og_title,
                 'description' => $seo->default_og_description,
