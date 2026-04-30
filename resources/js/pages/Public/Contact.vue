@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import { useForm, usePage } from '@inertiajs/vue3';
-import { CheckCircle, Mail, MapPin, Phone } from 'lucide-vue-next';
+import { ArrowUpRight, Check } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { useT } from '@/composables/useTranslate';
 
 interface SocialLinkItem {
     platform: string;
@@ -24,10 +14,13 @@ interface SocialLinkItem {
 
 interface Props {
     settings: Record<string, any>;
+    seo: Record<string, any>;
     budgetRanges: string[] | null;
 }
 
 defineProps<Props>();
+
+const { t } = useT();
 const page = usePage();
 
 const flash = computed(
@@ -53,263 +46,324 @@ function submit() {
         onSuccess: () => form.reset(),
     });
 }
+
+const fieldClass =
+    'block w-full border border-border bg-background px-3 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+const fieldErrorClass = 'border-destructive';
 </script>
 
 <template>
-    <section class="py-20">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl text-center">
-                <h1 class="text-4xl font-bold tracking-tight">Get in Touch</h1>
-                <p class="mt-4 text-lg text-muted-foreground">
-                    Have a project in mind? I'd love to hear from you. Fill out
-                    the form below and I'll get back to you as soon as possible.
-                </p>
-            </div>
+    <!-- ============ HEADER ============ -->
+    <section class="px-6 pt-24 pb-16 sm:px-8 sm:pt-32 sm:pb-20 lg:px-12">
+        <div class="mx-auto max-w-[1200px]">
+            <span class="eyebrow">{{ t('sections.contact.eyebrow') }}</span>
+            <h1
+                class="mt-6 max-w-[20ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance"
+            >
+                {{ t('contact.title') }}<span class="text-accent">.</span>
+            </h1>
+            <p
+                class="mt-8 max-w-[65ch] text-lg leading-relaxed text-pretty text-muted-foreground"
+            >
+                {{ t('contact.lead') }}
+            </p>
+        </div>
+    </section>
 
-            <div class="mt-14 grid gap-12 lg:grid-cols-3">
-                <!-- Contact Info -->
-                <div class="space-y-6">
-                    <Card v-if="settings?.email">
-                        <CardContent class="flex items-center gap-4 py-5">
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
-                            >
-                                <Mail class="h-5 w-5" />
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium">Email</p>
-                                <a
-                                    :href="`mailto:${settings.email}`"
-                                    class="text-sm text-muted-foreground hover:text-foreground"
-                                >
-                                    {{ settings.email }}
-                                </a>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card v-if="settings?.phone">
-                        <CardContent class="flex items-center gap-4 py-5">
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
-                            >
-                                <Phone class="h-5 w-5" />
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium">Phone</p>
-                                <p class="text-sm text-muted-foreground">
-                                    {{ settings.phone }}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card v-if="settings?.location">
-                        <CardContent class="flex items-center gap-4 py-5">
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
-                            >
-                                <MapPin class="h-5 w-5" />
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium">Location</p>
-                                <p class="text-sm text-muted-foreground">
-                                    {{ settings.location }}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <!-- Social Links -->
-                    <div v-if="socialLinks?.length" class="pt-4">
-                        <h3
-                            class="mb-4 text-sm font-semibold tracking-wider text-foreground uppercase"
+    <!-- ============ BODY ============ -->
+    <section
+        class="border-t border-border px-6 pb-32 sm:px-8 sm:pb-40 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div
+                class="grid gap-px bg-border md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
+            >
+                <!-- ====== Sidebar — facts ====== -->
+                <aside class="flex flex-col gap-10 bg-background p-8 sm:p-10">
+                    <div v-if="settings?.email">
+                        <div
+                            class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                         >
-                            Connect
-                        </h3>
-                        <div class="flex flex-wrap gap-3">
-                            <a
-                                v-for="link in socialLinks"
-                                :key="link.url"
-                                :href="link.url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="flex items-center gap-2 rounded-lg border border-border/40 bg-background px-4 py-2.5 text-sm transition-colors hover:bg-accent"
-                                :aria-label="link.label || link.platform"
-                            >
-                                <i
-                                    v-if="link.icon"
-                                    :class="link.icon"
-                                    class="text-lg"
-                                />
-                                <span>{{ link.label || link.platform }}</span>
-                            </a>
+                            {{ t('contact.email_label') }}
+                        </div>
+                        <a
+                            :href="`mailto:${settings.email}`"
+                            class="mt-2 block font-mono text-sm text-foreground transition-colors hover:text-accent"
+                        >
+                            {{ settings.email }}
+                        </a>
+                    </div>
+
+                    <div v-if="settings?.location">
+                        <div
+                            class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                        >
+                            {{ t('contact.based_label') }}
+                        </div>
+                        <div class="mt-2 text-sm text-foreground">
+                            {{ settings.location }}
                         </div>
                     </div>
-                </div>
 
-                <!-- Contact Form -->
-                <div class="lg:col-span-2">
-                    <!-- Success Message -->
-                    <div
-                        v-if="flash?.success"
-                        class="mb-6 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300"
-                    >
-                        <CheckCircle class="h-5 w-5 shrink-0" />
-                        <p class="text-sm">{{ flash.success }}</p>
+                    <div>
+                        <div
+                            class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                        >
+                            {{ t('contact.response_label') }}
+                        </div>
+                        <div class="mt-2 text-sm text-foreground">
+                            {{ t('contact.response_value') }}
+                        </div>
                     </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Send a Message</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form class="space-y-6" @submit.prevent="submit">
-                                <div class="grid gap-4 sm:grid-cols-2">
-                                    <div class="space-y-2">
-                                        <Label for="name">Name *</Label>
-                                        <Input
-                                            id="name"
-                                            v-model="form.name"
-                                            :class="{
-                                                'border-destructive':
-                                                    form.errors.name,
-                                            }"
-                                            placeholder="Your name"
-                                        />
-                                        <p
-                                            v-if="form.errors.name"
-                                            class="text-xs text-destructive"
-                                        >
-                                            {{ form.errors.name }}
-                                        </p>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <Label for="email">Email *</Label>
-                                        <Input
-                                            id="email"
-                                            v-model="form.email"
-                                            type="email"
-                                            :class="{
-                                                'border-destructive':
-                                                    form.errors.email,
-                                            }"
-                                            placeholder="your@email.com"
-                                        />
-                                        <p
-                                            v-if="form.errors.email"
-                                            class="text-xs text-destructive"
-                                        >
-                                            {{ form.errors.email }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="grid gap-4 sm:grid-cols-2">
-                                    <div class="space-y-2">
-                                        <Label for="company">Company</Label>
-                                        <Input
-                                            id="company"
-                                            v-model="form.company"
-                                            placeholder="Your company"
-                                        />
-                                    </div>
-                                    <div class="space-y-2">
-                                        <Label for="subject">Subject</Label>
-                                        <Input
-                                            id="subject"
-                                            v-model="form.subject"
-                                            placeholder="What is this about?"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div class="grid gap-4 sm:grid-cols-2">
-                                    <div class="space-y-2">
-                                        <Label for="project_type"
-                                            >Project Type</Label
-                                        >
-                                        <Select v-model="form.project_type">
-                                            <SelectTrigger>
-                                                <SelectValue
-                                                    placeholder="Select type"
-                                                />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="web_app"
-                                                    >Web Application</SelectItem
-                                                >
-                                                <SelectItem value="website"
-                                                    >Website</SelectItem
-                                                >
-                                                <SelectItem value="consulting"
-                                                    >Consulting</SelectItem
-                                                >
-                                                <SelectItem value="other"
-                                                    >Other</SelectItem
-                                                >
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div
-                                        v-if="budgetRanges?.length"
-                                        class="space-y-2"
-                                    >
-                                        <Label for="budget_range"
-                                            >Budget Range</Label
-                                        >
-                                        <Select v-model="form.budget_range">
-                                            <SelectTrigger>
-                                                <SelectValue
-                                                    placeholder="Select range"
-                                                />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem
-                                                    v-for="range in budgetRanges"
-                                                    :key="range"
-                                                    :value="range"
-                                                >
-                                                    {{ range }}
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <Label for="message">Message *</Label>
-                                    <textarea
-                                        id="message"
-                                        v-model="form.message"
-                                        rows="5"
-                                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                        :class="{
-                                            'border-destructive':
-                                                form.errors.message,
-                                        }"
-                                        placeholder="Tell me about your project..."
-                                    />
-                                    <p
-                                        v-if="form.errors.message"
-                                        class="text-xs text-destructive"
-                                    >
-                                        {{ form.errors.message }}
-                                    </p>
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    :disabled="form.processing"
-                                    class="w-full sm:w-auto"
+                    <div v-if="socialLinks?.length">
+                        <div
+                            class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                        >
+                            {{ t('footer.elsewhere') }}
+                        </div>
+                        <ul class="mt-3 flex flex-col gap-2">
+                            <li v-for="link in socialLinks" :key="link.url">
+                                <a
+                                    :href="link.url"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="group inline-flex items-center gap-2 font-mono text-sm text-foreground transition-colors hover:text-accent"
+                                    :aria-label="link.label || link.platform"
                                 >
-                                    {{
-                                        form.processing
-                                            ? 'Sending...'
-                                            : 'Send Message'
-                                    }}
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
+                                    {{ link.label || link.platform }}
+                                    <ArrowUpRight
+                                        class="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-accent"
+                                    />
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- ====== Form ====== -->
+                <div class="bg-background p-8 sm:p-10">
+                    <div
+                        v-if="flash?.success"
+                        class="mb-8 flex items-start gap-3 border border-accent bg-accent/5 p-4"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <Check
+                            class="mt-0.5 h-4 w-4 shrink-0 text-accent"
+                            :stroke-width="2"
+                        />
+                        <div>
+                            <div
+                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-accent uppercase"
+                            >
+                                {{ t('contact.success_title') }}
+                            </div>
+                            <p
+                                class="mt-2 text-sm leading-relaxed text-foreground"
+                            >
+                                {{ t('contact.success_body') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <form class="space-y-8" @submit.prevent="submit">
+                        <div class="grid gap-6 sm:grid-cols-2">
+                            <div>
+                                <label
+                                    for="name"
+                                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                >
+                                    {{ t('contact.name') }}
+                                    <span class="text-accent">*</span>
+                                </label>
+                                <input
+                                    id="name"
+                                    v-model="form.name"
+                                    type="text"
+                                    required
+                                    autocomplete="name"
+                                    :class="[
+                                        fieldClass,
+                                        'mt-2',
+                                        form.errors.name ? fieldErrorClass : '',
+                                    ]"
+                                />
+                                <p
+                                    v-if="form.errors.name"
+                                    class="mt-1 font-mono text-[11px] text-destructive"
+                                >
+                                    {{ form.errors.name }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    for="email"
+                                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                >
+                                    {{ t('contact.email') }}
+                                    <span class="text-accent">*</span>
+                                </label>
+                                <input
+                                    id="email"
+                                    v-model="form.email"
+                                    type="email"
+                                    required
+                                    autocomplete="email"
+                                    :class="[
+                                        fieldClass,
+                                        'mt-2',
+                                        form.errors.email
+                                            ? fieldErrorClass
+                                            : '',
+                                    ]"
+                                />
+                                <p
+                                    v-if="form.errors.email"
+                                    class="mt-1 font-mono text-[11px] text-destructive"
+                                >
+                                    {{ form.errors.email }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-6 sm:grid-cols-2">
+                            <div>
+                                <label
+                                    for="company"
+                                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                >
+                                    Company
+                                </label>
+                                <input
+                                    id="company"
+                                    v-model="form.company"
+                                    type="text"
+                                    autocomplete="organization"
+                                    :class="[fieldClass, 'mt-2']"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    for="subject"
+                                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                >
+                                    {{ t('contact.service') }}
+                                </label>
+                                <input
+                                    id="subject"
+                                    v-model="form.subject"
+                                    type="text"
+                                    :class="[fieldClass, 'mt-2']"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="budgetRanges?.length"
+                            class="grid gap-6 sm:grid-cols-2"
+                        >
+                            <div>
+                                <label
+                                    for="project_type"
+                                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                >
+                                    Project type
+                                </label>
+                                <select
+                                    id="project_type"
+                                    v-model="form.project_type"
+                                    :class="[fieldClass, 'mt-2']"
+                                >
+                                    <option value="">—</option>
+                                    <option value="web_app">
+                                        Web application
+                                    </option>
+                                    <option value="website">Website</option>
+                                    <option value="consulting">
+                                        Consulting
+                                    </option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    for="budget_range"
+                                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                >
+                                    {{ t('contact.budget') }}
+                                </label>
+                                <select
+                                    id="budget_range"
+                                    v-model="form.budget_range"
+                                    :class="[fieldClass, 'mt-2']"
+                                >
+                                    <option value="">
+                                        {{ t('contact.budget.unsure') }}
+                                    </option>
+                                    <option
+                                        v-for="range in budgetRanges"
+                                        :key="range"
+                                        :value="range"
+                                    >
+                                        {{ range }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                for="message"
+                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                            >
+                                {{ t('contact.message') }}
+                                <span class="text-accent">*</span>
+                            </label>
+                            <textarea
+                                id="message"
+                                v-model="form.message"
+                                rows="6"
+                                required
+                                :placeholder="t('contact.message_placeholder')"
+                                :class="[
+                                    fieldClass,
+                                    'mt-2 resize-y',
+                                    form.errors.message ? fieldErrorClass : '',
+                                ]"
+                            />
+                            <p
+                                v-if="form.errors.message"
+                                class="mt-1 font-mono text-[11px] text-destructive"
+                            >
+                                {{ form.errors.message }}
+                            </p>
+                        </div>
+
+                        <div
+                            class="flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <p
+                                class="max-w-[40ch] text-xs leading-relaxed text-muted-foreground"
+                            >
+                                {{ t('contact.privacy') }}
+                            </p>
+                            <button
+                                type="submit"
+                                :disabled="form.processing"
+                                class="group inline-flex items-center justify-center gap-2 bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+                            >
+                                {{
+                                    form.processing
+                                        ? t('contact.sending')
+                                        : t('contact.send')
+                                }}
+                                <ArrowUpRight
+                                    class="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                />
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
