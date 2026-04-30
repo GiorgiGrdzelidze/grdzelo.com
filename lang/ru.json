@@ -179,6 +179,14 @@
     "contact.privacy": "Ваши данные остаются между нами. Никаких рассылок, CRM и маркетинговых списков.",
     "contact.success_title": "Сообщение отправлено.",
     "contact.success_body": "Отвечу в течение двух рабочих дней. Если срочно — пришлите follow-up на почту, подниму в очереди.",
+    "contact.success_flash": "Спасибо за обращение! Я скоро вам отвечу.",
+
+    "flash.success_label": "Отправлено",
+    "flash.error_label": "Ошибка",
+    "flash.dismiss": "Закрыть",
+
+    "hobbies.title": "Вне редактора",
+    "hobbies.lead": "Чем занимаюсь, когда закрываю ноутбук — обычно это высота, вода или путь, где не ходят машины.",
 
     "sections.education.eyebrow": "Образование",
     "sections.gallery.eyebrow": "Галерея",
