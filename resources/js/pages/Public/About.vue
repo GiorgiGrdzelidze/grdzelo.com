@@ -1,15 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import {
-    ArrowRight,
-    Briefcase,
-    Calendar,
-    MapPin,
-    Sparkles,
-} from 'lucide-vue-next';
+import { ArrowUpRight } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { useT } from '@/composables/useTranslate';
 
 interface SkillItem {
     id: number;
@@ -46,12 +39,16 @@ interface HobbyItem {
 }
 
 interface Props {
+    settings: Record<string, any>;
+    seo: Record<string, any>;
     skills: SkillItem[];
     experiences: ExperienceItem[];
     hobbies: HobbyItem[];
 }
 
 const props = defineProps<Props>();
+
+const { t, locale } = useT();
 
 const groupedSkills = computed(() => {
     const groups: Record<string, SkillItem[]> = {};
@@ -74,14 +71,12 @@ function isUrl(icon: string | null): boolean {
 }
 
 function getDeviconClass(icon: string): string | null {
-    // Extract class from HTML tag like <i class="devicon-php-plain"></i>
     const match = icon.match(/class="([^"]+)"/);
 
     if (match) {
         return match[1];
     }
 
-    // Already a class string like "devicon-php-plain"
     if (icon.startsWith('devicon-')) {
         return icon;
     }
@@ -89,372 +84,323 @@ function getDeviconClass(icon: string): string | null {
     return null;
 }
 
-function formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', {
+function formatMonthYear(date: string): string {
+    return new Date(date).toLocaleDateString(locale.value || 'en', {
         year: 'numeric',
         month: 'short',
     });
 }
+
+const portrait = computed<string | null>(() => {
+    const path = props.settings?.about_image;
+
+    if (!path) {
+        return null;
+    }
+
+    return path.startsWith('http') || path.startsWith('/')
+        ? path
+        : `/storage/${path}`;
+});
+
+const intro = computed<string | null>(
+    () => props.settings?.about_intro || null,
+);
 </script>
 
 <template>
-    <div>
-        <!-- Hero -->
-        <section class="relative overflow-hidden py-20 sm:py-28">
-            <!-- Decorative gradient backdrop -->
+    <!-- ============ HERO ============ -->
+    <section class="px-6 pt-24 pb-24 sm:px-8 sm:pt-32 sm:pb-32 lg:px-12">
+        <div class="mx-auto max-w-[1200px]">
+            <span class="eyebrow">{{ t('sections.about.eyebrow') }}</span>
+
             <div
-                class="pointer-events-none absolute inset-0 -z-10"
-                aria-hidden="true"
+                class="mt-10 grid gap-12 lg:grid-cols-[1.1fr_minmax(0,1fr)] lg:items-start lg:gap-16"
+            >
+                <div>
+                    <h1
+                        class="max-w-[18ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance"
+                    >
+                        Engineer behind quietly reliable web products<span
+                            class="text-accent"
+                            >.</span
+                        >
+                    </h1>
+
+                    <div
+                        v-if="intro"
+                        class="mt-10 max-w-[55ch] text-lg leading-relaxed text-pretty text-foreground"
+                    >
+                        {{ intro }}
+                    </div>
+
+                    <div
+                        class="mt-10 max-w-[55ch] space-y-5 text-lg leading-relaxed text-pretty text-muted-foreground"
+                    >
+                        <p>
+                            Hi, I'm
+                            <span class="font-medium text-foreground"
+                                >Giorgi</span
+                            >
+                            — a full-stack engineer who builds web products end
+                            to end.
+                        </p>
+
+                        <p>
+                            I work mostly with
+                            <span class="font-medium text-foreground"
+                                >Laravel</span
+                            >
+                            on the backend and
+                            <span class="font-medium text-foreground">Vue</span>
+                            on the frontend, and I care about the small details
+                            that make a product feel finished.
+                        </p>
+
+                        <p>
+                            Over the years I've shipped admin panels, payment
+                            integrations, financial dashboards, and the kind of
+                            unglamorous internal tooling that quietly keeps real
+                            businesses moving.
+                        </p>
+                    </div>
+
+                    <div class="mt-12 flex flex-wrap gap-4">
+                        <Link
+                            href="/contact"
+                            class="group inline-flex items-center gap-2 bg-foreground px-5 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 active:scale-[0.98]"
+                        >
+                            {{ t('cta.get_in_touch') }}
+                            <ArrowUpRight
+                                class="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            />
+                        </Link>
+                        <Link
+                            href="/projects"
+                            class="inline-flex items-center gap-2 border border-border bg-transparent px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                        >
+                            {{ t('cta.view_projects') }}
+                        </Link>
+                    </div>
+                </div>
+
+                <figure
+                    v-if="portrait"
+                    class="relative mx-auto w-full max-w-sm self-start lg:mx-0 lg:max-w-none"
+                >
+                    <div
+                        class="aspect-[4/5] w-full overflow-hidden border border-border bg-muted"
+                    >
+                        <img
+                            :src="portrait"
+                            :alt="t('about.portrait_alt')"
+                            class="h-full w-full object-cover"
+                        />
+                    </div>
+                    <figcaption
+                        class="mt-3 font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                    >
+                        {{ t('about.portrait_alt') }}
+                        <span v-if="settings?.location">
+                            · {{ settings.location }}</span
+                        >
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SKILLS ============ -->
+    <section
+        v-if="props.skills.length"
+        class="border-t border-border bg-muted/40 px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16 flex items-end justify-between gap-4">
+                <div>
+                    <span class="eyebrow">{{
+                        t('sections.skills.eyebrow')
+                    }}</span>
+                    <h2
+                        class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                    >
+                        {{ t('about.skills_title') }}
+                    </h2>
+                    <p
+                        class="mt-4 max-w-[55ch] text-base leading-relaxed text-pretty text-muted-foreground"
+                    >
+                        {{ t('about.skills_lead') }}
+                    </p>
+                </div>
+                <Link
+                    href="/skills"
+                    class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                >
+                    {{ t('actions.view_all') }}
+                    <ArrowUpRight
+                        class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                </Link>
+            </div>
+
+            <div
+                v-for="(skillsInGroup, category) in groupedSkills"
+                :key="category"
+                class="mb-10 last:mb-0"
             >
                 <div
-                    class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-background to-background"
-                />
-                <div
-                    class="absolute -top-32 -left-20 h-72 w-[640px] rounded-full bg-primary/15 blur-3xl"
-                />
-            </div>
-
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
-                    <div>
-                        <span
-                            class="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase shadow-sm backdrop-blur"
-                        >
-                            <span class="relative flex h-1.5 w-1.5">
-                                <span
-                                    class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"
-                                />
-                                <span
-                                    class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"
-                                />
-                            </span>
-                            Available for new work
-                        </span>
-
-                        <h1
-                            class="mt-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-                        >
-                            Engineer behind
-                            <span class="relative whitespace-nowrap">
-                                <span
-                                    class="relative bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
-                                >
-                                    quietly reliable
-                                </span>
-                            </span>
-                            web products.
-                        </h1>
-
-                        <div
-                            class="mt-6 max-w-prose space-y-5 text-lg leading-8 text-foreground/80"
-                        >
-                            <p>
-                                Hi, I'm
-                                <span class="font-semibold text-foreground"
-                                    >Giorgi</span
-                                >
-                                — a full-stack engineer who builds web products
-                                end to end.
-                            </p>
-
-                            <p>
-                                I work mostly with
-                                <span class="font-semibold text-foreground"
-                                    >Laravel</span
-                                >
-                                on the backend and
-                                <span class="font-semibold text-foreground"
-                                    >Vue</span
-                                >
-                                on the frontend, and I care about the small
-                                details that make a product feel finished.
-                            </p>
-
-                            <p>
-                                Over the years I've shipped admin panels,
-                                payment integrations, financial dashboards, and
-                                the kind of unglamorous internal tooling that
-                                quietly keeps real businesses moving.
-                            </p>
-                        </div>
-
-                        <!-- Quick facts -->
-                        <ul
-                            class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground"
-                        >
-                            <li class="inline-flex items-center gap-1.5">
-                                <MapPin class="h-4 w-4 text-primary/70" />
-                                Tbilisi, Georgia
-                            </li>
-                            <li class="inline-flex items-center gap-1.5">
-                                <Briefcase class="h-4 w-4 text-primary/70" />
-                                Full-stack · Laravel · Vue
-                            </li>
-                            <li class="inline-flex items-center gap-1.5">
-                                <Sparkles class="h-4 w-4 text-primary/70" />
-                                Open to freelance & contract
-                            </li>
-                        </ul>
-
-                        <div class="mt-9 flex flex-wrap items-center gap-3">
-                            <Button as-child size="lg">
-                                <Link href="/contact">
-                                    Get in Touch
-                                    <ArrowRight class="ml-2 h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button as-child variant="outline" size="lg">
-                                <Link href="/projects">View Projects</Link>
-                            </Button>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center lg:justify-end">
-                        <div class="relative">
-                            <div
-                                class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 via-primary/5 to-transparent blur-2xl"
-                                aria-hidden="true"
-                            />
-                            <div
-                                class="relative aspect-square w-72 overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5 backdrop-blur sm:w-80"
-                            >
-                                <div
-                                    class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"
-                                />
-                                <div
-                                    class="absolute inset-0 flex items-center justify-center"
-                                >
-                                    <span
-                                        class="bg-gradient-to-br from-foreground/30 to-foreground/10 bg-clip-text font-mono text-7xl font-bold text-transparent select-none"
-                                    >
-                                        GG
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Preview -->
-        <section
-            v-if="props.skills.length"
-            class="border-t border-border/40 bg-muted/30 py-20"
-        >
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="flex items-end justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold tracking-tight">
-                            Skills & Expertise
-                        </h2>
-                        <p class="mt-2 text-muted-foreground">
-                            Technologies and tools I work with
-                        </p>
-                    </div>
-                    <Button as-child variant="ghost" size="sm">
-                        <Link href="/skills">
-                            View All
-                            <ArrowRight class="ml-1 h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
-
-                <div
-                    v-for="(skills, category) in groupedSkills"
-                    :key="category"
-                    class="mt-8"
+                    class="mb-4 font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                 >
-                    <h3 class="mb-4 text-lg font-semibold">{{ category }}</h3>
-                    <div
-                        class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                    {{ category }}
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span
+                        v-for="skill in skillsInGroup"
+                        :key="skill.id"
+                        class="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground"
                     >
-                        <div
-                            v-for="skill in skills"
-                            :key="skill.id"
-                            class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4"
+                        <img
+                            v-if="isUrl(skill.icon)"
+                            :src="skill.icon ?? ''"
+                            :alt="skill.name"
+                            class="h-3.5 w-3.5 object-contain"
+                        />
+                        <i
+                            v-else-if="
+                                skill.icon && getDeviconClass(skill.icon)
+                            "
+                            :class="getDeviconClass(skill.icon)"
+                            class="text-sm"
+                        />
+                        {{ skill.name }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
+    <section
+        v-if="experiences.length"
+        class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16 flex items-end justify-between gap-4">
+                <div>
+                    <span class="eyebrow">{{
+                        t('sections.experience.eyebrow')
+                    }}</span>
+                    <h2
+                        class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                    >
+                        {{ t('about.experience_title') }}
+                    </h2>
+                </div>
+                <Link
+                    href="/experience"
+                    class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                >
+                    {{ t('actions.full_timeline') }}
+                    <ArrowUpRight
+                        class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                </Link>
+            </div>
+
+            <ul class="border-t border-border">
+                <li
+                    v-for="exp in experiences"
+                    :key="exp.id"
+                    class="grid grid-cols-1 gap-6 border-b border-border py-8 sm:grid-cols-[180px_1fr]"
+                >
+                    <div
+                        class="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                    >
+                        <div>
+                            {{ formatMonthYear(exp.start_date) }} —
+                            <template v-if="exp.is_current">{{
+                                t('experience.current')
+                            }}</template>
+                            <template v-else-if="exp.end_date">{{
+                                formatMonthYear(exp.end_date)
+                            }}</template>
+                        </div>
+                        <div v-if="exp.is_current" class="mt-1 text-accent">
+                            {{ t('experience.current') }}
+                        </div>
+                    </div>
+                    <div>
+                        <h3
+                            class="text-lg font-semibold tracking-[-0.01em] text-foreground"
                         >
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl"
-                            >
-                                <img
-                                    v-if="isUrl(skill.icon)"
-                                    :src="skill.icon ?? ''"
-                                    :alt="skill.name"
-                                    class="h-6 w-6 object-contain"
-                                />
-                                <i
-                                    v-else-if="
-                                        skill.icon &&
-                                        getDeviconClass(skill.icon)
-                                    "
-                                    :class="getDeviconClass(skill.icon)"
-                                />
-                                <span v-else class="text-lg">🔧</span>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <p class="truncate font-medium">
-                                    {{ skill.name }}
-                                </p>
-                                <!-- <span class="text-xs text-muted-foreground">{{ skill.proficiency_score }}%</span> -->
-                            </div>
+                            {{ exp.role }}
+                        </h3>
+                        <div
+                            class="mt-1 font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                        >
+                            {{ exp.company }}
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Experience Timeline -->
-        <section
-            v-if="experiences.length"
-            class="border-t border-border/40 py-20"
-        >
-            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <div class="flex items-end justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold tracking-tight">
-                            Experience
-                        </h2>
-                        <p class="mt-2 text-muted-foreground">
-                            My professional journey
+                        <p
+                            v-if="exp.summary"
+                            class="mt-4 max-w-[65ch] text-sm leading-relaxed text-pretty text-muted-foreground"
+                        >
+                            {{ exp.summary }}
                         </p>
-                    </div>
-                    <Button as-child variant="ghost" size="sm">
-                        <Link href="/experience">
-                            Full Timeline
-                            <ArrowRight class="ml-1 h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
-
-                <div class="mt-10 space-y-8">
-                    <div
-                        v-for="exp in experiences"
-                        :key="exp.id"
-                        class="relative pl-8 before:absolute before:top-2 before:left-0 before:h-3 before:w-3 before:rounded-full before:bg-primary before:content-[''] after:absolute after:top-5 after:left-[5px] after:h-full after:w-0.5 after:bg-border/40 after:content-[''] last:after:hidden"
-                    >
-                        <div class="flex items-start gap-4">
-                            <div
-                                v-if="exp.logo"
-                                class="hidden shrink-0 sm:block"
+                        <div
+                            v-if="exp.technologies?.length"
+                            class="mt-4 flex flex-wrap gap-1.5"
+                        >
+                            <span
+                                v-for="tech in exp.technologies"
+                                :key="tech"
+                                class="border border-border px-2 py-0.5 font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase"
                             >
-                                <img
-                                    :src="`/storage/${exp.logo}`"
-                                    :alt="exp.company"
-                                    class="h-10 w-10 rounded-lg object-contain"
-                                />
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold">{{ exp.role }}</h3>
-                                <p
-                                    class="flex items-center gap-2 text-sm text-muted-foreground"
-                                >
-                                    <Briefcase class="h-3.5 w-3.5" />
-                                    {{ exp.company }}
-                                    <span v-if="exp.is_current">
-                                        <Badge
-                                            variant="secondary"
-                                            class="text-xs"
-                                            >Current</Badge
-                                        >
-                                    </span>
-                                </p>
-                                <p
-                                    class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"
-                                >
-                                    <Calendar class="h-3 w-3" />
-                                    {{ formatDate(exp.start_date) }} —
-                                    {{
-                                        exp.is_current
-                                            ? 'Present'
-                                            : exp.end_date
-                                              ? formatDate(exp.end_date)
-                                              : ''
-                                    }}
-                                </p>
-                                <p
-                                    v-if="exp.summary"
-                                    class="mt-3 text-sm leading-relaxed text-muted-foreground"
-                                >
-                                    {{ exp.summary }}
-                                </p>
-                                <div
-                                    v-if="exp.technologies?.length"
-                                    class="mt-3 flex flex-wrap gap-1"
-                                >
-                                    <Badge
-                                        v-for="tech in exp.technologies"
-                                        :key="tech"
-                                        variant="outline"
-                                        class="text-xs"
-                                        >{{ tech }}</Badge
-                                    >
-                                </div>
-                            </div>
+                                {{ tech }}
+                            </span>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </li>
+            </ul>
+        </div>
+    </section>
 
-        <!-- Hobbies & Interests -->
-        <section
-            v-if="hobbies.length"
-            class="border-t border-border/40 bg-muted/30 py-20"
-        >
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="flex items-end justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold tracking-tight">
-                            Hobbies & Interests
-                        </h2>
-                        <p class="mt-2 text-muted-foreground">
-                            What I enjoy outside of work
-                        </p>
-                    </div>
-                    <Button as-child variant="ghost" size="sm">
-                        <Link href="/hobbies">
-                            View All
-                            <ArrowRight class="ml-1 h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
-                <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <div
-                        v-for="hobby in hobbies.slice(0, 6)"
-                        :key="hobby.id"
-                        class="rounded-lg border border-border/40 bg-background p-5"
+    <!-- ============ HOBBIES ============ -->
+    <section
+        v-if="hobbies.length"
+        class="border-t border-border bg-muted/40 px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16">
+                <span class="eyebrow">{{ t('sections.hobbies.eyebrow') }}</span>
+                <h2
+                    class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                >
+                    {{ t('about.hobbies_title') }}
+                </h2>
+                <p
+                    class="mt-4 max-w-[55ch] text-base leading-relaxed text-pretty text-muted-foreground"
+                >
+                    {{ t('about.hobbies_lead') }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-px bg-border md:grid-cols-3">
+                <div
+                    v-for="hobby in hobbies.slice(0, 6)"
+                    :key="hobby.id"
+                    class="bg-background p-8"
+                >
+                    <h3 class="text-lg font-semibold tracking-[-0.01em]">
+                        {{ hobby.title }}
+                    </h3>
+                    <p
+                        v-if="hobby.summary"
+                        class="mt-3 line-clamp-3 text-sm leading-relaxed text-pretty text-muted-foreground"
                     >
-                        <div class="flex items-start gap-3">
-                            <div
-                                v-if="hobby.icon"
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg"
-                            >
-                                {{ hobby.icon }}
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-medium">
-                                        {{ hobby.title }}
-                                    </h3>
-                                    <Badge
-                                        v-if="hobby.is_featured"
-                                        variant="secondary"
-                                        class="text-xs"
-                                        >Featured</Badge
-                                    >
-                                </div>
-                                <p
-                                    v-if="hobby.summary"
-                                    class="mt-1 line-clamp-2 text-sm text-muted-foreground"
-                                >
-                                    {{ hobby.summary }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        {{ hobby.summary }}
+                    </p>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
 </template>

@@ -56,6 +56,19 @@ class ManageGeneralSettings extends SettingsPage
                         ->rows(4)
                         ->helperText('Paste verification meta tags here'),
                 ]),
+                Schemas\Components\Tabs\Tab::make('About Page')->schema([
+                    Forms\Components\FileUpload::make('about_image')
+                        ->label('Portrait')
+                        ->image()
+                        ->disk('public')
+                        ->directory('settings')
+                        ->helperText('Optional portrait shown in the About hero. Square or 4:5 aspect ratio works best.'),
+                    Forms\Components\Textarea::make('about_intro')
+                        ->label('Editorial intro')
+                        ->rows(4)
+                        ->maxLength(600)
+                        ->helperText('Optional short paragraph rendered above the existing About hero copy. Leave blank to omit.'),
+                ]),
                 Schemas\Components\Tabs\Tab::make('Branding')->schema([
                     Forms\Components\FileUpload::make('logo')
                         ->label('Main Logo')

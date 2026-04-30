@@ -41,14 +41,28 @@ class GalleryController extends BasePublicController
             abort(404);
         }
 
-        $photos = collect($album->photos ?? [])->map(fn ($path, $index) => [
-            'id' => $index,
-            'url' => Storage::url($path),
-            'thumb' => Storage::url($path),
-            'preview' => Storage::url($path),
-            'alt' => $album->title,
-            'caption' => null,
-        ]);
+        $photos = collect($album->photos ?? [])
+            ->map(function ($entry, $index) use ($album) {
+                $path = is_array($entry) ? ($entry['path'] ?? $entry['url'] ?? null) : $entry;
+                $caption = is_array($entry) ? ($entry['caption'] ?? null) : null;
+
+                if (! is_string($path) || $path === '') {
+                    return null;
+                }
+
+                $url = Storage::url($path);
+
+                return [
+                    'id' => $index,
+                    'url' => $url,
+                    'thumb' => $url,
+                    'preview' => $url,
+                    'alt' => $album->title,
+                    'caption' => $caption,
+                ];
+            })
+            ->filter()
+            ->values();
 
         return Inertia::render('Public/Gallery/Show', [
             ...$this->sharedProps(),

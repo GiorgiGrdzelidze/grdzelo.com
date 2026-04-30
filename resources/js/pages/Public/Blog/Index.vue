@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Clock } from 'lucide-vue-next';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowUpRight, BookOpen } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useT } from '@/composables/useTranslate';
 
 interface ArticleItem {
     id: number;
@@ -28,196 +28,298 @@ interface PaginatedArticles {
     links: Array<{ url: string | null; label: string; active: boolean }>;
     current_page: number;
     last_page: number;
+    total: number;
 }
 
 interface Props {
+    settings: Record<string, any>;
+    seo: Record<string, any>;
     articles: PaginatedArticles;
     categories: Category[];
     featured: ArticleItem[];
+    activeCategory?: string | null;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const { t, locale } = useT();
 
 function formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString(locale.value || 'en', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
     });
 }
+
+function pad(n: number): string {
+    return String(n).padStart(2, '0');
+}
+
+const totalArticles = computed(() => props.articles.total);
 </script>
 
 <template>
-    <section class="py-20">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl text-center">
-                <h1 class="text-4xl font-bold tracking-tight">Blog</h1>
-                <p class="mt-4 text-lg text-muted-foreground">
-                    Thoughts on engineering, product design, architecture, and
-                    the craft of building software.
-                </p>
+    <!-- ============ HEADER ============ -->
+    <section class="px-6 pt-24 pb-16 sm:px-8 sm:pt-32 sm:pb-20 lg:px-12">
+        <div class="mx-auto max-w-[1200px]">
+            <span class="eyebrow">{{ t('sections.journal.eyebrow') }}</span>
+            <h1
+                class="mt-6 max-w-[20ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance"
+            >
+                {{ t('blog.title') }}<span class="text-accent">.</span>
+            </h1>
+            <p
+                class="mt-8 max-w-[65ch] text-lg leading-relaxed text-pretty text-muted-foreground"
+            >
+                {{ t('blog.lead') }}
+            </p>
+        </div>
+    </section>
+
+    <!-- ============ FEATURED ============ -->
+    <section
+        v-if="featured.length"
+        class="border-t border-border px-6 pt-8 pb-10 sm:px-8 sm:pt-10 sm:pb-12 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-2 flex items-end justify-between gap-4">
+                <span
+                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                >
+                    {{ t('blog.featured') }}
+                </span>
+                <span
+                    class="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
+                >
+                    {{ pad(featured.length) }}
+                </span>
             </div>
 
-            <!-- Featured Articles -->
-            <div v-if="featured.length" class="mt-12 grid gap-6 lg:grid-cols-3">
+            <div
+                class="grid grid-cols-1 gap-px border border-border bg-border md:grid-cols-3"
+            >
                 <Link
-                    v-for="article in featured"
+                    v-for="(article, i) in featured"
                     :key="article.id"
                     :href="`/blog/${article.slug}`"
-                    class="group"
+                    class="group flex flex-col bg-background p-5 transition-colors hover:bg-muted/30"
                 >
-                    <Card
-                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-lg"
+                    <div
+                        class="flex items-center justify-between font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                     >
-                        <div
-                            v-if="article.cover_image"
-                            class="aspect-video overflow-hidden rounded-t-lg"
-                        >
-                            <img
-                                :src="`/storage/${article.cover_image}`"
-                                :alt="article.title"
-                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </div>
-                        <CardHeader>
-                            <Badge variant="secondary" class="w-fit text-xs"
-                                >Featured</Badge
-                            >
-                            <CardTitle
-                                class="text-lg group-hover:text-primary/80"
-                                >{{ article.title }}</CardTitle
-                            >
-                        </CardHeader>
-                        <CardContent>
-                            <p
-                                class="line-clamp-2 text-sm text-muted-foreground"
-                            >
-                                {{ article.excerpt }}
-                            </p>
-                            <div
-                                class="mt-3 flex items-center gap-3 text-xs text-muted-foreground"
-                            >
-                                <span>{{
-                                    formatDate(article.publish_at)
-                                }}</span>
-                                <span class="flex items-center gap-1">
-                                    <Clock class="h-3 w-3" />
-                                    {{ article.reading_time }} min
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        <span>/ {{ pad(i + 1) }}</span>
+                        <span>{{ article.reading_time }} min</span>
+                    </div>
+
+                    <div
+                        v-if="article.cover_image"
+                        class="mt-3 aspect-[4/3] overflow-hidden border border-border bg-muted/40"
+                    >
+                        <img
+                            :src="`/storage/${article.cover_image}`"
+                            :alt="article.title"
+                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                            loading="lazy"
+                        />
+                    </div>
+
+                    <h2
+                        class="mt-3 inline-flex items-start gap-1 text-base font-semibold tracking-[-0.01em] text-foreground sm:text-lg"
+                    >
+                        {{ article.title }}
+                        <ArrowUpRight
+                            class="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+                            aria-hidden="true"
+                        />
+                    </h2>
+
+                    <p
+                        class="mt-2 line-clamp-3 text-sm leading-relaxed text-pretty text-muted-foreground"
+                    >
+                        {{ article.excerpt }}
+                    </p>
+
+                    <div
+                        class="mt-auto pt-3 font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        {{ formatDate(article.publish_at) }}
+                    </div>
                 </Link>
             </div>
+        </div>
+    </section>
 
-            <!-- Categories -->
-            <div
-                v-if="categories.length"
-                class="mt-12 flex flex-wrap items-center gap-2"
-            >
-                <span class="text-sm font-medium text-muted-foreground"
-                    >Filter:</span
+    <!-- ============ CATEGORIES ============ -->
+    <section
+        v-if="categories.length"
+        class="border-t border-border px-6 pt-12 pb-6 sm:px-8 sm:pt-16 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <span
+                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                 >
-                <Badge variant="outline" class="cursor-pointer hover:bg-accent"
-                    >All</Badge
+                    Filter
+                </span>
+                <Link
+                    href="/blog"
+                    preserve-scroll
+                    preserve-state
+                    :only="['articles', 'activeCategory']"
+                    class="font-mono text-[11px] font-medium tracking-[0.12em] uppercase transition-colors"
+                    :class="
+                        !activeCategory
+                            ? 'text-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
+                    "
                 >
-                <Badge
+                    All
+                </Link>
+                <Link
                     v-for="cat in categories"
                     :key="cat.id"
-                    variant="outline"
-                    class="cursor-pointer hover:bg-accent"
+                    :href="`/blog?category=${cat.slug}`"
+                    preserve-scroll
+                    preserve-state
+                    :only="['articles', 'activeCategory']"
+                    class="font-mono text-[11px] font-medium tracking-[0.12em] uppercase transition-colors"
+                    :class="
+                        activeCategory === cat.slug
+                            ? 'text-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
+                    "
                 >
-                    {{ cat.name }} ({{ cat.articles_count }})
-                </Badge>
-            </div>
-
-            <!-- Articles Grid -->
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Link
-                    v-for="article in articles.data"
-                    :key="article.id"
-                    :href="`/blog/${article.slug}`"
-                    class="group"
-                >
-                    <Card
-                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-md"
+                    {{ cat.name }}
+                    <span class="text-muted-foreground/60"
+                        >({{ cat.articles_count }})</span
                     >
-                        <div
-                            v-if="article.cover_image"
-                            class="aspect-video overflow-hidden rounded-t-lg"
-                        >
-                            <img
-                                :src="`/storage/${article.cover_image}`"
-                                :alt="article.title"
-                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </div>
-                        <CardHeader>
-                            <Badge
-                                v-if="article.category"
-                                variant="secondary"
-                                class="w-fit text-xs"
-                            >
-                                {{ article.category.name }}
-                            </Badge>
-                            <CardTitle
-                                class="text-base group-hover:text-primary/80"
-                                >{{ article.title }}</CardTitle
-                            >
-                        </CardHeader>
-                        <CardContent>
-                            <p
-                                class="line-clamp-2 text-sm text-muted-foreground"
-                            >
-                                {{ article.excerpt }}
-                            </p>
-                            <div
-                                class="mt-3 flex items-center gap-3 text-xs text-muted-foreground"
-                            >
-                                <span>{{
-                                    formatDate(article.publish_at)
-                                }}</span>
-                                <span class="flex items-center gap-1">
-                                    <Clock class="h-3 w-3" />
-                                    {{ article.reading_time }} min
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
                 </Link>
             </div>
+        </div>
+    </section>
 
-            <!-- Empty State -->
-            <div v-if="!articles.data.length" class="mt-14 text-center">
-                <BookOpen class="mx-auto h-12 w-12 text-muted-foreground" />
-                <p class="mt-4 text-lg font-medium">No articles yet</p>
-                <p class="mt-1 text-muted-foreground">
-                    Check back soon for new content.
-                </p>
+    <!-- ============ ARTICLES LIST ============ -->
+    <section
+        v-if="articles.data.length"
+        class="border-t border-border px-6 pt-8 pb-24 sm:px-8 sm:pt-10 sm:pb-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-4 flex items-end justify-between gap-4">
+                <span
+                    class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                >
+                    All articles
+                </span>
+                <span
+                    class="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
+                >
+                    {{ pad(totalArticles) }}
+                </span>
             </div>
+
+            <ul class="border-t border-border">
+                <li
+                    v-for="(article, i) in articles.data"
+                    :key="article.id"
+                    class="group/row relative grid grid-cols-1 items-start gap-2 border-b border-border py-5 transition-colors hover:bg-muted/30 sm:grid-cols-[32px_minmax(0,1.6fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-6"
+                >
+                    <Link
+                        :href="`/blog/${article.slug}`"
+                        class="absolute inset-0 z-0"
+                        :aria-label="`Read ${article.title}`"
+                    />
+                    <span
+                        class="pointer-events-none relative z-10 font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        {{ pad(i + 1) }}
+                    </span>
+
+                    <div class="pointer-events-none relative z-10 min-w-0">
+                        <div
+                            class="inline-flex items-start gap-1 text-base font-semibold tracking-[-0.01em] text-foreground"
+                        >
+                            {{ article.title }}
+                            <ArrowUpRight
+                                class="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground transition-all group-hover/row:translate-x-0.5 group-hover/row:-translate-y-0.5 group-hover/row:text-accent"
+                                aria-hidden="true"
+                            />
+                        </div>
+                        <p
+                            v-if="article.excerpt"
+                            class="mt-1 line-clamp-2 max-w-[60ch] text-sm leading-relaxed text-pretty text-muted-foreground"
+                        >
+                            {{ article.excerpt }}
+                        </p>
+                    </div>
+
+                    <div
+                        class="pointer-events-none relative z-10 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                    >
+                        <span v-if="article.category" class="text-foreground">
+                            {{ article.category.name }}
+                        </span>
+                        <span>{{ article.reading_time }} min</span>
+                    </div>
+
+                    <span
+                        class="pointer-events-none relative z-10 justify-self-start font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase sm:justify-self-end"
+                    >
+                        {{ formatDate(article.publish_at) }}
+                    </span>
+                </li>
+            </ul>
 
             <!-- Pagination -->
             <nav
                 v-if="articles.last_page > 1"
-                class="mt-12 flex items-center justify-center gap-2"
+                class="mt-12 flex flex-wrap items-center justify-center gap-2"
+                :aria-label="'Pagination'"
             >
                 <template v-for="link in articles.links" :key="link.label">
                     <!-- eslint-disable vue/no-v-text-v-html-on-component -->
                     <component
                         :is="link.url ? Link : 'span'"
                         :href="link.url ?? undefined"
-                        class="inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-3 text-sm"
+                        :preserve-scroll="link.url ? true : undefined"
+                        :only="
+                            link.url
+                                ? ['articles', 'activeCategory']
+                                : undefined
+                        "
+                        class="inline-flex h-9 min-w-9 items-center justify-center border px-3 font-mono text-[11px] font-medium tracking-[0.12em] uppercase transition-colors"
                         :class="[
                             link.active
-                                ? 'border-primary bg-primary text-primary-foreground'
-                                : 'border-border hover:bg-accent',
-                            !link.url ? 'cursor-default opacity-50' : '',
+                                ? 'border-foreground bg-foreground text-background'
+                                : 'border-border text-foreground hover:border-foreground',
+                            !link.url
+                                ? 'cursor-default text-muted-foreground/40'
+                                : '',
                         ]"
                         v-html="link.label"
                     />
                     <!-- eslint-enable vue/no-v-text-v-html-on-component -->
                 </template>
             </nav>
+        </div>
+    </section>
+
+    <!-- ============ EMPTY STATE ============ -->
+    <section
+        v-else
+        class="border-t border-border px-6 py-32 sm:px-8 sm:py-40 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px] text-center">
+            <BookOpen
+                class="mx-auto h-10 w-10 text-muted-foreground"
+                :stroke-width="1.5"
+                aria-hidden="true"
+            />
+            <p
+                class="mt-6 font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase"
+            >
+                No articles yet
+            </p>
         </div>
     </section>
 </template>

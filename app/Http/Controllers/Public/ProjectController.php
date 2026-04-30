@@ -16,6 +16,7 @@ class ProjectController extends BasePublicController
             ->get([
                 'id', 'title', 'slug', 'summary', 'cover_image',
                 'tech_stack', 'year', 'is_featured', 'client_type', 'industry',
+                'metrics',
             ]);
 
         return Inertia::render('Public/Projects/Index', [

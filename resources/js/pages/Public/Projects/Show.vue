@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ArrowLeft, Calendar, ExternalLink, Github } from 'lucide-vue-next';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, ArrowUpRight } from 'lucide-vue-next';
+import { useT } from '@/composables/useTranslate';
+
+interface Metric {
+    label: string;
+    value: string;
+}
 
 interface Project {
     id: number;
@@ -26,7 +28,7 @@ interface Project {
     gallery: string[] | null;
     live_url: string | null;
     repo_url: string | null;
-    metrics: Array<{ label: string; value: string }> | null;
+    metrics: Metric[] | null;
     skills: Array<{ id: number; name: string; slug: string }>;
     testimonials: Array<{
         id: number;
@@ -50,248 +52,411 @@ interface RelatedProject {
 }
 
 interface Props {
+    settings: Record<string, any>;
+    seo: Record<string, any>;
     project: Project;
     relatedProjects: RelatedProject[];
 }
 
 defineProps<Props>();
+
+const { t } = useT();
+
+function pad(n: number): string {
+    return String(n).padStart(2, '0');
+}
 </script>
 
 <template>
-    <article class="py-12">
-        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <!-- Back Link -->
-            <Link
-                href="/projects"
-                class="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-            >
-                <ArrowLeft class="h-4 w-4" />
-                Back to Projects
-            </Link>
-
-            <!-- Header -->
-            <header>
-                <h1 class="text-4xl font-bold tracking-tight">
-                    {{ project.title }}
-                </h1>
-                <p
-                    v-if="project.summary"
-                    class="mt-4 text-lg text-muted-foreground"
+    <article>
+        <!-- ============ HEADER ============ -->
+        <section class="px-6 pt-16 pb-16 sm:px-8 sm:pt-24 sm:pb-20 lg:px-12">
+            <div class="mx-auto max-w-[1200px]">
+                <Link
+                    href="/projects"
+                    class="group inline-flex items-center gap-2 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
                 >
-                    {{ project.summary }}
-                </p>
+                    <ArrowLeft
+                        class="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5"
+                    />
+                    {{ t('actions.back_to_work') }}
+                </Link>
 
                 <div
-                    class="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground"
+                    class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-end lg:gap-16"
                 >
-                    <span v-if="project.role" class="flex items-center gap-1">
-                        Role:
-                        <strong class="text-foreground">{{
-                            project.role
-                        }}</strong>
-                    </span>
-                    <span v-if="project.year" class="flex items-center gap-1">
-                        <Calendar class="h-4 w-4" />
-                        {{ project.year }}
-                    </span>
-                    <span v-if="project.industry">{{ project.industry }}</span>
-                </div>
-
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <Button v-if="project.live_url" as-child size="sm">
-                        <a
-                            :href="project.live_url"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                    <div>
+                        <span class="eyebrow">{{
+                            t('sections.work.eyebrow')
+                        }}</span>
+                        <h1
+                            class="mt-6 text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance"
                         >
-                            <ExternalLink class="mr-1.5 h-4 w-4" />
-                            Live Site
-                        </a>
-                    </Button>
-                    <Button
-                        v-if="project.repo_url"
-                        as-child
-                        variant="outline"
-                        size="sm"
+                            {{ project.title
+                            }}<span class="text-accent">.</span>
+                        </h1>
+                        <p
+                            v-if="project.summary"
+                            class="mt-8 max-w-[60ch] text-lg leading-relaxed text-pretty text-muted-foreground"
+                        >
+                            {{ project.summary }}
+                        </p>
+                    </div>
+
+                    <dl
+                        class="grid grid-cols-2 gap-x-6 gap-y-6 border-t border-border pt-6 sm:grid-cols-3 lg:grid-cols-2 lg:border-t-0 lg:pt-0"
                     >
-                        <a
-                            :href="project.repo_url"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <Github class="mr-1.5 h-4 w-4" />
-                            Source Code
-                        </a>
-                    </Button>
+                        <div v-if="project.role">
+                            <dt
+                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                            >
+                                {{ t('project.role') }}
+                            </dt>
+                            <dd class="mt-2 text-sm text-foreground">
+                                {{ project.role }}
+                            </dd>
+                        </div>
+                        <div v-if="project.client_type">
+                            <dt
+                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                            >
+                                {{ t('project.client') }}
+                            </dt>
+                            <dd class="mt-2 text-sm text-foreground">
+                                {{ project.client_type }}
+                            </dd>
+                        </div>
+                        <div v-if="project.year">
+                            <dt
+                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                            >
+                                {{ t('project.year') }}
+                            </dt>
+                            <dd class="mt-2 font-mono text-sm text-foreground">
+                                {{ project.year }}
+                            </dd>
+                        </div>
+                        <div v-if="project.industry">
+                            <dt
+                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                            >
+                                Industry
+                            </dt>
+                            <dd class="mt-2 text-sm text-foreground">
+                                {{ project.industry }}
+                            </dd>
+                        </div>
+                    </dl>
                 </div>
-            </header>
 
-            <!-- Cover Image -->
-            <div
-                v-if="project.cover_image"
-                class="mt-8 overflow-hidden rounded-xl"
-            >
-                <img
-                    :src="`/storage/${project.cover_image}`"
-                    :alt="project.title"
-                    class="w-full"
+                <div
+                    v-if="project.live_url || project.repo_url"
+                    class="mt-12 flex flex-wrap gap-4"
+                >
+                    <a
+                        v-if="project.live_url"
+                        :href="project.live_url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group inline-flex items-center gap-2 bg-foreground px-5 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                    >
+                        {{ t('project.visit_live') }}
+                        <ArrowUpRight
+                            class="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        />
+                    </a>
+                    <a
+                        v-if="project.repo_url"
+                        :href="project.repo_url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 border border-border bg-transparent px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                    >
+                        {{ t('project.view_source') }}
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ COVER ============ -->
+        <section
+            v-if="project.cover_image"
+            class="px-6 pb-24 sm:px-8 sm:pb-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px]">
+                <div
+                    class="aspect-[16/9] w-full overflow-hidden border border-border bg-muted"
+                >
+                    <img
+                        :src="`/storage/${project.cover_image}`"
+                        :alt="project.title"
+                        class="h-full w-full object-cover"
+                    />
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ DESCRIPTION ============ -->
+        <section
+            v-if="project.description"
+            class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px]">
+                <div
+                    class="prose prose-neutral dark:prose-invert max-w-[70ch] text-pretty"
+                    v-html="project.description"
                 />
             </div>
+        </section>
 
-            <Separator class="my-10" />
-
-            <!-- Description -->
-            <div
-                v-if="project.description"
-                class="prose prose-neutral dark:prose-invert max-w-none"
-                v-html="project.description"
-            />
-
-            <!-- Case Study Sections -->
-            <div v-if="project.challenge" class="mt-10">
-                <h2 class="text-2xl font-bold">The Challenge</h2>
-                <p class="mt-3 leading-relaxed text-muted-foreground">
-                    {{ project.challenge }}
-                </p>
-            </div>
-            <div v-if="project.solution" class="mt-8">
-                <h2 class="text-2xl font-bold">The Solution</h2>
-                <p class="mt-3 leading-relaxed text-muted-foreground">
-                    {{ project.solution }}
-                </p>
-            </div>
-            <div v-if="project.process" class="mt-8">
-                <h2 class="text-2xl font-bold">The Process</h2>
-                <p class="mt-3 leading-relaxed text-muted-foreground">
-                    {{ project.process }}
-                </p>
-            </div>
-
-            <!-- Metrics -->
-            <div v-if="project.metrics?.length" class="mt-12">
-                <h2 class="text-2xl font-bold">Project Highlights</h2>
+        <!-- ============ CASE STUDY: CHALLENGE / SOLUTION / PROCESS ============ -->
+        <section
+            v-if="project.challenge || project.solution || project.process"
+            class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px] space-y-16">
                 <div
-                    class="mt-4 divide-y divide-border/50 rounded-xl border border-border/50"
+                    v-if="project.challenge"
+                    class="grid gap-8 md:grid-cols-[180px_1fr]"
+                >
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        / 01 · Challenge
+                    </div>
+                    <p
+                        class="max-w-[65ch] text-lg leading-relaxed text-pretty text-foreground"
+                    >
+                        {{ project.challenge }}
+                    </p>
+                </div>
+                <div
+                    v-if="project.solution"
+                    class="grid gap-8 md:grid-cols-[180px_1fr]"
+                >
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        / 02 · Solution
+                    </div>
+                    <p
+                        class="max-w-[65ch] text-lg leading-relaxed text-pretty text-foreground"
+                    >
+                        {{ project.solution }}
+                    </p>
+                </div>
+                <div
+                    v-if="project.process"
+                    class="grid gap-8 md:grid-cols-[180px_1fr]"
+                >
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        / 03 · Process
+                    </div>
+                    <p
+                        class="max-w-[65ch] text-lg leading-relaxed text-pretty text-foreground"
+                    >
+                        {{ project.process }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ METRICS ============ -->
+        <section
+            v-if="project.metrics?.length"
+            class="border-t border-border bg-muted/40 px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px]">
+                <span class="eyebrow">Numbers</span>
+                <div
+                    class="mt-12 grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4"
                 >
                     <div
                         v-for="metric in project.metrics"
                         :key="metric.label"
-                        class="flex items-start gap-4 p-4 sm:items-center sm:gap-6"
+                        class="bg-background p-8"
                     >
-                        <span
-                            class="shrink-0 text-xs font-medium tracking-wider text-muted-foreground uppercase sm:w-40"
-                            >{{ metric.label }}</span
+                        <div
+                            class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                         >
-                        <span class="text-sm text-foreground">{{
-                            metric.value
-                        }}</span>
+                            {{ metric.label }}
+                        </div>
+                        <div
+                            class="mt-3 font-mono text-3xl font-semibold tracking-[-0.01em] text-foreground"
+                        >
+                            {{ metric.value }}
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Tech Stack -->
-            <div v-if="project.tech_stack?.length" class="mt-10">
-                <h2 class="text-2xl font-bold">Tech Stack</h2>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <Badge
-                        v-for="tech in project.tech_stack"
-                        :key="tech"
-                        variant="secondary"
-                        >{{ tech }}</Badge
-                    >
+        <!-- ============ TECH STACK ============ -->
+        <section
+            v-if="project.tech_stack?.length || project.skills?.length"
+            class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px] space-y-12">
+                <div v-if="project.tech_stack?.length">
+                    <span class="eyebrow">{{ t('project.stack') }}</span>
+                    <div class="mt-6 flex flex-wrap gap-1.5">
+                        <span
+                            v-for="tech in project.tech_stack"
+                            :key="tech"
+                            class="border border-border px-3 py-1.5 font-mono text-xs text-foreground"
+                        >
+                            {{ tech }}
+                        </span>
+                    </div>
+                </div>
+                <div v-if="project.skills?.length">
+                    <span class="eyebrow">{{
+                        t('sections.skills.eyebrow')
+                    }}</span>
+                    <div class="mt-6 flex flex-wrap gap-1.5">
+                        <span
+                            v-for="skill in project.skills"
+                            :key="skill.id"
+                            class="border border-border px-3 py-1.5 font-mono text-xs text-foreground"
+                        >
+                            {{ skill.name }}
+                        </span>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Skills Used -->
-            <div v-if="project.skills?.length" class="mt-8">
-                <h2 class="text-2xl font-bold">Skills</h2>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <Badge
-                        v-for="skill in project.skills"
-                        :key="skill.id"
-                        variant="outline"
-                        >{{ skill.name }}</Badge
+        <!-- ============ TESTIMONIALS ============ -->
+        <section
+            v-if="project.testimonials?.length"
+            class="border-t border-border bg-muted/40 px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px]">
+                <span class="eyebrow">{{
+                    t('sections.feedback.eyebrow')
+                }}</span>
+                <div
+                    class="mt-12 grid grid-cols-1 gap-px bg-border md:grid-cols-2"
+                >
+                    <figure
+                        v-for="testimonial in project.testimonials"
+                        :key="testimonial.id"
+                        class="flex flex-col justify-between bg-background p-8"
                     >
-                </div>
-            </div>
-
-            <!-- Testimonials -->
-            <div v-if="project.testimonials?.length" class="mt-10">
-                <h2 class="text-2xl font-bold">Client Feedback</h2>
-                <div class="mt-4 space-y-4">
-                    <Card v-for="t in project.testimonials" :key="t.id">
-                        <CardContent class="pt-6">
-                            <blockquote
-                                class="text-sm text-muted-foreground italic"
+                        <blockquote
+                            class="text-base leading-relaxed text-pretty text-foreground"
+                        >
+                            “{{ testimonial.quote }}”
+                        </blockquote>
+                        <figcaption
+                            class="mt-8 border-t border-border pt-6 font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                        >
+                            <div class="text-foreground">
+                                {{ testimonial.author_name }}
+                            </div>
+                            <div
+                                v-if="
+                                    testimonial.author_role ||
+                                    testimonial.company
+                                "
+                                class="mt-1"
                             >
-                                "{{ t.quote }}"
-                            </blockquote>
-                            <p class="mt-3 text-sm font-medium">
-                                — {{ t.author_name }}
-                                <span
-                                    v-if="t.company"
-                                    class="text-muted-foreground"
-                                    >, {{ t.company }}</span
-                                >
-                            </p>
-                        </CardContent>
-                    </Card>
+                                {{
+                                    [
+                                        testimonial.author_role,
+                                        testimonial.company,
+                                    ]
+                                        .filter(Boolean)
+                                        .join(' · ')
+                                }}
+                            </div>
+                        </figcaption>
+                    </figure>
                 </div>
             </div>
+        </section>
 
-            <!-- Gallery -->
-            <div v-if="project.gallery?.length" class="mt-10">
-                <h2 class="text-2xl font-bold">Gallery</h2>
-                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <!-- ============ GALLERY ============ -->
+        <section
+            v-if="project.gallery?.length"
+            class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+        >
+            <div class="mx-auto max-w-[1200px]">
+                <span class="eyebrow">{{ t('project.gallery') }}</span>
+                <div
+                    class="mt-12 grid grid-cols-1 gap-px bg-border sm:grid-cols-2"
+                >
                     <div
                         v-for="(img, idx) in project.gallery"
                         :key="idx"
-                        class="overflow-hidden rounded-lg"
+                        class="aspect-[4/3] overflow-hidden bg-muted"
                     >
                         <img
                             :src="`/storage/${img}`"
-                            :alt="`${project.title} screenshot ${idx + 1}`"
-                            class="w-full"
+                            :alt="`${project.title} — ${idx + 1}`"
+                            class="h-full w-full object-cover"
                         />
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Related Projects -->
-        <div
+        <!-- ============ RELATED ============ -->
+        <section
             v-if="relatedProjects.length"
-            class="mt-16 border-t border-border/40 py-16"
+            class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
         >
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl font-bold">More Projects</h2>
-                <div class="mt-6 grid gap-6 sm:grid-cols-3">
+            <div class="mx-auto max-w-[1200px]">
+                <div class="mb-16 flex items-end justify-between gap-4">
+                    <div>
+                        <span class="eyebrow">{{ t('project.related') }}</span>
+                        <h2
+                            class="mt-4 text-[clamp(1.5rem,2.5vw,2rem)] font-semibold tracking-[-0.02em]"
+                        >
+                            {{ t('project.related') }}
+                        </h2>
+                    </div>
                     <Link
-                        v-for="rp in relatedProjects"
+                        href="/projects"
+                        class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                    >
+                        {{ t('actions.view_all') }}
+                        <ArrowUpRight
+                            class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        />
+                    </Link>
+                </div>
+
+                <div class="grid grid-cols-1 gap-px bg-border sm:grid-cols-3">
+                    <Link
+                        v-for="(rp, i) in relatedProjects"
                         :key="rp.id"
                         :href="`/projects/${rp.slug}`"
-                        class="group"
+                        class="group flex flex-col bg-background p-8 transition-colors hover:bg-muted/30"
                     >
-                        <Card
-                            class="h-full transition-all hover:border-foreground/20 hover:shadow-md"
+                        <div
+                            class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                         >
-                            <CardHeader>
-                                <CardTitle
-                                    class="text-base group-hover:text-primary/80"
-                                    >{{ rp.title }}</CardTitle
-                                >
-                            </CardHeader>
-                            <CardContent>
-                                <p
-                                    class="line-clamp-2 text-sm text-muted-foreground"
-                                >
-                                    {{ rp.summary }}
-                                </p>
-                            </CardContent>
-                        </Card>
+                            {{ pad(i + 1) }}
+                        </div>
+                        <h3
+                            class="mt-6 flex items-center gap-1 text-base font-semibold tracking-[-0.01em]"
+                        >
+                            {{ rp.title }}
+                            <ArrowUpRight
+                                class="h-3.5 w-3.5 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+                            />
+                        </h3>
+                        <p
+                            class="mt-3 line-clamp-3 text-sm leading-relaxed text-pretty text-muted-foreground"
+                        >
+                            {{ rp.summary }}
+                        </p>
                     </Link>
                 </div>
             </div>
-        </div>
+        </section>
     </article>
 </template>

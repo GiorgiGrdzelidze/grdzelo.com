@@ -435,7 +435,7 @@ class ContentSeeder extends Seeder
         // Certifications
         $certifications = [
             [
-                'name' => 'AWS Certified Solutions Architect',
+                'title' => 'AWS Certified Solutions Architect',
                 'issuing_organization' => 'Amazon Web Services',
                 'issue_date' => '2022-03-15',
                 'expiry_date' => '2025-03-15',
@@ -446,7 +446,7 @@ class ContentSeeder extends Seeder
                 'sort_order' => 1,
             ],
             [
-                'name' => 'Docker Certified Associate',
+                'title' => 'Docker Certified Associate',
                 'issuing_organization' => 'Docker',
                 'issue_date' => '2021-08-20',
                 'expiry_date' => '2024-08-20',
@@ -457,7 +457,7 @@ class ContentSeeder extends Seeder
                 'sort_order' => 2,
             ],
             [
-                'name' => 'Vue.js Certification',
+                'title' => 'Vue.js Certification',
                 'issuing_organization' => 'Vue School',
                 'issue_date' => '2020-11-10',
                 'credential_id' => 'VUE-CERT-2020',

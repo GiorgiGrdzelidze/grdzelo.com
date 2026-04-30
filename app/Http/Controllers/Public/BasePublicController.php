@@ -30,6 +30,8 @@ abstract class BasePublicController extends Controller
                 'logo' => $general->logo,
                 'logo_dark' => $general->logo_dark,
                 'logo_icon' => $general->logo_icon,
+                'about_image' => $general->about_image,
+                'about_intro' => $general->about_intro,
             ],
             'socialLinks' => SocialLink::visible()->ordered()->get(['platform', 'label', 'url', 'username', 'icon']),
             'seoDefaults' => [

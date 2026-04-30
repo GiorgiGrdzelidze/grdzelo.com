@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { Code2 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useT } from '@/composables/useTranslate';
 
 interface SkillItem {
     id: number;
@@ -13,29 +15,54 @@ interface SkillItem {
 }
 
 interface Props {
+    settings?: Record<string, any>;
+    seo?: Record<string, any>;
     skills: SkillItem[];
 }
 
 const props = defineProps<Props>();
+
+const { t } = useT();
 
 function isUrl(icon: string | null): boolean {
     return !!icon && (icon.startsWith('http') || icon.startsWith('/'));
 }
 
 function getDeviconClass(icon: string): string | null {
-    // Extract class from HTML tag like <i class="devicon-php-plain"></i>
-    const match = icon.match(/class="([^"]+)"/);
+    const trimmed = icon.trim();
+    let raw: string | null = null;
 
-    if (match) {
-        return match[1];
+    const classAttr = trimmed.match(/class\s*=\s*["']([^"']+)["']/i);
+
+    if (classAttr) {
+        raw = classAttr[1];
+    } else {
+        const inline = trimmed.match(/devicon-[\w-]+(?:\s+[\w-]+)*/i);
+
+        if (inline) {
+            raw = inline[0];
+        }
     }
 
-    // Already a class string like "devicon-php-plain"
-    if (icon.startsWith('devicon-')) {
-        return icon;
+    if (!raw) {
+        return null;
     }
 
-    return null;
+    const tokens = raw.split(/\s+/).filter(Boolean);
+
+    if (!tokens.some((tok) => tok.toLowerCase().startsWith('devicon-'))) {
+        return null;
+    }
+
+    if (!tokens.includes('colored')) {
+        tokens.push('colored');
+    }
+
+    return tokens.join(' ');
+}
+
+function pad(n: number): string {
+    return String(n).padStart(2, '0');
 }
 
 const grouped = computed(() => {
@@ -53,82 +80,129 @@ const grouped = computed(() => {
 
     return groups;
 });
+
+const totalSkills = computed(() => props.skills.length);
+const totalCategories = computed(() => Object.keys(grouped.value).length);
 </script>
 
 <template>
-    <section class="py-20">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl text-center">
-                <h1 class="text-4xl font-bold tracking-tight">
-                    Skills & Expertise
-                </h1>
-                <p class="mt-4 text-lg text-muted-foreground">
-                    A comprehensive overview of technologies, tools, and
-                    methodologies I work with.
-                </p>
-            </div>
+    <!-- ============ HEADER ============ -->
+    <section class="px-6 pt-24 pb-16 sm:px-8 sm:pt-32 sm:pb-20 lg:px-12">
+        <div class="mx-auto max-w-[1200px]">
+            <span class="eyebrow">{{
+                t('sections.stack.eyebrow') || 'Stack'
+            }}</span>
+            <h1
+                class="mt-6 max-w-[20ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance"
+            >
+                {{ t('skills.title') || 'Skills & expertise'
+                }}<span class="text-accent">.</span>
+            </h1>
+            <p
+                class="mt-8 max-w-[65ch] text-lg leading-relaxed text-pretty text-muted-foreground"
+            >
+                {{
+                    t('skills.lead') ||
+                    'A working catalogue of the languages, frameworks, and tools I reach for — grouped by where they sit in the stack.'
+                }}
+            </p>
 
             <div
-                v-for="(skills, category) in grouped"
-                :key="category"
-                class="mt-12"
+                v-if="totalSkills"
+                class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6 font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
             >
-                <h2 class="text-xl font-semibold">{{ category }}</h2>
+                <span>{{ pad(totalSkills) }} skills</span>
+                <span>{{ pad(totalCategories) }} categories</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ GROUPS ============ -->
+    <section
+        v-if="skills.length"
+        class="border-t border-border px-6 pt-12 pb-24 sm:px-8 sm:pt-16 sm:pb-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px] space-y-14 sm:space-y-16">
+            <div
+                v-for="(skillsInGroup, category, idx) in grouped"
+                :key="category"
+            >
+                <div class="mb-6 flex items-end justify-between gap-4">
+                    <div
+                        class="flex items-baseline gap-3 font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        <span>/ {{ pad(idx + 1) }}</span>
+                        <span class="text-foreground">{{ category }}</span>
+                    </div>
+                    <span
+                        class="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        {{ pad(skillsInGroup.length) }}
+                    </span>
+                </div>
+
                 <div
-                    class="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                    class="grid grid-cols-1 gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <div
-                        v-for="skill in skills"
+                        v-for="skill in skillsInGroup"
                         :key="skill.id"
-                        class="rounded-lg border border-border/40 p-4 transition-colors hover:bg-accent"
+                        class="group flex items-center gap-4 bg-background p-5 transition-colors hover:border-foreground hover:bg-muted/30"
                     >
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl"
-                            >
-                                <img
-                                    v-if="isUrl(skill.icon)"
-                                    :src="skill.icon ?? ''"
-                                    :alt="skill.name"
-                                    class="h-6 w-6 object-contain"
-                                />
-                                <i
-                                    v-else-if="
-                                        skill.icon &&
-                                        getDeviconClass(skill.icon)
-                                    "
-                                    :class="getDeviconClass(skill.icon)"
-                                />
-                                <span v-else class="text-lg">🔧</span>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <p class="font-medium">{{ skill.name }}</p>
-                                <span
-                                    v-if="skill.proficiency_label"
-                                    class="text-xs text-muted-foreground"
-                                    >{{ skill.proficiency_label }}</span
-                                >
-                            </div>
-                        </div>
-                        <!-- Proficiency score temporarily hidden
-                        <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
-                            <div
-                                class="h-full rounded-full bg-primary transition-all"
-                                :style="{ width: `${skill.proficiency_score}%` }"
+                        <div
+                            class="flex h-11 w-11 shrink-0 items-center justify-center border border-border bg-background transition-colors group-hover:border-foreground"
+                        >
+                            <img
+                                v-if="isUrl(skill.icon)"
+                                :src="skill.icon ?? ''"
+                                :alt="skill.name"
+                                class="h-6 w-6 object-contain"
+                            />
+                            <i
+                                v-else-if="
+                                    skill.icon && getDeviconClass(skill.icon)
+                                "
+                                :class="getDeviconClass(skill.icon)"
+                                style="font-size: 1.5rem; line-height: 1"
+                                aria-hidden="true"
+                            />
+                            <Code2
+                                v-else
+                                class="h-5 w-5 text-muted-foreground transition-colors group-hover:text-foreground"
+                                :stroke-width="1.5"
+                                aria-hidden="true"
                             />
                         </div>
-                        <div class="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                            <span>{{ skill.proficiency_score }}%</span>
-                            <span v-if="skill.years_experience">{{ skill.years_experience }} yrs</span>
+                        <div class="min-w-0 flex-1">
+                            <p
+                                class="truncate text-base font-medium tracking-[-0.01em] text-foreground sm:text-lg"
+                            >
+                                {{ skill.name }}
+                            </p>
+                            <span
+                                v-if="skill.proficiency_label"
+                                class="mt-1 inline-block font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase"
+                            >
+                                {{ skill.proficiency_label }}
+                            </span>
                         </div>
-                        -->
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div v-if="!skills.length" class="mt-14 text-center">
-                <p class="text-lg font-medium">Skills coming soon</p>
-            </div>
+    <!-- ============ EMPTY STATE ============ -->
+    <section
+        v-else
+        class="border-t border-border px-6 py-32 sm:px-8 sm:py-40 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px] text-center">
+            <p
+                class="font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase"
+            >
+                {{ t('skills.empty') || 'Skills coming soon' }}
+            </p>
         </div>
     </section>
 </template>

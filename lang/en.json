@@ -68,6 +68,9 @@
     "sections.services.eyebrow": "Services",
     "sections.hobbies.eyebrow": "Outside work",
 
+    "home.services.title": "How I can help.",
+    "home.feedback.title": "What people say.",
+
     "capabilities.greenfield.title": "Greenfield builds",
     "capabilities.greenfield.body": "Web products from zero — auth, billing, admin, the public site. I'll architect, build, and ship the first usable version.",
     "capabilities.rewrites.title": "Rewrites and rescues",
@@ -176,6 +179,14 @@
     "contact.privacy": "Your details stay between us. No newsletter, no CRM, no marketing list.",
     "contact.success_title": "Message sent.",
     "contact.success_body": "I'll come back to you within two business days. If it's urgent, send a follow-up email — I'll move it up the queue.",
+    "contact.success_flash": "Thank you for reaching out! I'll get back to you soon.",
+
+    "flash.success_label": "Sent",
+    "flash.error_label": "Error",
+    "flash.dismiss": "Dismiss",
+
+    "hobbies.title": "Outside the editor",
+    "hobbies.lead": "What I get up to when I close the laptop — usually involves altitude, water, or going somewhere a road doesn't.",
 
     "sections.education.eyebrow": "Education",
     "sections.gallery.eyebrow": "Gallery",
