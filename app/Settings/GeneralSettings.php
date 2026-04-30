@@ -44,6 +44,10 @@ class GeneralSettings extends Settings
 
     public ?string $favicon;
 
+    public ?string $about_image;
+
+    public ?string $about_intro;
+
     public static function group(): string
     {
         return 'general';
