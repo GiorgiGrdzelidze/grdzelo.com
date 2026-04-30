@@ -4,20 +4,28 @@ namespace App\Http\Controllers\Public;
 
 use App\Models\Article;
 use App\Models\ArticleCategory;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ArticleController extends BasePublicController
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $categorySlug = $request->string('category')->toString() ?: null;
+
         $articles = Article::published()
             ->with('category:id,name,slug')
+            ->when($categorySlug, fn ($q) => $q->whereHas(
+                'category',
+                fn ($cat) => $cat->where('slug', $categorySlug)
+            ))
             ->latest('publish_at')
             ->paginate(12, [
                 'id', 'title', 'slug', 'excerpt', 'cover_image',
                 'article_category_id', 'publish_at', 'reading_time', 'is_featured',
-            ]);
+            ])
+            ->withQueryString();
 
         $categories = ArticleCategory::query()
             ->withCount(['articles' => fn ($q) => $q->published()])
@@ -36,6 +44,7 @@ class ArticleController extends BasePublicController
             'articles' => $articles,
             'categories' => $categories,
             'featured' => $featured,
+            'activeCategory' => $categorySlug,
         ]);
     }
 
