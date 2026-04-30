@@ -18,6 +18,9 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
+    /** @var array<string, array<string, string>> */
+    private static array $translationCache = [];
+
     /**
      * Determines the current asset version.
      *
@@ -60,26 +63,33 @@ class HandleInertiaRequests extends Middleware
      * Load the JSON file for the active locale (lang/{locale}.json).
      * English fills any gaps so partial translations degrade gracefully.
      *
+     * Memoized per-process: i18n keys are read on every Inertia request,
+     * and the JSON files are only updated by deploys, not at runtime.
+     *
      * @return array<string, string>
      */
     private function loadTranslations(string $locale): array
     {
+        if (isset(self::$translationCache[$locale])) {
+            return self::$translationCache[$locale];
+        }
+
         $fallbackPath = base_path('lang/en.json');
         $base = File::exists($fallbackPath)
             ? json_decode(File::get($fallbackPath), true) ?? []
             : [];
 
         if ($locale === 'en') {
-            return $base;
+            return self::$translationCache[$locale] = $base;
         }
 
         $path = base_path("lang/{$locale}.json");
         if (! File::exists($path)) {
-            return $base;
+            return self::$translationCache[$locale] = $base;
         }
 
         $localized = json_decode(File::get($path), true) ?? [];
 
-        return array_merge($base, $localized);
+        return self::$translationCache[$locale] = array_merge($base, $localized);
     }
 }

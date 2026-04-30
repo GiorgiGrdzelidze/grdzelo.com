@@ -68,6 +68,9 @@
     "sections.services.eyebrow": "Услуги",
     "sections.hobbies.eyebrow": "Вне работы",
 
+    "home.services.title": "How I can help.",
+    "home.feedback.title": "What people say.",
+
     "capabilities.greenfield.title": "Greenfield-разработка",
     "capabilities.greenfield.body": "Веб-продукты с нуля — авторизация, биллинг, админка, публичный сайт. Спроектирую, построю и выпущу первую рабочую версию.",
     "capabilities.rewrites.title": "Переписывания и спасение",

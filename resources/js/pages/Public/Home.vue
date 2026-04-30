@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ArrowRight, Code2, ExternalLink, Star } from 'lucide-vue-next';
+import { ArrowUpRight, Code2, Github, Mail } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useT } from '@/composables/useTranslate';
 
 interface Project {
     id: number;
@@ -66,6 +64,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { t, locale } = useT();
+
 const groupedSkills = computed(() => {
     const groups: Record<string, SkillItem[]> = {};
 
@@ -81,6 +81,24 @@ const groupedSkills = computed(() => {
 
     return groups;
 });
+
+const capabilities = [
+    { num: '01', key: 'greenfield' },
+    { num: '02', key: 'rewrites' },
+    { num: '03', key: 'senior' },
+] as const;
+
+function pad(n: number): string {
+    return String(n).padStart(2, '0');
+}
+
+function formatPublishedAt(date: string): string {
+    return new Date(date).toLocaleDateString(locale.value || 'en', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+    });
+}
 
 function isUrl(icon: string | null): boolean {
     return !!icon && (icon.startsWith('http') || icon.startsWith('/'));
@@ -99,417 +117,515 @@ function getDeviconClass(icon: string): string | null {
 
     return null;
 }
-
-function formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-}
 </script>
 
 <template>
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden">
-        <div class="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-            <div class="mx-auto max-w-3xl text-center">
-                <h1
-                    class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+    <!-- ============ HERO ============ -->
+    <section class="px-6 pt-24 pb-32 sm:px-8 sm:pt-32 sm:pb-40 lg:px-12">
+        <div class="mx-auto max-w-[1200px]">
+            <div class="reveal reveal-1 mb-12 flex items-center gap-3">
+                <span class="status-dot" aria-hidden="true" />
+                <span
+                    class="font-mono text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase"
                 >
-                    {{
-                        settings?.tagline || 'Product-Minded Software Engineer'
-                    }}
-                </h1>
-                <p class="mt-6 text-lg leading-8 text-muted-foreground">
-                    I build elegant, scalable web applications with a focus on
-                    clean architecture, exceptional user experience, and
-                    measurable business impact.
-                </p>
-                <div class="mt-10 flex items-center justify-center gap-4">
-                    <Button as-child size="lg">
-                        <Link href="/projects">
-                            View My Work
-                            <ArrowRight class="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <Button as-child variant="outline" size="lg">
-                        <Link href="/contact">
-                            {{ settings?.default_cta_text || "Let's Talk" }}
-                        </Link>
-                    </Button>
-                </div>
+                    {{ t('hero.status') }} · {{ t('hero.location') }}
+                </span>
             </div>
-        </div>
-        <div
-            class="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_60%,hsl(var(--primary)/0.04),transparent)]"
-        />
-    </section>
 
-    <!-- Featured Projects -->
-    <section
-        v-if="featuredProjects.length"
-        class="border-t border-border/40 py-20"
-    >
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="flex items-end justify-between">
-                <div>
-                    <h2 class="text-3xl font-bold tracking-tight">
-                        Featured Projects
-                    </h2>
-                    <p class="mt-2 text-muted-foreground">
-                        Selected work that I'm proud of
-                    </p>
-                </div>
-                <Button as-child variant="ghost" size="sm">
-                    <Link href="/projects">
-                        View All
-                        <ArrowRight class="ml-1 h-4 w-4" />
-                    </Link>
-                </Button>
-            </div>
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <h1
+                class="reveal reveal-2 max-w-[18ch] text-[clamp(2.75rem,7vw,5rem)] leading-[1.04] font-semibold tracking-[-0.035em] text-balance"
+            >
+                {{ t('hero.title_1') }}<br />{{ t('hero.title_2')
+                }}<span class="text-accent">.</span>
+            </h1>
+
+            <p
+                class="reveal reveal-3 mt-10 max-w-[55ch] text-[clamp(1.125rem,1.4vw,1.25rem)] leading-relaxed text-pretty text-muted-foreground"
+            >
+                {{ t('hero.lead') }}
+            </p>
+
+            <div class="reveal reveal-4 mt-12 flex flex-wrap gap-4">
                 <Link
-                    v-for="project in featuredProjects"
-                    :key="project.id"
-                    :href="`/projects/${project.slug}`"
-                    class="group"
+                    href="/projects"
+                    class="group inline-flex items-center gap-2 bg-foreground px-5 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 active:scale-[0.98]"
                 >
-                    <Card
-                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-lg"
-                    >
-                        <div
-                            v-if="project.cover_image"
-                            class="aspect-video overflow-hidden rounded-t-lg"
-                        >
-                            <img
-                                :src="`/storage/${project.cover_image}`"
-                                :alt="project.title"
-                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </div>
-                        <div
-                            v-else
-                            class="flex aspect-video items-center justify-center rounded-t-lg bg-muted"
-                        >
-                            <Code2 class="h-10 w-10 text-muted-foreground" />
-                        </div>
-                        <CardHeader>
-                            <div class="flex items-center justify-between">
-                                <CardTitle
-                                    class="text-lg group-hover:text-primary/80"
-                                    >{{ project.title }}</CardTitle
-                                >
-                                <ExternalLink
-                                    class="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                                />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p
-                                class="line-clamp-2 text-sm text-muted-foreground"
-                            >
-                                {{ project.summary }}
-                            </p>
-                            <div
-                                v-if="project.tech_stack?.length"
-                                class="mt-3 flex flex-wrap gap-1"
-                            >
-                                <Badge
-                                    v-for="tech in project.tech_stack.slice(
-                                        0,
-                                        4,
-                                    )"
-                                    :key="tech"
-                                    variant="secondary"
-                                    class="text-xs"
-                                >
-                                    {{ tech }}
-                                </Badge>
-                                <Badge
-                                    v-if="project.tech_stack.length > 4"
-                                    variant="secondary"
-                                    class="text-xs"
-                                >
-                                    +{{ project.tech_stack.length - 4 }}
-                                </Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {{ t('cta.view_work') }}
+                    <ArrowUpRight
+                        class="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
                 </Link>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services -->
-    <section
-        v-if="services.length"
-        class="border-t border-border/40 bg-muted/30 py-20"
-    >
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl text-center">
-                <h2 class="text-3xl font-bold tracking-tight">What I Do</h2>
-                <p class="mt-2 text-muted-foreground">
-                    Services I offer to help you build and grow
-                </p>
-            </div>
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Card
-                    v-for="service in services"
-                    :key="service.id"
-                    class="text-center"
+                <Link
+                    href="/contact"
+                    class="inline-flex items-center gap-2 border border-border bg-transparent px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
-                    <CardHeader>
-                        <div
-                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary"
-                        >
-                            <Code2 class="h-6 w-6" />
-                        </div>
-                        <CardTitle class="text-lg">{{
-                            service.title
-                        }}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p class="text-sm text-muted-foreground">
-                            {{ service.summary }}
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills -->
-    <section v-if="props.skills.length" class="border-t border-border/40 py-20">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="flex items-end justify-between">
-                <div>
-                    <h2 class="text-3xl font-bold tracking-tight">
-                        Skills & Expertise
-                    </h2>
-                    <p class="mt-2 text-muted-foreground">
-                        Technologies and tools I work with daily
-                    </p>
-                </div>
-                <Button as-child variant="ghost" size="sm">
-                    <Link href="/skills">
-                        View All
-                        <ArrowRight class="ml-1 h-4 w-4" />
-                    </Link>
-                </Button>
+                    {{ t('cta.write_to_me') }}
+                </Link>
             </div>
 
             <div
-                v-for="(skills, category) in groupedSkills"
-                :key="category"
-                class="mt-8"
+                class="reveal reveal-4 mt-20 grid grid-cols-2 gap-8 border-t border-border pt-8 sm:grid-cols-4"
             >
-                <h3 class="mb-4 text-lg font-semibold">{{ category }}</h3>
-                <div
-                    class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                >
-                    <div
-                        v-for="skill in skills"
-                        :key="skill.id"
-                        class="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-4 transition-colors hover:bg-accent"
-                    >
-                        <div
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xl"
-                        >
-                            <img
-                                v-if="isUrl(skill.icon)"
-                                :src="skill.icon ?? ''"
-                                :alt="skill.name"
-                                class="h-6 w-6 object-contain"
-                            />
-                            <i
-                                v-else-if="
-                                    skill.icon && getDeviconClass(skill.icon)
-                                "
-                                :class="getDeviconClass(skill.icon)"
-                            />
-                            <span v-else class="text-lg">🔧</span>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="truncate font-medium">{{ skill.name }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section
-        v-if="testimonials.length"
-        class="border-t border-border/40 bg-muted/30 py-20"
-    >
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl text-center">
-                <h2 class="text-3xl font-bold tracking-tight">
-                    What People Say
-                </h2>
-                <p class="mt-2 text-muted-foreground">
-                    Feedback from clients and colleagues
-                </p>
-            </div>
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Card
-                    v-for="testimonial in testimonials"
-                    :key="testimonial.id"
-                    class="flex flex-col"
-                >
-                    <CardContent class="flex-1 pt-6">
-                        <div
-                            v-if="testimonial.rating"
-                            class="mb-3 flex gap-0.5"
-                        >
-                            <Star
-                                v-for="i in testimonial.rating"
-                                :key="i"
-                                class="h-4 w-4 fill-amber-400 text-amber-400"
-                            />
-                        </div>
-                        <blockquote
-                            class="text-sm leading-relaxed text-muted-foreground"
-                        >
-                            "{{ testimonial.quote }}"
-                        </blockquote>
-                    </CardContent>
-                    <div
-                        class="flex items-center gap-3 border-t border-border/40 px-6 py-4"
-                    >
-                        <div
-                            v-if="testimonial.avatar"
-                            class="h-10 w-10 overflow-hidden rounded-full"
-                        >
-                            <img
-                                :src="`/storage/${testimonial.avatar}`"
-                                :alt="testimonial.author_name"
-                                class="h-full w-full object-cover"
-                            />
-                        </div>
-                        <div
-                            v-else
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary"
-                        >
-                            {{ testimonial.author_name.charAt(0) }}
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium">
-                                {{ testimonial.author_name }}
-                            </p>
-                            <p
-                                v-if="
-                                    testimonial.author_role ||
-                                    testimonial.company
-                                "
-                                class="text-xs text-muted-foreground"
-                            >
-                                {{
-                                    [
-                                        testimonial.author_role,
-                                        testimonial.company,
-                                    ]
-                                        .filter(Boolean)
-                                        .join(' at ')
-                                }}
-                            </p>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-        </div>
-    </section>
-
-    <!-- Latest Articles -->
-    <section
-        v-if="latestArticles.length"
-        class="border-t border-border/40 py-20"
-    >
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div class="flex items-end justify-between">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight">
-                        Latest Articles
-                    </h2>
-                    <p class="mt-2 text-muted-foreground">
-                        Thoughts on engineering, product, and craft
-                    </p>
-                </div>
-                <Button as-child variant="ghost" size="sm">
-                    <Link href="/blog">
-                        View All
-                        <ArrowRight class="ml-1 h-4 w-4" />
-                    </Link>
-                </Button>
-            </div>
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Link
-                    v-for="article in latestArticles"
-                    :key="article.id"
-                    :href="`/blog/${article.slug}`"
-                    class="group"
-                >
-                    <Card
-                        class="h-full transition-all duration-200 hover:border-foreground/20 hover:shadow-lg"
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
                     >
-                        <div
-                            v-if="article.cover_image"
-                            class="aspect-video overflow-hidden rounded-t-lg"
+                        {{ t('hero.meta.years') }}
+                    </div>
+                    <div class="mt-2 font-mono text-2xl">2018 → 2025</div>
+                </div>
+                <div>
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        {{ t('hero.meta.role') }}
+                    </div>
+                    <div class="mt-2 text-base">
+                        {{ t('hero.meta.role_value') }}
+                    </div>
+                </div>
+                <div>
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        {{ t('hero.meta.stack') }}
+                    </div>
+                    <div class="mt-2 font-mono text-sm">
+                        PHP · TS · Vue · Laravel
+                    </div>
+                </div>
+                <div>
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        {{ t('hero.meta.based') }}
+                    </div>
+                    <div class="mt-2 text-base">
+                        {{ settings?.location || t('hero.location') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SELECTED WORK ============ -->
+    <section
+        v-if="featuredProjects.length"
+        class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16 flex items-end justify-between gap-4">
+                <div>
+                    <span class="eyebrow">{{
+                        t('sections.work.eyebrow')
+                    }}</span>
+                    <h2
+                        class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                    >
+                        {{ t('sections.work.title') }}
+                    </h2>
+                </div>
+                <Link
+                    href="/projects"
+                    class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                >
+                    {{ t('actions.view_all') }}
+                    <ArrowUpRight
+                        class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                </Link>
+            </div>
+
+            <div
+                class="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-3"
+            >
+                <Link
+                    v-for="(project, i) in featuredProjects"
+                    :key="project.id"
+                    :href="`/projects/${project.slug}`"
+                    class="group flex flex-col bg-background p-8 transition-colors hover:bg-muted/30"
+                >
+                    <div
+                        class="flex items-center justify-between font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        <span>{{ pad(i + 1) }}</span>
+                        <span v-if="project.year">{{ project.year }}</span>
+                    </div>
+                    <div
+                        class="mt-6 flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted"
+                    >
+                        <img
+                            v-if="project.cover_image"
+                            :src="`/storage/${project.cover_image}`"
+                            :alt="project.title"
+                            class="h-full w-full object-cover"
+                        />
+                        <Code2
+                            v-else
+                            class="h-8 w-8 text-muted-foreground"
+                            :stroke-width="1.5"
+                        />
+                    </div>
+                    <h3
+                        class="mt-6 flex items-center gap-1 text-lg font-semibold tracking-[-0.01em]"
+                    >
+                        {{ project.title }}
+                        <ArrowUpRight
+                            class="h-3.5 w-3.5 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+                        />
+                    </h3>
+                    <p
+                        class="mt-3 line-clamp-3 text-sm leading-relaxed text-pretty text-muted-foreground"
+                    >
+                        {{ project.summary }}
+                    </p>
+                    <div
+                        v-if="project.tech_stack?.length"
+                        class="mt-6 flex flex-wrap gap-1.5 pt-6"
+                    >
+                        <span
+                            v-for="tech in project.tech_stack.slice(0, 5)"
+                            :key="tech"
+                            class="border border-border px-2 py-0.5 font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase"
                         >
-                            <img
-                                :src="`/storage/${article.cover_image}`"
-                                :alt="article.title"
-                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </div>
-                        <CardHeader>
-                            <CardTitle
-                                class="text-lg group-hover:text-primary/80"
-                                >{{ article.title }}</CardTitle
-                            >
-                        </CardHeader>
-                        <CardContent>
-                            <p
-                                class="line-clamp-2 text-sm text-muted-foreground"
-                            >
-                                {{ article.excerpt }}
-                            </p>
-                            <div
-                                class="mt-3 flex items-center gap-3 text-xs text-muted-foreground"
-                            >
-                                <span>{{
-                                    formatDate(article.publish_at)
-                                }}</span>
-                                <span>{{ article.reading_time }} min read</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            {{ tech }}
+                        </span>
+                        <span
+                            v-if="project.tech_stack.length > 5"
+                            class="border border-border px-2 py-0.5 font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase"
+                        >
+                            +{{ project.tech_stack.length - 5 }}
+                        </span>
+                    </div>
                 </Link>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
+    <!-- ============ CAPABILITIES ============ -->
     <section
-        class="border-t border-border/40 bg-primary py-20 text-primary-foreground"
+        class="border-t border-border bg-muted/40 px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
     >
-        <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold tracking-tight">
-                Ready to Build Something Great?
-            </h2>
-            <p class="mt-4 text-lg opacity-90">
-                I'm always interested in hearing about new projects and
-                opportunities.
-            </p>
-            <div class="mt-8 flex items-center justify-center gap-4">
-                <Button as-child size="lg" variant="secondary">
-                    <Link href="/contact">
-                        {{ settings?.default_cta_text || "Let's Talk" }}
-                        <ArrowRight class="ml-2 h-4 w-4" />
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16">
+                <span class="eyebrow">{{
+                    t('sections.capabilities.eyebrow')
+                }}</span>
+                <h2
+                    class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                >
+                    {{ t('sections.capabilities.title') }}
+                </h2>
+                <p
+                    class="mt-4 max-w-[55ch] text-lg leading-relaxed text-pretty text-muted-foreground"
+                >
+                    {{ t('sections.capabilities.lead') }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-px bg-border md:grid-cols-3">
+                <div
+                    v-for="cap in capabilities"
+                    :key="cap.key"
+                    class="bg-background p-8"
+                >
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        / {{ cap.num }}
+                    </div>
+                    <h3 class="mt-6 text-xl font-semibold tracking-[-0.01em]">
+                        {{ t(`capabilities.${cap.key}.title`) }}
+                    </h3>
+                    <p
+                        class="mt-3 text-sm leading-relaxed text-pretty text-muted-foreground"
+                    >
+                        {{ t(`capabilities.${cap.key}.body`) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section
+        v-if="services.length"
+        class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16 flex items-end justify-between gap-4">
+                <div>
+                    <span class="eyebrow">{{
+                        t('sections.services.eyebrow')
+                    }}</span>
+                    <h2
+                        class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                    >
+                        {{ t('home.services.title') }}
+                    </h2>
+                </div>
+                <Link
+                    href="/services"
+                    class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                >
+                    {{ t('actions.view_all') }}
+                    <ArrowUpRight
+                        class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                </Link>
+            </div>
+
+            <div class="grid grid-cols-1 gap-px bg-border md:grid-cols-3">
+                <div
+                    v-for="(service, i) in services"
+                    :key="service.id"
+                    class="flex flex-col bg-background p-8"
+                >
+                    <div
+                        class="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                    >
+                        / {{ pad(i + 1) }}
+                    </div>
+                    <h3 class="mt-6 text-xl font-semibold tracking-[-0.01em]">
+                        {{ service.title }}
+                    </h3>
+                    <p
+                        class="mt-3 text-sm leading-relaxed text-pretty text-muted-foreground"
+                    >
+                        {{ service.summary }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ STACK ============ -->
+    <section
+        v-if="props.skills.length"
+        class="border-t border-border bg-muted/40 px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16 flex items-end justify-between gap-4">
+                <div>
+                    <span class="eyebrow">{{
+                        t('sections.stack.eyebrow')
+                    }}</span>
+                    <h2
+                        class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                    >
+                        {{ t('sections.stack.title') }}
+                    </h2>
+                </div>
+                <Link
+                    href="/skills"
+                    class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                >
+                    {{ t('actions.view_all') }}
+                    <ArrowUpRight
+                        class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                </Link>
+            </div>
+
+            <div
+                v-for="(skillsInGroup, category) in groupedSkills"
+                :key="category"
+                class="mb-10 last:mb-0"
+            >
+                <div
+                    class="mb-4 font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                >
+                    {{ category }}
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span
+                        v-for="skill in skillsInGroup"
+                        :key="skill.id"
+                        class="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground"
+                    >
+                        <img
+                            v-if="isUrl(skill.icon)"
+                            :src="skill.icon ?? ''"
+                            :alt="skill.name"
+                            class="h-3.5 w-3.5 object-contain"
+                        />
+                        <i
+                            v-else-if="
+                                skill.icon && getDeviconClass(skill.icon)
+                            "
+                            :class="getDeviconClass(skill.icon)"
+                            class="text-sm"
+                        />
+                        {{ skill.name }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ FEEDBACK ============ -->
+    <section
+        v-if="testimonials.length"
+        class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16">
+                <span class="eyebrow">{{
+                    t('sections.feedback.eyebrow')
+                }}</span>
+                <h2
+                    class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-balance"
+                >
+                    {{ t('home.feedback.title') }}
+                </h2>
+            </div>
+
+            <div
+                class="grid grid-cols-1 gap-px bg-border md:grid-cols-2 lg:grid-cols-3"
+            >
+                <figure
+                    v-for="testimonial in testimonials"
+                    :key="testimonial.id"
+                    class="flex flex-col justify-between bg-background p-8"
+                >
+                    <blockquote
+                        class="text-base leading-relaxed text-pretty text-foreground"
+                    >
+                        “{{ testimonial.quote }}”
+                    </blockquote>
+                    <figcaption
+                        class="mt-8 border-t border-border pt-6 font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                    >
+                        <div class="text-foreground">
+                            {{ testimonial.author_name }}
+                        </div>
+                        <div
+                            v-if="
+                                testimonial.author_role || testimonial.company
+                            "
+                            class="mt-1"
+                        >
+                            {{
+                                [testimonial.author_role, testimonial.company]
+                                    .filter(Boolean)
+                                    .join(' · ')
+                            }}
+                        </div>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ JOURNAL ============ -->
+    <section
+        v-if="latestArticles.length"
+        class="border-t border-border px-6 py-24 sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <div class="mb-16 flex items-end justify-between gap-4">
+                <div>
+                    <span class="eyebrow">{{
+                        t('sections.journal.eyebrow')
+                    }}</span>
+                    <h2
+                        class="mt-4 text-[clamp(1.875rem,3vw,2.25rem)] font-semibold tracking-[-0.02em]"
+                    >
+                        {{ t('sections.journal.title') }}
+                    </h2>
+                </div>
+                <Link
+                    href="/blog"
+                    class="group inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+                >
+                    {{ t('actions.all_writing') }}
+                    <ArrowUpRight
+                        class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                </Link>
+            </div>
+
+            <ul class="border-t border-border">
+                <li
+                    v-for="(article, i) in latestArticles"
+                    :key="article.id"
+                    class="border-b border-border"
+                >
+                    <Link
+                        :href="`/blog/${article.slug}`"
+                        class="group grid grid-cols-[40px_1fr_auto] items-baseline gap-6 py-6 transition-colors hover:bg-muted/30 sm:grid-cols-[40px_1fr_auto_auto]"
+                    >
+                        <span
+                            class="font-mono text-[11px] text-muted-foreground"
+                            >{{ pad(i + 1) }}</span
+                        >
+                        <h3
+                            class="text-[clamp(1.125rem,1.4vw,1.25rem)] leading-tight font-medium tracking-[-0.01em]"
+                        >
+                            {{ article.title }}
+                            <ArrowUpRight
+                                class="ml-1 inline-block h-3.5 w-3.5 -translate-y-px text-muted-foreground transition-colors group-hover:text-accent"
+                            />
+                        </h3>
+                        <span
+                            class="hidden font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase sm:inline"
+                            >{{ article.reading_time }}
+                            {{ t('article.min') }}</span
+                        >
+                        <time
+                            class="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
+                            >{{ formatPublishedAt(article.publish_at) }}</time
+                        >
                     </Link>
-                </Button>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section
+        class="border-t border-border bg-foreground px-6 py-24 text-background sm:px-8 sm:py-32 lg:px-12"
+    >
+        <div class="mx-auto max-w-[1200px]">
+            <span class="eyebrow" style="color: hsl(var(--background) / 0.6)">{{
+                t('sections.contact.eyebrow')
+            }}</span>
+            <h2
+                class="mt-6 max-w-[18ch] text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance"
+            >
+                {{ t('sections.contact.title')
+                }}<span class="text-accent">.</span>
+            </h2>
+            <p
+                class="mt-8 max-w-[55ch] text-lg leading-relaxed text-pretty"
+                style="color: hsl(var(--background) / 0.7)"
+            >
+                {{ t('sections.contact.lead') }}
+            </p>
+            <div class="mt-12 flex flex-wrap items-center gap-6">
+                <a
+                    v-if="settings?.email"
+                    :href="`mailto:${settings.email}`"
+                    class="inline-flex items-center gap-3 border px-5 py-3 text-sm font-medium transition-colors"
+                    style="
+                        border-color: hsl(var(--background) / 0.2);
+                        color: hsl(var(--background));
+                    "
+                >
+                    <Mail class="h-4 w-4" :stroke-width="1.5" />
+                    {{ settings.email }}
+                </a>
+                <a
+                    href="https://github.com/GiorgiGrdzelidze"
+                    target="_blank"
+                    rel="noopener"
+                    class="group inline-flex items-center gap-3 text-sm font-medium transition-colors"
+                    style="color: hsl(var(--background) / 0.8)"
+                >
+                    <Github class="h-4 w-4" :stroke-width="1.5" />
+                    {{ t('sections.contact.github') }}
+                    <ArrowUpRight class="h-3.5 w-3.5 text-accent" />
+                </a>
             </div>
         </div>
     </section>

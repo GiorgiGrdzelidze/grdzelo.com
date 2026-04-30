@@ -68,6 +68,9 @@
     "sections.services.eyebrow": "Services",
     "sections.hobbies.eyebrow": "Outside work",
 
+    "home.services.title": "How I can help.",
+    "home.feedback.title": "What people say.",
+
     "capabilities.greenfield.title": "Greenfield builds",
     "capabilities.greenfield.body": "Web products from zero — auth, billing, admin, the public site. I'll architect, build, and ship the first usable version.",
     "capabilities.rewrites.title": "Rewrites and rescues",
