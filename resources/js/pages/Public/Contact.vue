@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm, usePage } from '@inertiajs/vue3';
-import { ArrowUpRight, Check } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { AlertCircle, ArrowUpRight } from 'lucide-vue-next';
+import { computed, nextTick, ref } from 'vue';
 import { useT } from '@/composables/useTranslate';
 
 interface SocialLinkItem {
@@ -23,9 +23,6 @@ defineProps<Props>();
 const { t } = useT();
 const page = usePage();
 
-const flash = computed(
-    () => page.props.flash as Record<string, string> | undefined,
-);
 const socialLinks = computed(
     () => page.props.socialLinks as SocialLinkItem[] | undefined,
 );
@@ -40,16 +37,91 @@ const form = useForm({
     message: '',
 });
 
+const clientErrors = ref<Record<string, string>>({});
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validate(): boolean {
+    const errs: Record<string, string> = {};
+
+    if (!form.name.trim()) {
+        errs.name =
+            t('contact.errors.name_required') || 'Please tell me your name.';
+    }
+
+    if (!form.email.trim()) {
+        errs.email =
+            t('contact.errors.email_required') ||
+            'I need an email to reply to.';
+    } else if (!EMAIL_RE.test(form.email.trim())) {
+        errs.email =
+            t('contact.errors.email_invalid') ||
+            'That email looks off — double-check it.';
+    }
+
+    if (!form.message.trim()) {
+        errs.message =
+            t('contact.errors.message_required') ||
+            'Add a few words about what you need.';
+    } else if (form.message.trim().length < 10) {
+        errs.message =
+            t('contact.errors.message_short') ||
+            'A bit more detail helps me reply usefully.';
+    }
+
+    clientErrors.value = errs;
+
+    if (Object.keys(errs).length) {
+        nextTick(() => {
+            const first = Object.keys(errs)[0];
+            const el = document.getElementById(first);
+            el?.focus();
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        return false;
+    }
+
+    return true;
+}
+
+function clearError(field: string): void {
+    if (clientErrors.value[field]) {
+        const next = { ...clientErrors.value };
+        delete next[field];
+        clientErrors.value = next;
+    }
+
+    if (form.errors[field as keyof typeof form.errors]) {
+        form.clearErrors(field as keyof typeof form.errors);
+    }
+}
+
+function errorFor(field: string): string | null {
+    return (
+        clientErrors.value[field] ??
+        form.errors[field as keyof typeof form.errors] ??
+        null
+    );
+}
+
 function submit() {
+    if (!validate()) {
+        return;
+    }
+
     form.post('/contact', {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset();
+            clientErrors.value = {};
+        },
     });
 }
 
 const fieldClass =
     'block w-full border border-border bg-background px-3 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background';
-const fieldErrorClass = 'border-destructive';
+const fieldErrorClass = 'border-destructive focus-visible:ring-destructive';
 </script>
 
 <template>
@@ -143,31 +215,7 @@ const fieldErrorClass = 'border-destructive';
 
                 <!-- ====== Form ====== -->
                 <div class="bg-background p-8 sm:p-10">
-                    <div
-                        v-if="flash?.success"
-                        class="mb-8 flex items-start gap-3 border border-accent bg-accent/5 p-4"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        <Check
-                            class="mt-0.5 h-4 w-4 shrink-0 text-accent"
-                            :stroke-width="2"
-                        />
-                        <div>
-                            <div
-                                class="font-mono text-[11px] font-medium tracking-[0.12em] text-accent uppercase"
-                            >
-                                {{ t('contact.success_title') }}
-                            </div>
-                            <p
-                                class="mt-2 text-sm leading-relaxed text-foreground"
-                            >
-                                {{ t('contact.success_body') }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <form class="space-y-8" @submit.prevent="submit">
+                    <form class="space-y-8" novalidate @submit.prevent="submit">
                         <div class="grid gap-6 sm:grid-cols-2">
                             <div>
                                 <label
@@ -181,20 +229,39 @@ const fieldErrorClass = 'border-destructive';
                                     id="name"
                                     v-model="form.name"
                                     type="text"
-                                    required
                                     autocomplete="name"
+                                    :aria-invalid="!!errorFor('name')"
+                                    :aria-describedby="
+                                        errorFor('name')
+                                            ? 'name-error'
+                                            : undefined
+                                    "
                                     :class="[
                                         fieldClass,
                                         'mt-2',
-                                        form.errors.name ? fieldErrorClass : '',
+                                        errorFor('name') ? fieldErrorClass : '',
                                     ]"
+                                    @input="clearError('name')"
                                 />
-                                <p
-                                    v-if="form.errors.name"
-                                    class="mt-1 font-mono text-[11px] text-destructive"
+                                <Transition
+                                    enter-active-class="transition duration-150"
+                                    enter-from-class="opacity-0 -translate-y-0.5"
+                                    enter-to-class="opacity-100 translate-y-0"
                                 >
-                                    {{ form.errors.name }}
-                                </p>
+                                    <p
+                                        v-if="errorFor('name')"
+                                        id="name-error"
+                                        class="mt-2 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.04em] text-destructive"
+                                        role="alert"
+                                    >
+                                        <AlertCircle
+                                            class="h-3 w-3 shrink-0"
+                                            :stroke-width="2"
+                                            aria-hidden="true"
+                                        />
+                                        {{ errorFor('name') }}
+                                    </p>
+                                </Transition>
                             </div>
                             <div>
                                 <label
@@ -208,22 +275,41 @@ const fieldErrorClass = 'border-destructive';
                                     id="email"
                                     v-model="form.email"
                                     type="email"
-                                    required
                                     autocomplete="email"
+                                    :aria-invalid="!!errorFor('email')"
+                                    :aria-describedby="
+                                        errorFor('email')
+                                            ? 'email-error'
+                                            : undefined
+                                    "
                                     :class="[
                                         fieldClass,
                                         'mt-2',
-                                        form.errors.email
+                                        errorFor('email')
                                             ? fieldErrorClass
                                             : '',
                                     ]"
+                                    @input="clearError('email')"
                                 />
-                                <p
-                                    v-if="form.errors.email"
-                                    class="mt-1 font-mono text-[11px] text-destructive"
+                                <Transition
+                                    enter-active-class="transition duration-150"
+                                    enter-from-class="opacity-0 -translate-y-0.5"
+                                    enter-to-class="opacity-100 translate-y-0"
                                 >
-                                    {{ form.errors.email }}
-                                </p>
+                                    <p
+                                        v-if="errorFor('email')"
+                                        id="email-error"
+                                        class="mt-2 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.04em] text-destructive"
+                                        role="alert"
+                                    >
+                                        <AlertCircle
+                                            class="h-3 w-3 shrink-0"
+                                            :stroke-width="2"
+                                            aria-hidden="true"
+                                        />
+                                        {{ errorFor('email') }}
+                                    </p>
+                                </Transition>
                             </div>
                         </div>
 
@@ -324,20 +410,39 @@ const fieldErrorClass = 'border-destructive';
                                 id="message"
                                 v-model="form.message"
                                 rows="6"
-                                required
                                 :placeholder="t('contact.message_placeholder')"
+                                :aria-invalid="!!errorFor('message')"
+                                :aria-describedby="
+                                    errorFor('message')
+                                        ? 'message-error'
+                                        : undefined
+                                "
                                 :class="[
                                     fieldClass,
                                     'mt-2 resize-y',
-                                    form.errors.message ? fieldErrorClass : '',
+                                    errorFor('message') ? fieldErrorClass : '',
                                 ]"
+                                @input="clearError('message')"
                             />
-                            <p
-                                v-if="form.errors.message"
-                                class="mt-1 font-mono text-[11px] text-destructive"
+                            <Transition
+                                enter-active-class="transition duration-150"
+                                enter-from-class="opacity-0 -translate-y-0.5"
+                                enter-to-class="opacity-100 translate-y-0"
                             >
-                                {{ form.errors.message }}
-                            </p>
+                                <p
+                                    v-if="errorFor('message')"
+                                    id="message-error"
+                                    class="mt-2 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.04em] text-destructive"
+                                    role="alert"
+                                >
+                                    <AlertCircle
+                                        class="h-3 w-3 shrink-0"
+                                        :stroke-width="2"
+                                        aria-hidden="true"
+                                    />
+                                    {{ errorFor('message') }}
+                                </p>
+                            </Transition>
                         </div>
 
                         <div

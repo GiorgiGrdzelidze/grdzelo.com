@@ -48,6 +48,6 @@ class ContactController extends BasePublicController
             'status' => 'new',
         ]);
 
-        return back()->with('success', 'Thank you for reaching out! I\'ll get back to you soon.');
+        return back()->with('success', __('contact.success_flash'));
     }
 }
