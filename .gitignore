@@ -29,3 +29,6 @@ yarn-error.log
 
 # Local AI prompt drafts (not tracked)
 /prompts
+
+# Local Claude Code config (not tracked)
+/.claude
