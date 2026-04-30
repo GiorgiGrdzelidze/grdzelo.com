@@ -441,7 +441,7 @@ function getDeviconClass(icon: string): string | null {
                     <span
                         v-for="skill in skillsInGroup"
                         :key="skill.id"
-                        class="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground"
+                        class="inline-flex cursor-default items-center gap-2 border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-foreground hover:bg-muted/40"
                     >
                         <img
                             v-if="isUrl(skill.icon)"
