@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Concerns\HasPublishState;
 use App\Concerns\HasSeoFields;
+use App\Support\Tiptap;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -65,5 +67,28 @@ class Project extends Model implements HasMedia
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    // Long-form content fields are read either as raw HTML (legacy) or as TipTap JSON
+    // documents (legacy, when admin used RichEditor). Render to HTML on read so the
+    // public surface can drop the value straight into v-html.
+    protected function description(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+    }
+
+    protected function challenge(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+    }
+
+    protected function solution(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+    }
+
+    protected function process(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
     }
 }

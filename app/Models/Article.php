@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Concerns\HasPublishState;
 use App\Concerns\HasSeoFields;
+use App\Support\Tiptap;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -62,5 +64,10 @@ class Article extends Model implements HasMedia
         $wordCount = str_word_count(strip_tags($this->body ?? ''));
 
         return max(1, (int) ceil($wordCount / 200));
+    }
+
+    protected function body(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
     }
 }

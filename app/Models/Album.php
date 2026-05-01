@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Concerns\HasPublishState;
 use App\Concerns\HasSeoFields;
+use App\Support\Tiptap;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -47,5 +49,10 @@ class Album extends Model
     public function getPhotoCountAttribute(): int
     {
         return count($this->photos ?? []);
+    }
+
+    protected function description(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
     }
 }
