@@ -16,14 +16,19 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
-| Single locale-agnostic surface. Locale is resolved per-request by the
-| SetLocale middleware (registered in bootstrap/app.php) from session,
-| cookie, or Accept-Language header — see the LanguageSwitcher for the
-| user-facing toggle. Localized URL prefixes (e.g. /ka/about) can be
-| layered on as a separate concern later without renaming routes.
+| Public surface is registered three times — once at the root for the
+| default locale (en), and once each under literal `/ka` and `/ru`
+| prefixes for the localized variants. Same controllers, same closure.
+|
+| The prefixes are LITERAL (not `{locale}`) on purpose: a `{locale}`
+| route parameter would be passed positionally to controller actions
+| via Laravel's dispatcher, breaking signatures like `show(Project)`
+| because the locale segment lands in $project. With literal prefixes
+| the segment never enters the route parameter table — SetLocale reads
+| the locale by inspecting `$request->getPathInfo()` instead.
 */
 
-Route::name('public.')->group(function () {
+$publicRoutes = function (): void {
     Route::get('/', HomeController::class)->name('home');
 
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
@@ -51,11 +56,19 @@ Route::name('public.')->group(function () {
 
     Route::get('/contact', [ContactController::class, 'show'])->name('contact');
     Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+};
 
-    Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
-        ->where('locale', 'en|ka|ru')
-        ->name('locale.switch');
-});
+Route::name('public.')->group($publicRoutes);
+
+foreach (['ka', 'ru'] as $loc) {
+    Route::prefix($loc)
+        ->name("public.{$loc}.")
+        ->group($publicRoutes);
+}
+
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
+    ->where('locale', 'en|ka|ru')
+    ->name('public.locale.switch');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Settings\SeoSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
@@ -40,8 +41,6 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $locale = App::getLocale();
-
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -49,17 +48,57 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'locale' => $locale,
+            // Lazy: resolved at response-build time, after SetLocale middleware has run.
+            // Capturing eagerly here would race with middleware ordering and read the wrong value.
+            'locale' => fn () => App::getLocale(),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            'translations' => fn () => $this->loadTranslations($locale),
+            'translations' => fn () => $this->loadTranslations(App::getLocale()),
             'availableLocales' => [
                 ['code' => 'en', 'label' => 'EN', 'name' => 'English'],
                 ['code' => 'ka', 'label' => 'KA', 'name' => 'ქართული'],
                 ['code' => 'ru', 'label' => 'RU', 'name' => 'Русский'],
             ],
+            'hreflang' => fn () => $this->hreflangAlternates($request),
+        ];
+    }
+
+    /**
+     * Build the hreflang alternate URLs for the current request.
+     * "/" + "/about" is the en canonical; "/ka" + "/ka/about" is ka; same for ru.
+     * x-default points at the unprefixed (default-locale) URL.
+     *
+     * Gated to the public.* route group: locale-switch redirects, the sitemap,
+     * and any future non-public Inertia surface get an empty array, so we don't
+     * compute (or leak) hreflang for routes that aren't part of the localized set.
+     *
+     * @return array<int, array{hreflang: string, href: string}>
+     */
+    private function hreflangAlternates(Request $request): array
+    {
+        if (! $request->routeIs('public.*') || $request->routeIs('public.locale.switch')) {
+            return [];
+        }
+
+        $base = app(SeoSettings::class)->canonicalBase();
+        $path = '/'.ltrim($request->getPathInfo(), '/');
+
+        $stripped = preg_replace('#^/(ka|ru)(?=/|$)#', '', $path) ?: '/';
+        if ($stripped === '') {
+            $stripped = '/';
+        }
+
+        $unprefixed = $base.($stripped === '/' ? '' : $stripped);
+        $kaPath = $stripped === '/' ? '/ka' : '/ka'.$stripped;
+        $ruPath = $stripped === '/' ? '/ru' : '/ru'.$stripped;
+
+        return [
+            ['hreflang' => 'en', 'href' => $unprefixed === $base ? $base.'/' : $unprefixed],
+            ['hreflang' => 'ka', 'href' => $base.$kaPath],
+            ['hreflang' => 'ru', 'href' => $base.$ruPath],
+            ['hreflang' => 'x-default', 'href' => $unprefixed === $base ? $base.'/' : $unprefixed],
         ];
     }
 

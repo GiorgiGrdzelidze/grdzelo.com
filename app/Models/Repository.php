@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Concerns\HasSeoFields;
+use App\Support\Tiptap;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -65,5 +67,10 @@ class Repository extends Model implements HasMedia
     public function getSeoTitle(): string
     {
         return $this->meta_title ?? $this->name ?? '';
+    }
+
+    protected function description(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 }

@@ -75,6 +75,10 @@
         @if($seoCanonical)
             <link rel="canonical" href="{{ $seoCanonical }}">
         @endif
+        {{-- Hreflang alternates — emitted server-side so search engines see all locale variants on first crawl --}}
+        @foreach(($page['props']['hreflang'] ?? []) as $alt)
+            <link rel="alternate" hreflang="{{ $alt['hreflang'] }}" href="{{ $alt['href'] }}">
+        @endforeach
         {{-- Open Graph --}}
         <meta property="og:site_name" content="{{ $appName }}">
         @if($og['title'] ?? null)
@@ -120,9 +124,13 @@
                 <meta name="twitter:image:alt" content="{{ $twitter['image_alt'] }}">
             @endif
         @endif
-        {{-- JSON-LD Schema --}}
+        {{-- JSON-LD Schema. Flags:
+             - UNESCAPED_SLASHES keeps URLs readable (no \/ in canonical/url fields).
+             - UNESCAPED_UNICODE keeps Georgian/Cyrillic intact in name/description for crawlers.
+             - HEX_TAG escapes < and > so a stray "</script>" inside admin content
+               can't break out of the script element. --}}
         @if($schema)
-            <script type="application/ld+json">{!! json_encode($schema) !!}</script>
+            <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
         @endif
     </head>
     <body class="font-sans antialiased">

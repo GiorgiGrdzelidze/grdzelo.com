@@ -13,10 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
  * SetLocale — picks the active locale for the request.
  *
  * Order of precedence:
- *   1. Session value (last explicit choice)
- *   2. Cookie value (cross-session memory)
- *   3. Accept-Language header (best-fit match)
- *   4. App default ("en")
+ *   1. URL prefix segment, e.g. /ka/about — read from the path, not from
+ *      a route parameter, because the route uses literal /ka and /ru
+ *      prefixes (a {locale} param would land positionally in controller
+ *      actions like show(Project) and shadow the bound model).
+ *   2. Session value (last explicit choice on an unprefixed URL)
+ *   3. Cookie value (cross-session memory)
+ *   4. Accept-Language header (best-fit match)
+ *   5. App default ("en")
  *
  * Once resolved, the locale is set on the App, persisted to session,
  * and dropped into a 1-year cookie so navigation feels sticky.
@@ -24,7 +28,15 @@ use Symfony\Component\HttpFoundation\Response;
 class SetLocale
 {
     /** @var array<int, string> */
-    private const SUPPORTED = ['en', 'ka', 'ru'];
+    public const SUPPORTED = ['en', 'ka', 'ru'];
+
+    /**
+     * Locales that may appear as a URL prefix segment. 'en' is canonical
+     * at the unprefixed root, so it must NEVER be accepted from /{locale}/...
+     *
+     * @var array<int, string>
+     */
+    private const PREFIX_LOCALES = ['ka', 'ru'];
 
     private const COOKIE = 'locale';
 
@@ -52,6 +64,17 @@ class SetLocale
 
     private function resolveLocale(Request $request): string
     {
+        // 0. URL-prefixed locale segment wins outright — the URL is canonical.
+        //    Read from the path (not a route param) because routes use literal
+        //    /ka and /ru prefixes; a {locale} param would be passed positionally
+        //    by Laravel's dispatcher and break model-bound controller actions.
+        //    Restricted to PREFIX_LOCALES so 'en' can't sneak in via /en/foo
+        //    (which would create a duplicate-content variant of /foo).
+        $first = explode('/', trim($request->getPathInfo(), '/'), 2)[0] ?? '';
+        if (in_array($first, self::PREFIX_LOCALES, true)) {
+            return $first;
+        }
+
         // 1. Session
         $session = $request->session()->get('locale');
         if (in_array($session, self::SUPPORTED, true)) {
