@@ -20,7 +20,7 @@ it('renders the show page for a visible repository', function () {
         'sort_order' => 0,
     ]);
 
-    $response = $this->get(route('public.repositories.show', $repository));
+    $response = $this->get(route('public.repositories.show', ['locale' => 'en', 'repository' => $repository]));
 
     $response->assertOk();
     $response->assertSee($repository->name);
@@ -38,9 +38,9 @@ it('returns 404 for a hidden repository', function () {
         'sort_order' => 0,
     ]);
 
-    $this->get(route('public.repositories.show', $repository))->assertNotFound();
+    $this->get(route('public.repositories.show', ['locale' => 'en', 'repository' => $repository]))->assertNotFound();
 });
 
 it('returns 404 for a non-existent repository', function () {
-    $this->get('/repositories/does-not-exist')->assertNotFound();
+    $this->get('/en/repositories/does-not-exist')->assertNotFound();
 });

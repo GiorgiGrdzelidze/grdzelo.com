@@ -12,28 +12,28 @@ beforeEach(function () {
     $seo->save();
 });
 
-it('emits canonical pointing at the unprefixed path for /about', function () {
-    $this->get('/about')
+it('emits canonical pointing at /en/about for /en/about', function () {
+    $this->get('/en/about')
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('seo.canonical', 'https://grdzelo.test/about')
+            ->where('seo.canonical', 'https://grdzelo.test/en/about')
         );
 });
 
-it('emits canonical pointing at the /ka path for /ka/about', function () {
+it('emits canonical pointing at /ka/about for /ka/about', function () {
     $this->get('/ka/about')
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('seo.canonical', 'https://grdzelo.test/ka/about')
         );
 });
 
-it('emits canonical pointing at root for /', function () {
-    $this->get('/')
+it('emits canonical pointing at /en for the en home', function () {
+    $this->get('/en')
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('seo.canonical', 'https://grdzelo.test/')
+            ->where('seo.canonical', 'https://grdzelo.test/en')
         );
 });
 
-it('emits self-canonical for /projects/{slug} (no admin override)', function () {
+it('emits self-canonical for /en/projects/{slug} (no admin override)', function () {
     Project::create([
         'title' => 'Demo',
         'slug' => 'demo-canonical',
@@ -42,9 +42,9 @@ it('emits self-canonical for /projects/{slug} (no admin override)', function () 
         'status' => 'published',
     ]);
 
-    $this->get('/projects/demo-canonical')
+    $this->get('/en/projects/demo-canonical')
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('seo.canonical', 'https://grdzelo.test/projects/demo-canonical')
+            ->where('seo.canonical', 'https://grdzelo.test/en/projects/demo-canonical')
         );
 });
 
@@ -55,7 +55,7 @@ it('emits localized self-canonical for /ka/projects/{slug} even when admin set c
         'summary' => 's',
         'is_visible' => true,
         'status' => 'published',
-        'canonical_url' => 'https://grdzelo.test/projects/demo-locale-canonical',
+        'canonical_url' => 'https://grdzelo.test/en/projects/demo-locale-canonical',
     ]);
 
     $this->get('/ka/projects/demo-locale-canonical')
@@ -74,7 +74,7 @@ it('preserves an external admin canonical_url across locales', function () {
         'canonical_url' => 'https://medium.com/@author/demo-external',
     ]);
 
-    $this->get('/projects/demo-external-canonical')
+    $this->get('/en/projects/demo-external-canonical')
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('seo.canonical', 'https://medium.com/@author/demo-external')
         );

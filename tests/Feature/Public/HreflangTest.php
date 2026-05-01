@@ -11,50 +11,50 @@ beforeEach(function () {
     $seo->save();
 });
 
-it('shares hreflang alternates on the unprefixed root', function () {
-    $this->get('/')
+it('shares hreflang alternates on the en home', function () {
+    $this->get('/en')
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('hreflang', [
-                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/'],
+                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/en'],
                 ['hreflang' => 'ka', 'href' => 'https://grdzelo.test/ka'],
                 ['hreflang' => 'ru', 'href' => 'https://grdzelo.test/ru'],
-                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/'],
+                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/en'],
             ])
         );
 });
 
-it('shares hreflang alternates on an unprefixed inner page', function () {
-    $this->get('/about')
+it('shares hreflang alternates on an inner en page', function () {
+    $this->get('/en/about')
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('hreflang', [
-                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/about'],
+                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/en/about'],
                 ['hreflang' => 'ka', 'href' => 'https://grdzelo.test/ka/about'],
                 ['hreflang' => 'ru', 'href' => 'https://grdzelo.test/ru/about'],
-                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/about'],
+                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/en/about'],
             ])
         );
 });
 
-it('shares hreflang alternates on a /ka-prefixed page (en alternate strips the prefix)', function () {
+it('shares hreflang alternates on a /ka-prefixed inner page (en alternate is /en/...)', function () {
     $this->get('/ka/about')
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('hreflang', [
-                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/about'],
+                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/en/about'],
                 ['hreflang' => 'ka', 'href' => 'https://grdzelo.test/ka/about'],
                 ['hreflang' => 'ru', 'href' => 'https://grdzelo.test/ru/about'],
-                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/about'],
+                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/en/about'],
             ])
         );
 });
 
-it('shares hreflang alternates on the /ru root', function () {
+it('shares hreflang alternates on the /ru home', function () {
     $this->get('/ru')
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('hreflang', [
-                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/'],
+                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/en'],
                 ['hreflang' => 'ka', 'href' => 'https://grdzelo.test/ka'],
                 ['hreflang' => 'ru', 'href' => 'https://grdzelo.test/ru'],
-                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/'],
+                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/en'],
             ])
         );
 });

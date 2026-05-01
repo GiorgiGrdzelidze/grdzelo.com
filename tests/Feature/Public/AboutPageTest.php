@@ -11,7 +11,7 @@ it('renders the About page with about_image and about_intro when set', function 
     $settings->about_intro = 'A short editorial intro for testing.';
     $settings->save();
 
-    $response = $this->get('/about');
+    $response = $this->get('/en/about');
 
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -27,7 +27,7 @@ it('renders the About page when about_image and about_intro are null', function 
     $settings->about_intro = null;
     $settings->save();
 
-    $response = $this->get('/about');
+    $response = $this->get('/en/about');
 
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page

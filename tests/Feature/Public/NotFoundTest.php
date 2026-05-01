@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Inertia\Testing\AssertableInertia;
 
 it('renders the editorial NotFound page for unknown public routes', function () {
-    $response = $this->get('/this-route-does-not-exist');
+    $response = $this->get('/en/this-route-does-not-exist');
 
     $response->assertStatus(404);
     $response->assertInertia(fn (AssertableInertia $page) => $page
