@@ -74,6 +74,15 @@ it('exposes every translatable field via the per-locale tab closure', function (
             continue;
         }
 
+        if ($field === 'jsonld') {
+            $hasJsonLdTabs = str_contains($source, 'TranslatableSchema::jsonLdTabs(');
+            expect($hasJsonLdTabs)->toBeTrue(
+                "{$resourceClass} declares `jsonld` as translatable but doesn't call TranslatableSchema::jsonLdTabs() to surface the JSON-LD tab strip."
+            );
+
+            continue;
+        }
+
         $pattern = '/make\(\s*["\']'.preg_quote($field, '/').'\.\{?\$locale\}?["\']/';
         $matched = preg_match($pattern, $source) === 1;
 
