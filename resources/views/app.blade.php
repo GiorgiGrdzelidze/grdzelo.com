@@ -75,6 +75,10 @@
         @if($seoCanonical)
             <link rel="canonical" href="{{ $seoCanonical }}">
         @endif
+        {{-- Hreflang alternates — emitted server-side so search engines see all locale variants on first crawl --}}
+        @foreach(($page['props']['hreflang'] ?? []) as $alt)
+            <link rel="alternate" hreflang="{{ $alt['hreflang'] }}" href="{{ $alt['href'] }}">
+        @endforeach
         {{-- Open Graph --}}
         <meta property="og:site_name" content="{{ $appName }}">
         @if($og['title'] ?? null)
