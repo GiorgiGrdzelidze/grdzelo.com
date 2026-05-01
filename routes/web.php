@@ -70,7 +70,10 @@ Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
     ->where('locale', Locale::pattern())
     ->name('public.locale.switch');
 
-Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-{locale}.xml', [SitemapController::class, 'locale'])
+    ->where('locale', Locale::pattern())
+    ->name('sitemap.locale');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 // Catch-all for unprefixed public paths — 301 to the locale-prefixed form.
