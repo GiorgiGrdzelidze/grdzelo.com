@@ -25,6 +25,7 @@ class Article extends Model implements HasMedia
         'meta_title', 'meta_description', 'canonical_url', 'robots',
         'og_title', 'og_description', 'og_image_alt',
         'twitter_title', 'twitter_description', 'twitter_image_alt',
+        'jsonld',
     ];
 
     protected $guarded = ['id'];
@@ -79,5 +80,27 @@ class Article extends Model implements HasMedia
     protected function body(): Attribute
     {
         return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
+    }
+
+    public function defaultJsonLd(): ?array
+    {
+        if (! $this->title) {
+            return null;
+        }
+
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => (string) $this->title,
+            'description' => $this->excerpt !== null ? strip_tags((string) $this->excerpt) : null,
+            'inLanguage' => app()->getLocale(),
+            'url' => $this->canonical_url ?: null,
+            'datePublished' => $this->publish_at?->toAtomString(),
+            'dateModified' => $this->updated_at?->toAtomString(),
+            'author' => $this->author ? [
+                '@type' => 'Person',
+                'name' => $this->author->name,
+            ] : null,
+        ], fn ($v) => $v !== null && $v !== '');
     }
 }

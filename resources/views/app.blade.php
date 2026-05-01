@@ -128,8 +128,15 @@
              - UNESCAPED_SLASHES keeps URLs readable (no \/ in canonical/url fields).
              - UNESCAPED_UNICODE keeps Georgian/Cyrillic intact in name/description for crawlers.
              - HEX_TAG escapes < and > so a stray "</script>" inside admin content
-               can't break out of the script element. --}}
-        @if($schema)
+               can't break out of the script element.
+
+             Translatable `jsonld` (Task 4) wins over the legacy non-translatable
+             `schema` payload — admin-saved per-locale JSON-LD is the canonical
+             source going forward. --}}
+        @php($jsonld = $page['props']['seo']['jsonld'] ?? null)
+        @if(! empty($jsonld) && is_array($jsonld))
+            <script type="application/ld+json">{!! json_encode($jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
+        @elseif($schema)
             <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
         @endif
     </head>

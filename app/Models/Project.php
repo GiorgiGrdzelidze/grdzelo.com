@@ -25,6 +25,7 @@ class Project extends Model implements HasMedia
         'meta_title', 'meta_description', 'canonical_url', 'robots',
         'og_title', 'og_description', 'og_image_alt',
         'twitter_title', 'twitter_description', 'twitter_image_alt',
+        'jsonld',
     ];
 
     protected $guarded = ['id'];
@@ -100,5 +101,23 @@ class Project extends Model implements HasMedia
     protected function process(): Attribute
     {
         return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
+    }
+
+    public function defaultJsonLd(): ?array
+    {
+        if (! $this->title) {
+            return null;
+        }
+
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'CreativeWork',
+            'name' => (string) $this->title,
+            'description' => $this->summary !== null ? strip_tags((string) $this->summary) : null,
+            'inLanguage' => app()->getLocale(),
+            'url' => $this->canonical_url ?: null,
+            'dateCreated' => $this->date_start?->toAtomString(),
+            'datePublished' => $this->publish_at?->toAtomString(),
+        ], fn ($v) => $v !== null && $v !== '');
     }
 }

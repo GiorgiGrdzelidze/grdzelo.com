@@ -98,9 +98,44 @@ trait HasSeoFields
                 'image_alt' => $this->getTwitterImageAlt(),
                 'card' => $this->twitter_card ?? 'summary_large_image',
             ],
+            'jsonld' => $this->getJsonLd(),
             'schema' => $this->schema_json ?? null,
             'breadcrumb_title' => $this->breadcrumb_title ?? $this->title ?? '',
         ];
+    }
+
+    /**
+     * Read the active-locale JSON-LD value, falling back to the model's
+     * programmatic `defaultJsonLd()` when the admin hasn't saved a custom
+     * payload. Returns null when neither is available so the Blade root
+     * can suppress the empty `<script>` block.
+     */
+    public function getJsonLd(): ?array
+    {
+        $translatable = is_array($this->translatable ?? null) ? $this->translatable : [];
+
+        if (in_array('jsonld', $translatable, true) && method_exists($this, 'getTranslation')) {
+            $stored = $this->getTranslation('jsonld', app()->getLocale(), useFallbackLocale: true);
+
+            if (is_array($stored) && $stored !== []) {
+                return $stored;
+            }
+
+            if (is_string($stored) && trim($stored) !== '') {
+                $decoded = json_decode($stored, true);
+                if (is_array($decoded) && $decoded !== []) {
+                    return $decoded;
+                }
+            }
+        }
+
+        if (method_exists($this, 'defaultJsonLd')) {
+            $default = $this->defaultJsonLd();
+
+            return is_array($default) && $default !== [] ? $default : null;
+        }
+
+        return null;
     }
 
     /**

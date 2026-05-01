@@ -23,6 +23,7 @@ class Repository extends Model implements HasMedia
         'meta_title', 'meta_description', 'canonical_url', 'robots',
         'og_title', 'og_description', 'og_image_alt',
         'twitter_title', 'twitter_description', 'twitter_image_alt',
+        'jsonld',
     ];
 
     protected $guarded = ['id'];
@@ -87,5 +88,22 @@ class Repository extends Model implements HasMedia
     protected static function translatableSlugSource(): ?string
     {
         return 'name';
+    }
+
+    public function defaultJsonLd(): ?array
+    {
+        if (! $this->name) {
+            return null;
+        }
+
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'SoftwareSourceCode',
+            'name' => (string) $this->name,
+            'description' => $this->summary !== null ? strip_tags((string) $this->summary) : null,
+            'inLanguage' => app()->getLocale(),
+            'codeRepository' => $this->url ?: null,
+            'programmingLanguage' => $this->language ?: null,
+        ], fn ($v) => $v !== null && $v !== '');
     }
 }
