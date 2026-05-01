@@ -169,6 +169,9 @@ class ProjectResource extends Resource
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
                     TranslatableSchema::seoTabs(),
+                    Schemas\Components\Section::make('JSON-LD')->schema([
+                        TranslatableSchema::jsonLdTabs(),
+                    ])->collapsed(),
                     Schemas\Components\Section::make('Indexing')->schema([
                         Schemas\Components\Grid::make(2)->schema([
                             Forms\Components\Toggle::make('noindex'),

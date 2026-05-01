@@ -55,6 +55,9 @@ class HobbyResource extends Resource
             ]),
             Schemas\Components\Section::make('SEO')->schema([
                 TranslatableSchema::seoTabs(),
+                Schemas\Components\Section::make('JSON-LD')->schema([
+                    TranslatableSchema::jsonLdTabs(),
+                ])->collapsed(),
                 Forms\Components\FileUpload::make('og_image')->image()->directory('seo'),
             ])->collapsed(),
         ]);

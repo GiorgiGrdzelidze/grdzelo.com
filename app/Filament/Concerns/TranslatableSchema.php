@@ -73,4 +73,27 @@ final class TranslatableSchema
                 ->label('Twitter Image Alt')->maxLength(255),
         ]);
     }
+
+    /**
+     * Per-locale JSON-LD editor — one Textarea tab per locale, JSON-validated.
+     * Hand-rolled in lieu of Filament's Code component (not in v5 forms).
+     * Empty values fall through to the model's `defaultJsonLd()` at render time;
+     * a custom payload here overrides the default for that locale only.
+     */
+    public static function jsonLdTabs(): Tabs
+    {
+        return self::tabs(fn (string $locale, bool $isDefault) => [
+            Forms\Components\Textarea::make("jsonld.{$locale}")
+                ->label('JSON-LD ('.strtoupper($locale).')')
+                ->rows(8)
+                ->dehydrateStateUsing(fn ($state) => is_string($state) && trim($state) !== ''
+                    ? json_decode($state, true)
+                    : null)
+                ->formatStateUsing(fn ($state) => is_array($state)
+                    ? json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    : $state)
+                ->rule('json')
+                ->helperText('Leave blank to fall back to the auto-generated default. Custom JSON-LD overrides per locale.'),
+        ]);
+    }
 }

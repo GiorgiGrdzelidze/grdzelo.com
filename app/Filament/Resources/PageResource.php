@@ -96,6 +96,9 @@ class PageResource extends Resource
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
                     TranslatableSchema::seoTabs(),
+                    Schemas\Components\Section::make('JSON-LD')->schema([
+                        TranslatableSchema::jsonLdTabs(),
+                    ])->collapsed(),
                     Schemas\Components\Section::make('Indexing')->schema([
                         Forms\Components\TextInput::make('meta_keywords')->maxLength(255),
                         Schemas\Components\Grid::make(2)->schema([
