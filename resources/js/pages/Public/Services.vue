@@ -104,7 +104,7 @@ const processSteps = [
 
                     <div
                         v-if="service.description"
-                        class="prose prose-sm prose-neutral dark:prose-invert mt-6 max-w-none text-sm leading-relaxed text-foreground"
+                        class="prose prose-sm mt-6 max-w-none text-sm leading-relaxed text-foreground prose-neutral dark:prose-invert"
                         v-html="service.description"
                     />
 

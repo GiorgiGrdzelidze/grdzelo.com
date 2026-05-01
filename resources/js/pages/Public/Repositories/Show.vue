@@ -369,7 +369,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                     <h2 class="text-2xl font-bold tracking-tight">About</h2>
                 </div>
                 <div
-                    class="prose prose-neutral dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-bold prose-h2:mt-10 prose-h2:text-2xl prose-h3:text-xl prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:rounded prose-code:border prose-code:border-border/60 prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[0.875em] prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-pre:overflow-x-auto prose-pre:rounded-xl prose-pre:border prose-pre:border-border/60 prose-pre:bg-zinc-950 prose-pre:p-4 prose-pre:text-zinc-100 prose-pre:shadow-md dark:prose-pre:bg-zinc-900 mt-5 max-w-none"
+                    class="prose mt-5 max-w-none prose-neutral dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-bold prose-h2:mt-10 prose-h2:text-2xl prose-h3:text-xl prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:rounded prose-code:border prose-code:border-border/60 prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[0.875em] prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-pre:overflow-x-auto prose-pre:rounded-xl prose-pre:border prose-pre:border-border/60 prose-pre:bg-zinc-950 prose-pre:p-4 prose-pre:text-zinc-100 prose-pre:shadow-md dark:prose-pre:bg-zinc-900"
                     v-html="repository.description"
                 />
             </section>

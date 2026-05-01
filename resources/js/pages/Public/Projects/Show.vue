@@ -203,7 +203,7 @@ function pad(n: number): string {
         >
             <div class="mx-auto max-w-[1200px]">
                 <div
-                    class="prose prose-neutral dark:prose-invert max-w-[70ch] text-pretty"
+                    class="prose max-w-[70ch] text-pretty prose-neutral dark:prose-invert"
                     v-html="project.description"
                 />
             </div>
@@ -225,7 +225,7 @@ function pad(n: number): string {
                         / 01 · Challenge
                     </div>
                     <div
-                        class="prose prose-neutral dark:prose-invert max-w-[65ch] text-pretty"
+                        class="prose max-w-[65ch] text-pretty prose-neutral dark:prose-invert"
                         v-html="project.challenge"
                     />
                 </div>
@@ -239,7 +239,7 @@ function pad(n: number): string {
                         / 02 · Solution
                     </div>
                     <div
-                        class="prose prose-neutral dark:prose-invert max-w-[65ch] text-pretty"
+                        class="prose max-w-[65ch] text-pretty prose-neutral dark:prose-invert"
                         v-html="project.solution"
                     />
                 </div>
@@ -253,7 +253,7 @@ function pad(n: number): string {
                         / 03 · Process
                     </div>
                     <div
-                        class="prose prose-neutral dark:prose-invert max-w-[65ch] text-pretty"
+                        class="prose max-w-[65ch] text-pretty prose-neutral dark:prose-invert"
                         v-html="project.process"
                     />
                 </div>

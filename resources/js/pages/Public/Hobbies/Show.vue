@@ -74,7 +74,7 @@ defineProps<Props>();
             <!-- Description -->
             <div
                 v-if="hobby.description"
-                class="prose prose-neutral dark:prose-invert mx-auto mt-10 max-w-none"
+                class="mx-auto prose mt-10 max-w-none prose-neutral dark:prose-invert"
                 v-html="hobby.description"
             />
 
