@@ -35,7 +35,7 @@ class GalleryController extends BasePublicController
         ]);
     }
 
-    public function show(Album $album): Response
+    public function show(string $locale, Album $album): Response
     {
         if (! $album->isPublished() || ! $album->is_visible) {
             abort(404);

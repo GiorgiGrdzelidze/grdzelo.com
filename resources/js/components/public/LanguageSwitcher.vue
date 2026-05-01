@@ -42,21 +42,17 @@ const locales = ['en', 'ka', 'ru'] as const;
 const active = computed(() => (page.props.locale as string) || 'en');
 
 // URL-canonical i18n: locale lives in the path itself.
-// "/" + "/{path}" is en; "/ka" + "/ka/{path}" is ka; "/ru" + "/ru/{path}" is ru.
-// Switching languages is just a path rewrite — no controller round-trip needed.
+// Every public URL is /{locale}/{path}; switching languages is a path rewrite —
+// strip the existing /{locale} segment, prepend the new one. No controller
+// round-trip needed.
 function switchUrl(loc: string): string {
     const url = (page.url as string) || '/';
     const [pathOnly, ...rest] = url.split('?');
     const query = rest.length ? '?' + rest.join('?') : '';
 
-    const stripped = pathOnly.replace(/^\/(ka|ru)(?=\/|$)/, '') || '/';
+    const stripped = pathOnly.replace(/^\/(en|ka|ru)(?=\/|$)/, '');
+    const target = stripped === '' ? `/${loc}` : `/${loc}${stripped}`;
 
-    if (loc === 'en') {
-        return stripped + query;
-    }
-
-    const prefixed = stripped === '/' ? `/${loc}` : `/${loc}${stripped}`;
-
-    return prefixed + query;
+    return target + query;
 }
 </script>

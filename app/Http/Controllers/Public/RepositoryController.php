@@ -42,7 +42,7 @@ class RepositoryController extends BasePublicController
         ]);
     }
 
-    public function show(Repository $repository): Response
+    public function show(string $locale, Repository $repository): Response
     {
         abort_unless($repository->is_visible, 404);
 

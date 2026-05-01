@@ -48,7 +48,7 @@ class ArticleController extends BasePublicController
         ]);
     }
 
-    public function show(Article $article): Response
+    public function show(string $locale, Article $article): Response
     {
         abort_unless($article->isPublished(), 404);
 

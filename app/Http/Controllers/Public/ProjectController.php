@@ -26,7 +26,7 @@ class ProjectController extends BasePublicController
         ]);
     }
 
-    public function show(Project $project): Response
+    public function show(string $locale, Project $project): Response
     {
         abort_unless($project->isPublished() && $project->is_visible, 404);
 

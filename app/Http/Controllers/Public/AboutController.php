@@ -92,7 +92,7 @@ class AboutController extends BasePublicController
         ]);
     }
 
-    public function hobby(Hobby $hobby): Response
+    public function hobby(string $locale, Hobby $hobby): Response
     {
         abort_if(! $hobby->is_visible, 404);
 
