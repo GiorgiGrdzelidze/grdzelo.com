@@ -153,7 +153,7 @@ onBeforeUnmount(() => {
     >
         <div class="mx-auto max-w-[760px]">
             <div
-                class="prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-headings:tracking-[-0.02em] prose-a:text-foreground prose-a:underline-offset-4 hover:prose-a:text-accent max-w-none"
+                class="prose max-w-none prose-neutral dark:prose-invert prose-headings:font-semibold prose-headings:tracking-[-0.02em] prose-a:text-foreground prose-a:underline-offset-4 hover:prose-a:text-accent"
                 v-html="album.description"
             />
         </div>

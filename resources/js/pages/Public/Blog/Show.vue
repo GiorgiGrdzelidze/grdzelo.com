@@ -318,7 +318,7 @@ function pad(n: number): string {
     >
         <div class="mx-auto max-w-[760px]">
             <div
-                class="article-body prose prose-neutral dark:prose-invert max-w-none"
+                class="article-body prose max-w-none prose-neutral dark:prose-invert"
                 v-html="article.body"
             />
 

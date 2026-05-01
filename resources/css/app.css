@@ -42,8 +42,8 @@
     --font-display-ka:
         'BPG Banner ExtraSquare', 'FiraGO', 'Instrument Sans', sans-serif;
     --font-mtavruli-ka:
-        'BPG Nateli Mtavruli', 'BPG Arial Caps', 'FiraGO',
-        'Instrument Sans', sans-serif;
+        'BPG Nateli Mtavruli', 'BPG Arial Caps', 'FiraGO', 'Instrument Sans',
+        sans-serif;
 
     /* ---- Radius ----------------------------------------- */
     --radius-lg: var(--radius);
