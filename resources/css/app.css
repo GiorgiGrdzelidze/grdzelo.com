@@ -2,6 +2,15 @@
 
 @import 'tw-animate-css';
 
+/* BPG Georgian webfonts — applied via :lang(ka) and .font-bpg-* utilities below.
+   Vite resolves these from node_modules at build time; the bundled CSS contains
+   @font-face declarations with relative ../fonts/*.woff(2) paths. */
+@import 'bpg-banner-extrasquare/css/bpg-banner-extrasquare.min.css';
+@import 'bpg-arial-caps/css/bpg-arial-caps.min.css';
+@import 'bpg-boxo/css/bpg-boxo.min.css';
+@import 'bpg-le-studio-02-caps/css/bpg-le-studio-02-caps.min.css';
+@import 'bpg-nateli-mtavruli/css/bpg-nateli-mtavruli.min.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -23,8 +32,16 @@
         Consolas, monospace;
     --font-display: 'Instrument Sans', sans-serif;
 
-    /* Georgian fallback — applied via :lang(ka) below */
-    --font-sans-ka: 'FiraGO', 'Instrument Sans', system-ui, sans-serif;
+    /* Georgian font stack — applied via :lang(ka) below.
+       Body / headings / mtavruli (uppercase) variants chain to FiraGO and the
+       Latin stack so mixed scripts always have a glyph. */
+    --font-sans-ka:
+        'BPG Boxo', 'FiraGO', 'Instrument Sans', system-ui, sans-serif;
+    --font-display-ka:
+        'BPG Banner ExtraSquare', 'FiraGO', 'Instrument Sans', sans-serif;
+    --font-mtavruli-ka:
+        'BPG Nateli Mtavruli', 'BPG Arial Caps', 'FiraGO',
+        'Instrument Sans', sans-serif;
 
     /* ---- Radius ----------------------------------------- */
     --radius-lg: var(--radius);
@@ -205,9 +222,43 @@
         text-wrap: pretty;
     }
 
-    /* Georgian language fallback */
+    /* Georgian language fallback. Body picks up BPG Boxo, headings use
+       BPG Banner ExtraSquare, and uppercase/eyebrow labels use BPG Nateli
+       Mtavruli — set up so the Georgian site reads as a coherent type system
+       instead of a single fallback. Latin script in mixed-language paragraphs
+       falls through to Instrument Sans via the chained stacks above. */
     :lang(ka) {
         font-family: var(--font-sans-ka);
+    }
+
+    :lang(ka) h1,
+    :lang(ka) h2,
+    :lang(ka) h3 {
+        font-family: var(--font-display-ka);
+    }
+
+    :lang(ka) .eyebrow,
+    :lang(ka) .index-gutter {
+        font-family: var(--font-mtavruli-ka);
+        letter-spacing: 0.06em;
+    }
+
+    /* Manual font swaps — useful for comparing the five BPG families side by side
+       without touching markup. e.g. <h1 class="font-bpg-banner-extrasquare">. */
+    .font-bpg-banner-extrasquare {
+        font-family: 'BPG Banner ExtraSquare', sans-serif;
+    }
+    .font-bpg-arial-caps {
+        font-family: 'BPG Arial Caps', sans-serif;
+    }
+    .font-bpg-boxo {
+        font-family: 'BPG Boxo', sans-serif;
+    }
+    .font-bpg-le-studio-02-caps {
+        font-family: 'BPG LE Studio 02 Caps', sans-serif;
+    }
+    .font-bpg-nateli-mtavruli {
+        font-family: 'BPG Nateli Mtavruli', sans-serif;
     }
 }
 
