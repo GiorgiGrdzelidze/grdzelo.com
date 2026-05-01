@@ -55,7 +55,25 @@ it('exposes every translatable field via the per-locale tab closure', function (
     $reflector = new ReflectionClass($resourceClass);
     $source = file_get_contents($reflector->getFileName());
 
+    // The 10 standard SEO string fields are emitted via TranslatableSchema::seoTabs(),
+    // which the resource calls inside its SEO tab — they don't need an inline
+    // make("$field.\$locale") in the resource source itself.
+    $standardSeoFields = [
+        'meta_title', 'meta_description', 'canonical_url', 'robots',
+        'og_title', 'og_description', 'og_image_alt',
+        'twitter_title', 'twitter_description', 'twitter_image_alt',
+    ];
+
     foreach ($translatable as $field) {
+        if (in_array($field, $standardSeoFields, true)) {
+            $hasSeoTabs = str_contains($source, 'TranslatableSchema::seoTabs(');
+            expect($hasSeoTabs)->toBeTrue(
+                "{$resourceClass} declares `{$field}` as translatable but doesn't call TranslatableSchema::seoTabs() to surface the SEO tab strip."
+            );
+
+            continue;
+        }
+
         $pattern = '/make\(\s*["\']'.preg_quote($field, '/').'\.\{?\$locale\}?["\']/';
         $matched = preg_match($pattern, $source) === 1;
 
