@@ -18,7 +18,12 @@ class Page extends Model implements HasMedia
     use HasFactory, HasPublishState, HasSeoFields, HasTranslatableSlug, HasTranslations, InteractsWithMedia;
 
     /** @var array<int, string> */
-    public array $translatable = ['title', 'summary', 'body', 'excerpt', 'slug'];
+    public array $translatable = [
+        'title', 'summary', 'body', 'excerpt', 'slug',
+        'meta_title', 'meta_description', 'canonical_url', 'robots',
+        'og_title', 'og_description', 'og_image_alt',
+        'twitter_title', 'twitter_description', 'twitter_image_alt',
+    ];
 
     protected $guarded = ['id'];
 

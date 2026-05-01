@@ -132,6 +132,34 @@ final class TranslatableColumns
     }
 
     /**
+     * Add brand-new nullable JSON columns. Used by Task 3 to bring SEO
+     * coverage to spec on models that were missing fields like `og_image_alt`
+     * before becoming translatable.
+     *
+     * @param  array<int, string>  $fields
+     */
+    public static function addJson(string $table, array $fields): void
+    {
+        Schema::table($table, function (Blueprint $blueprint) use ($fields): void {
+            foreach ($fields as $field) {
+                $blueprint->json($field)->nullable();
+            }
+        });
+    }
+
+    /**
+     * @param  array<int, string>  $fields
+     */
+    public static function dropJson(string $table, array $fields): void
+    {
+        Schema::table($table, function (Blueprint $blueprint) use ($fields): void {
+            foreach ($fields as $field) {
+                $blueprint->dropColumn($field);
+            }
+        });
+    }
+
+    /**
      * MySQL-only per-locale unique indexes on a JSON slug column. SQLite (CI)
      * doesn't support functional indexes; we let the application layer enforce
      * uniqueness in tests there.

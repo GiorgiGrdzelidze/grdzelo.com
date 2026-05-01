@@ -20,7 +20,12 @@ class Article extends Model implements HasMedia
     use HasFactory, HasPublishState, HasSeoFields, HasTags, HasTranslatableSlug, HasTranslations, InteractsWithMedia;
 
     /** @var array<int, string> */
-    public array $translatable = ['title', 'excerpt', 'body', 'slug'];
+    public array $translatable = [
+        'title', 'excerpt', 'body', 'slug',
+        'meta_title', 'meta_description', 'canonical_url', 'robots',
+        'og_title', 'og_description', 'og_image_alt',
+        'twitter_title', 'twitter_description', 'twitter_image_alt',
+    ];
 
     protected $guarded = ['id'];
 

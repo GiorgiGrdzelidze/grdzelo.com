@@ -16,7 +16,12 @@ class Album extends Model
     use HasFactory, HasPublishState, HasSeoFields, HasTranslatableSlug, HasTranslations;
 
     /** @var array<int, string> */
-    public array $translatable = ['title', 'summary', 'description', 'slug'];
+    public array $translatable = [
+        'title', 'summary', 'description', 'slug',
+        'meta_title', 'meta_description', 'canonical_url', 'robots',
+        'og_title', 'og_description', 'og_image_alt',
+        'twitter_title', 'twitter_description', 'twitter_image_alt',
+    ];
 
     protected $guarded = ['id'];
 
