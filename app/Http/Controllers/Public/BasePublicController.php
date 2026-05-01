@@ -48,15 +48,18 @@ abstract class BasePublicController extends Controller
     protected function seoFor($model, string $fallbackTitle = ''): array
     {
         $seo = app(SeoSettings::class);
-
-        $canonical = rtrim($seo->canonicalBase().request()->getPathInfo(), '/');
-        if ($canonical === '') {
-            $canonical = $seo->canonicalBase();
-        }
+        $canonical = $this->canonicalForCurrentRequest();
 
         if ($model && method_exists($model, 'toSeoArray')) {
             $payload = $model->toSeoArray();
-            if (empty($payload['canonical'])) {
+            $existing = $payload['canonical'] ?? null;
+
+            // Self-canonical wins over admin override when the override points
+            // at our own domain — otherwise /ka/foo and /ru/foo would all
+            // collapse to the en URL the admin pasted in. External overrides
+            // (different host) are preserved: that's the "this content lives
+            // canonically elsewhere" use case.
+            if (empty($existing) || str_starts_with((string) $existing, $seo->canonicalBase())) {
                 $payload['canonical'] = $canonical;
             }
 
@@ -80,5 +83,23 @@ abstract class BasePublicController extends Controller
                 'card' => 'summary_large_image',
             ],
         ];
+    }
+
+    /**
+     * Build the self-canonical URL for the current request.
+     * Root '/' keeps its trailing slash to stay consistent with the en hreflang
+     * self-reference; deeper paths drop the trailing slash so the canonical
+     * matches Laravel's route normalization.
+     */
+    protected function canonicalForCurrentRequest(): string
+    {
+        $base = app(SeoSettings::class)->canonicalBase();
+        $path = request()->getPathInfo();
+
+        if ($path === '' || $path === '/') {
+            return $base.'/';
+        }
+
+        return rtrim($base.$path, '/');
     }
 }

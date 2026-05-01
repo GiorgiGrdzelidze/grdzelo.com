@@ -92,9 +92,13 @@ class RepositoryController extends BasePublicController
         $seo = $repository->toSeoArray();
 
         $base = app(SeoSettings::class)->canonicalBase();
+        $self = $this->canonicalForCurrentRequest();
 
-        if (empty($seo['canonical'])) {
-            $seo['canonical'] = rtrim($base.request()->getPathInfo(), '/');
+        // Same self-canonical-wins-over-internal-override rule as
+        // BasePublicController::seoFor — keeps /ka/repositories/foo from
+        // collapsing to en when admin sets repository.canonical_url.
+        if (empty($seo['canonical']) || str_starts_with((string) $seo['canonical'], $base)) {
+            $seo['canonical'] = $self;
         }
 
         if (empty($seo['og']['image']) && $repository->thumbnail) {
