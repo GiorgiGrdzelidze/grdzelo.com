@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Settings\SeoSettings;
 use App\Support\Locale;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
@@ -71,6 +72,12 @@ class HandleInertiaRequests extends Middleware
      * Every public URL is /{locale}/...; alternates emit the same path under
      * each supported locale. x-default points at the default-locale URL.
      *
+     * For routes bound to a translatable-slug model, each alternate substitutes
+     * that model's per-locale slug into the path — so `/ka/projects/{ka_slug}`
+     * emits `hreflang="en"` pointing at `/en/projects/{en_slug}` instead of
+     * the current request's slug under a different locale prefix (which would
+     * 404 because route binding only finds the active-locale slug).
+     *
      * Gated to the public.* route group: locale-switch redirects, the sitemap,
      * and any future non-public Inertia surface get an empty array, so we don't
      * compute (or leak) hreflang for routes that aren't part of the localized set.
@@ -86,25 +93,79 @@ class HandleInertiaRequests extends Middleware
         $base = app(SeoSettings::class)->canonicalBase();
         $path = '/'.ltrim($request->getPathInfo(), '/');
 
-        // Strip the leading /{locale} segment so we have the locale-agnostic
-        // remainder ('/about', '/projects/foo', or '' for the locale root).
         $pattern = '#^/('.Locale::pattern().')(?=/|$)#';
         $stripped = preg_replace($pattern, '', $path) ?? '';
+
+        // Collect per-locale slug replacements for every translatable-slug
+        // route parameter. Keyed by the active-locale slug (which is what
+        // currently appears in $stripped via Spatie's HasTranslations).
+        $slugReplacements = $this->collectSlugReplacements($request);
 
         $alternates = [];
         foreach (Locale::SUPPORTED as $locale) {
             $alternates[] = [
                 'hreflang' => $locale,
-                'href' => $base.'/'.$locale.$stripped,
+                'href' => $base.'/'.$locale.$this->translatePath($stripped, $slugReplacements, $locale),
             ];
         }
 
         $alternates[] = [
             'hreflang' => 'x-default',
-            'href' => $base.'/'.Locale::default().$stripped,
+            'href' => $base.'/'.Locale::default().$this->translatePath($stripped, $slugReplacements, Locale::default()),
         ];
 
         return $alternates;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    private function collectSlugReplacements(Request $request): array
+    {
+        $route = $request->route();
+        if ($route === null) {
+            return [];
+        }
+
+        $replacements = [];
+        foreach ($route->parameters() as $value) {
+            if (! $value instanceof Model) {
+                continue;
+            }
+            if (! method_exists($value, 'getTranslations')) {
+                continue;
+            }
+            $translatable = $value->translatable ?? [];
+            if (! is_array($translatable) || ! in_array('slug', $translatable, true)) {
+                continue;
+            }
+
+            $activeSlug = (string) $value->getRouteKey();
+            if ($activeSlug === '') {
+                continue;
+            }
+
+            $perLocale = [];
+            foreach (Locale::SUPPORTED as $locale) {
+                $localized = $value->getTranslation('slug', $locale, useFallbackLocale: true);
+                $perLocale[$locale] = is_string($localized) && $localized !== '' ? $localized : $activeSlug;
+            }
+            $replacements[$activeSlug] = $perLocale;
+        }
+
+        return $replacements;
+    }
+
+    /**
+     * @param  array<string, array<string, string>>  $replacements
+     */
+    private function translatePath(string $path, array $replacements, string $locale): string
+    {
+        foreach ($replacements as $activeSlug => $perLocale) {
+            $path = str_replace($activeSlug, $perLocale[$locale] ?? $activeSlug, $path);
+        }
+
+        return $path;
     }
 
     /**

@@ -42,10 +42,25 @@ const locales = ['en', 'ka', 'ru'] as const;
 const active = computed(() => (page.props.locale as string) || 'en');
 
 // URL-canonical i18n: locale lives in the path itself.
-// Every public URL is /{locale}/{path}; switching languages is a path rewrite —
-// strip the existing /{locale} segment, prepend the new one. No controller
-// round-trip needed.
+// Prefer the server-resolved hreflang alternates (they translate slugs for
+// model-bound routes). Fall back to a plain prefix-rewrite for static pages
+// or routes that didn't ship hreflang.
+type HreflangEntry = { hreflang: string; href: string };
+
 function switchUrl(loc: string): string {
+    const hreflang = (page.props.hreflang as HreflangEntry[]) || [];
+    const match = hreflang.find((h) => h.hreflang === loc);
+
+    if (match) {
+        try {
+            const url = new URL(match.href);
+
+            return url.pathname + url.search + url.hash;
+        } catch {
+            return match.href;
+        }
+    }
+
     const url = (page.url as string) || '/';
     const [pathOnly, ...rest] = url.split('?');
     const query = rest.length ? '?' + rest.join('?') : '';

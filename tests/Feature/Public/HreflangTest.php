@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Hobby;
 use App\Settings\SeoSettings;
 use Inertia\Testing\AssertableInertia;
 
@@ -55,6 +56,28 @@ it('shares hreflang alternates on the /ru home', function () {
                 ['hreflang' => 'ka', 'href' => 'https://grdzelo.test/ka'],
                 ['hreflang' => 'ru', 'href' => 'https://grdzelo.test/ru'],
                 ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/en'],
+            ])
+        );
+});
+
+it('translates per-locale slugs when emitting hreflang on a translated detail page', function () {
+    $hobby = new Hobby;
+    $hobby->setTranslations('title', ['en' => 'Photography']);
+    $hobby->setTranslations('slug', [
+        'en' => 'photography',
+        'ka' => 'potograpia-manual',
+        'ru' => 'fotografiya',
+    ]);
+    $hobby->is_visible = true;
+    $hobby->save();
+
+    $this->get('/ka/hobbies/potograpia-manual')
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('hreflang', [
+                ['hreflang' => 'en', 'href' => 'https://grdzelo.test/en/hobbies/photography'],
+                ['hreflang' => 'ka', 'href' => 'https://grdzelo.test/ka/hobbies/potograpia-manual'],
+                ['hreflang' => 'ru', 'href' => 'https://grdzelo.test/ru/hobbies/fotografiya'],
+                ['hreflang' => 'x-default', 'href' => 'https://grdzelo.test/en/hobbies/photography'],
             ])
         );
 });
