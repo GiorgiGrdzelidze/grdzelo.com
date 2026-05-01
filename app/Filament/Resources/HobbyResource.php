@@ -54,8 +54,7 @@ class HobbyResource extends Resource
                 Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
             ]),
             Schemas\Components\Section::make('SEO')->schema([
-                Forms\Components\TextInput::make('meta_title')->maxLength(255),
-                Forms\Components\Textarea::make('meta_description')->maxLength(500)->rows(2),
+                TranslatableSchema::seoTabs(),
                 Forms\Components\FileUpload::make('og_image')->image()->directory('seo'),
             ])->collapsed(),
         ]);

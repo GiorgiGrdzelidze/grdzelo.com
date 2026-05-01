@@ -104,24 +104,18 @@ class ArticleResource extends Resource
                         ]),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
-                    Schemas\Components\Section::make('Search Engine Optimization')->schema([
-                        Forms\Components\TextInput::make('meta_title')->maxLength(255),
-                        Forms\Components\Textarea::make('meta_description')->maxLength(500)->rows(3),
-                        Forms\Components\TextInput::make('canonical_url')->url()->maxLength(255),
+                    TranslatableSchema::seoTabs(),
+                    Schemas\Components\Section::make('Indexing')->schema([
                         Schemas\Components\Grid::make(2)->schema([
                             Forms\Components\Toggle::make('noindex'),
                             Forms\Components\Toggle::make('nofollow'),
                         ]),
                         Forms\Components\TextInput::make('breadcrumb_title')->maxLength(255),
                     ]),
-                    Schemas\Components\Section::make('Open Graph')->schema([
-                        Forms\Components\TextInput::make('og_title')->maxLength(255),
-                        Forms\Components\Textarea::make('og_description')->maxLength(500)->rows(2),
+                    Schemas\Components\Section::make('Open Graph media')->schema([
                         Forms\Components\FileUpload::make('og_image')->image()->directory('seo'),
                     ]),
-                    Schemas\Components\Section::make('Twitter')->schema([
-                        Forms\Components\TextInput::make('twitter_title')->maxLength(255),
-                        Forms\Components\Textarea::make('twitter_description')->maxLength(500)->rows(2),
+                    Schemas\Components\Section::make('Twitter media')->schema([
                         Forms\Components\FileUpload::make('twitter_image')->image()->directory('seo'),
                     ]),
                 ]),

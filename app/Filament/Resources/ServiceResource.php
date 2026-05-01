@@ -60,11 +60,7 @@ class ServiceResource extends Resource
                     ]),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
-                    Forms\Components\TextInput::make('meta_title')->maxLength(255),
-                    Forms\Components\Textarea::make('meta_description')->maxLength(500)->rows(3),
-                    Forms\Components\TextInput::make('canonical_url')->url()->maxLength(255),
-                    Forms\Components\TextInput::make('og_title')->maxLength(255),
-                    Forms\Components\Textarea::make('og_description')->maxLength(500)->rows(2),
+                    TranslatableSchema::seoTabs(),
                     Forms\Components\FileUpload::make('og_image')->image()->directory('seo'),
                 ]),
             ])->columnSpanFull(),

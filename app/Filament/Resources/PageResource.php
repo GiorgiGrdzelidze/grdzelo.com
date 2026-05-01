@@ -95,36 +95,16 @@ class PageResource extends Resource
                         ->maxLength(255),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
-                    Schemas\Components\Section::make('Search Engine Optimization')->schema([
-                        Forms\Components\TextInput::make('meta_title')
-                            ->maxLength(255)
-                            ->helperText('Leave blank to use page title'),
-                        Forms\Components\Textarea::make('meta_description')
-                            ->maxLength(500)
-                            ->rows(3),
-                        Forms\Components\TextInput::make('meta_keywords')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('canonical_url')
-                            ->url()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('robots')
-                            ->maxLength(255)
-                            ->placeholder('index, follow'),
+                    TranslatableSchema::seoTabs(),
+                    Schemas\Components\Section::make('Indexing')->schema([
+                        Forms\Components\TextInput::make('meta_keywords')->maxLength(255),
                         Schemas\Components\Grid::make(2)->schema([
                             Forms\Components\Toggle::make('noindex'),
                             Forms\Components\Toggle::make('nofollow'),
                         ]),
-                        Forms\Components\TextInput::make('breadcrumb_title')
-                            ->maxLength(255),
+                        Forms\Components\TextInput::make('breadcrumb_title')->maxLength(255),
                     ]),
-                    Schemas\Components\Section::make('Open Graph')->schema([
-                        Forms\Components\TextInput::make('og_title')
-                            ->label('OG Title')
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('og_description')
-                            ->label('OG Description')
-                            ->maxLength(500)
-                            ->rows(2),
+                    Schemas\Components\Section::make('Open Graph media')->schema([
                         Forms\Components\FileUpload::make('og_image')
                             ->label('OG Image')
                             ->image()
@@ -137,12 +117,7 @@ class PageResource extends Resource
                             ])
                             ->default('website'),
                     ]),
-                    Schemas\Components\Section::make('Twitter Card')->schema([
-                        Forms\Components\TextInput::make('twitter_title')
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('twitter_description')
-                            ->maxLength(500)
-                            ->rows(2),
+                    Schemas\Components\Section::make('Twitter media')->schema([
                         Forms\Components\FileUpload::make('twitter_image')
                             ->image()
                             ->directory('seo'),

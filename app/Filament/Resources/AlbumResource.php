@@ -91,11 +91,7 @@ class AlbumResource extends Resource
                         ->helperText('Upload multiple photos. You can drag to reorder.'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
-                    Forms\Components\TextInput::make('meta_title')
-                        ->maxLength(255),
-                    Forms\Components\Textarea::make('meta_description')
-                        ->maxLength(500)
-                        ->rows(3),
+                    TranslatableSchema::seoTabs(),
                     Forms\Components\FileUpload::make('og_image')
                         ->image()
                         ->directory('seo'),

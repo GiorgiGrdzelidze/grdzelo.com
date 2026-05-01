@@ -6,6 +6,7 @@ namespace App\Filament\Concerns;
 
 use App\Support\Locale;
 use Closure;
+use Filament\Forms;
 use Filament\Schemas\Components\Tabs;
 
 /**
@@ -37,5 +38,39 @@ final class TranslatableSchema
         }
 
         return Tabs::make('Translations')->tabs($tabs);
+    }
+
+    /**
+     * Standard per-locale SEO tab strip — every HasSeoFields resource embeds
+     * this inside its top-level "SEO" tab. The 10 translatable SEO string
+     * fields appear once per supported locale; non-translatable booleans
+     * (noindex, nofollow), structural enums (og_type, twitter_card), media
+     * uploads (og_image, twitter_image), and schema_json stay outside this
+     * helper, in the resource's own SEO tab body.
+     */
+    public static function seoTabs(): Tabs
+    {
+        return self::tabs(fn (string $locale, bool $isDefault) => [
+            Forms\Components\TextInput::make("meta_title.{$locale}")
+                ->label('Meta Title')->maxLength(255),
+            Forms\Components\Textarea::make("meta_description.{$locale}")
+                ->label('Meta Description')->maxLength(500)->rows(3),
+            Forms\Components\TextInput::make("canonical_url.{$locale}")
+                ->label('Canonical URL')->url()->maxLength(255),
+            Forms\Components\TextInput::make("robots.{$locale}")
+                ->label('Robots')->maxLength(255)->placeholder('index, follow'),
+            Forms\Components\TextInput::make("og_title.{$locale}")
+                ->label('OG Title')->maxLength(255),
+            Forms\Components\Textarea::make("og_description.{$locale}")
+                ->label('OG Description')->maxLength(500)->rows(2),
+            Forms\Components\TextInput::make("og_image_alt.{$locale}")
+                ->label('OG Image Alt')->maxLength(255),
+            Forms\Components\TextInput::make("twitter_title.{$locale}")
+                ->label('Twitter Title')->maxLength(255),
+            Forms\Components\Textarea::make("twitter_description.{$locale}")
+                ->label('Twitter Description')->maxLength(500)->rows(2),
+            Forms\Components\TextInput::make("twitter_image_alt.{$locale}")
+                ->label('Twitter Image Alt')->maxLength(255),
+        ]);
     }
 }
