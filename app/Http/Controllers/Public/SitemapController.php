@@ -13,7 +13,6 @@ use App\Support\Locale;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\App;
 
 class SitemapController extends Controller
 {
@@ -55,10 +54,9 @@ class SitemapController extends Controller
      * each with reciprocal `<xhtml:link>` alternates pointing at the other
      * locales (and an `x-default` pinning the configured default locale).
      *
-     * Slugs come from each model's translatable `slug` column under the
-     * requested locale, falling back to the default locale when missing.
-     * Setting `App::setLocale($locale)` before reading `$model->slug` lets
-     * Spatie's HasTranslations return the right per-locale value.
+     * Slugs are read via explicit-locale `getTranslation()` calls inside
+     * `slugForLocale()`, so the controller does not need to mutate the
+     * application's active locale to render this response.
      */
     public function locale(string $locale): Response
     {
@@ -72,16 +70,7 @@ class SitemapController extends Controller
             abort(404);
         }
 
-        $base = $seo->canonicalBase();
-        $previousLocale = App::getLocale();
-        App::setLocale($locale);
-
-        try {
-            $urls = $this->buildUrlsForLocale($locale, $base);
-        } finally {
-            App::setLocale($previousLocale);
-        }
-
+        $urls = $this->buildUrlsForLocale($locale, $seo->canonicalBase());
         $xml = view('sitemap', ['urls' => $urls])->render();
 
         return response($xml, 200, [
