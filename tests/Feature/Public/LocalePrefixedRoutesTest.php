@@ -39,6 +39,15 @@ it('returns 404 for an unsupported locale prefix', function () {
     $this->get('/fr')->assertNotFound();
 });
 
+it('returns 404 for /en/* — en is canonical at the unprefixed root, never a URL segment', function () {
+    $this->get('/en')->assertNotFound();
+    $this->get('/en/about')->assertNotFound();
+});
+
+it('returns 404 for /ka/locale/en — locale switch is not nested under prefix', function () {
+    $this->get('/ka/locale/en')->assertNotFound();
+});
+
 it('keeps the unprefixed root at the default locale (en)', function () {
     $this->get('/about')
         ->assertStatus(200)

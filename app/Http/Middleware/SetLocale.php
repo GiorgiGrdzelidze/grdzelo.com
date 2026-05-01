@@ -27,6 +27,14 @@ class SetLocale
     /** @var array<int, string> */
     public const SUPPORTED = ['en', 'ka', 'ru'];
 
+    /**
+     * Locales that may appear as a URL prefix segment. 'en' is canonical
+     * at the unprefixed root, so it must NEVER be accepted from /{locale}/...
+     *
+     * @var array<int, string>
+     */
+    private const PREFIX_LOCALES = ['ka', 'ru'];
+
     private const COOKIE = 'locale';
 
     public function handle(Request $request, Closure $next): Response
@@ -54,8 +62,10 @@ class SetLocale
     private function resolveLocale(Request $request): string
     {
         // 0. URL-prefixed locale segment wins outright — the URL is canonical.
+        //    Restricted to PREFIX_LOCALES so 'en' can't sneak in via /en/foo
+        //    (which would create a duplicate-content variant of /foo).
         $segment = $request->route()?->parameter('locale');
-        if (in_array($segment, self::SUPPORTED, true)) {
+        if (in_array($segment, self::PREFIX_LOCALES, true)) {
             return $segment;
         }
 
