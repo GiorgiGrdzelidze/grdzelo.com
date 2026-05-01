@@ -9,6 +9,7 @@ use App\Models\Hobby;
 use App\Models\Project;
 use App\Models\Repository;
 use App\Settings\SeoSettings;
+use App\Support\Locale;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -144,35 +145,49 @@ class SitemapController extends Controller
     }
 
     /**
-     * Build hreflang alternates for a sitemap URL. Path is the unprefixed (en) form;
-     * we emit the en self-reference, /ka, /ru, and x-default (= en) per Google guidelines.
+     * Build hreflang alternates for a sitemap URL. Path is the locale-agnostic
+     * form ('/' for the home, '/about' for inner pages); we emit one alternate
+     * per supported locale plus an x-default pointing at the default locale.
      *
      * @return array<int, array{hreflang: string, href: string}>
      */
     private function alternatesFor(string $base, string $path): array
     {
-        [$en, $ka, $ru] = $this->localePaths($path);
+        $alternates = [];
+        foreach (Locale::SUPPORTED as $locale) {
+            $alternates[] = [
+                'hreflang' => $locale,
+                'href' => $base.$this->localeUrl($locale, $path),
+            ];
+        }
 
-        return [
-            ['hreflang' => 'en', 'href' => $base.$en],
-            ['hreflang' => 'ka', 'href' => $base.$ka],
-            ['hreflang' => 'ru', 'href' => $base.$ru],
-            ['hreflang' => 'x-default', 'href' => $base.$en],
+        $alternates[] = [
+            'hreflang' => 'x-default',
+            'href' => $base.$this->localeUrl(Locale::default(), $path),
         ];
+
+        return $alternates;
     }
 
     /**
-     * Map an unprefixed path to its three locale variants in [en, ka, ru] order.
-     * Root '/' becomes '/ka' and '/ru' (no trailing slash) so loc URLs stay tidy.
+     * Map a locale-agnostic path to its per-locale variants in SUPPORTED order.
      *
-     * @return array{0: string, 1: string, 2: string}
+     * @return array<int, string>
      */
     private function localePaths(string $path): array
     {
-        return [
-            $path,
-            $path === '/' ? '/ka' : '/ka'.$path,
-            $path === '/' ? '/ru' : '/ru'.$path,
-        ];
+        return array_map(
+            fn (string $locale): string => $this->localeUrl($locale, $path),
+            Locale::SUPPORTED,
+        );
+    }
+
+    /**
+     * Build the locale-prefixed URL path for a given locale + locale-agnostic path.
+     * '/' becomes '/{locale}'; '/about' becomes '/{locale}/about'.
+     */
+    private function localeUrl(string $locale, string $path): string
+    {
+        return $path === '/' ? '/'.$locale : '/'.$locale.$path;
     }
 }

@@ -87,18 +87,15 @@ abstract class BasePublicController extends Controller
 
     /**
      * Build the self-canonical URL for the current request.
-     * Root '/' keeps its trailing slash to stay consistent with the en hreflang
-     * self-reference; deeper paths drop the trailing slash so the canonical
-     * matches Laravel's route normalization.
+     *
+     * Every public URL is /{locale}/... post-prefix-mandate, so the canonical
+     * is just `canonical_base + request_path` with any trailing slash trimmed
+     * — there is no longer a bare `/` to special-case.
      */
     protected function canonicalForCurrentRequest(): string
     {
         $base = app(SeoSettings::class)->canonicalBase();
         $path = request()->getPathInfo();
-
-        if ($path === '' || $path === '/') {
-            return $base.'/';
-        }
 
         return rtrim($base.$path, '/');
     }
