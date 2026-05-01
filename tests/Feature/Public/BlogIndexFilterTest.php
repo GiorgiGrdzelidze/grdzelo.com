@@ -26,7 +26,7 @@ it('filters articles by category slug from query string', function () {
     makePublishedArticle(['title' => 'Laravel two', 'article_category_id' => $laravel->id]);
     makePublishedArticle(['title' => 'Vue one', 'article_category_id' => $vue->id]);
 
-    $this->get('/blog?category=laravel')
+    $this->get('/en/blog?category=laravel')
         ->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Public/Blog/Index')
@@ -43,7 +43,7 @@ it('returns all published articles when no category param is provided', function
     makePublishedArticle(['article_category_id' => $cat->id]);
     makePublishedArticle(['article_category_id' => null]);
 
-    $this->get('/blog')
+    $this->get('/en/blog')
         ->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Public/Blog/Index')
@@ -62,7 +62,7 @@ it('exposes paginator total even on the first of multiple pages', function () {
         ]);
     }
 
-    $this->get('/blog?category=bulk')
+    $this->get('/en/blog?category=bulk')
         ->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('articles.total', 15)
@@ -82,7 +82,7 @@ it('preserves the category filter across pagination links', function () {
         ]);
     }
 
-    $response = $this->get('/blog?category=bulk');
+    $response = $this->get('/en/blog?category=bulk');
 
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->where('articles.total', 15)
@@ -94,4 +94,5 @@ it('preserves the category filter across pagination links', function () {
 
     expect($nextLink)->not->toBeNull();
     expect($nextLink['url'])->toContain('category=bulk');
+    expect($nextLink['url'])->toContain('/en/blog');
 });

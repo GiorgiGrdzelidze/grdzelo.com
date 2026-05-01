@@ -105,6 +105,19 @@
         @if($seoCanonical)
             <meta property="og:url" content="{{ $seoCanonical }}">
         @endif
+        {{-- og:locale + og:locale:alternate. Maps the active short locale
+             code to a Facebook-flavoured tag (en_US / ka_GE / ru_RU); the
+             list of alternates covers every supported non-active locale. --}}
+        @php($ogLocaleMap = ['en' => 'en_US', 'ka' => 'ka_GE', 'ru' => 'ru_RU'])
+        @php($activeLocale = $page['props']['locale'] ?? app()->getLocale())
+        @if(isset($ogLocaleMap[$activeLocale]))
+            <meta property="og:locale" content="{{ $ogLocaleMap[$activeLocale] }}">
+            @foreach($ogLocaleMap as $loc => $ogLoc)
+                @if($loc !== $activeLocale)
+                    <meta property="og:locale:alternate" content="{{ $ogLoc }}">
+                @endif
+            @endforeach
+        @endif
         {{-- Twitter Card --}}
         @if($twitter['card'] ?? null)
             <meta name="twitter:card" content="{{ $twitter['card'] }}">
@@ -128,8 +141,15 @@
              - UNESCAPED_SLASHES keeps URLs readable (no \/ in canonical/url fields).
              - UNESCAPED_UNICODE keeps Georgian/Cyrillic intact in name/description for crawlers.
              - HEX_TAG escapes < and > so a stray "</script>" inside admin content
-               can't break out of the script element. --}}
-        @if($schema)
+               can't break out of the script element.
+
+             Translatable `jsonld` (Task 4) wins over the legacy non-translatable
+             `schema` payload — admin-saved per-locale JSON-LD is the canonical
+             source going forward. --}}
+        @php($jsonld = $page['props']['seo']['jsonld'] ?? null)
+        @if(! empty($jsonld) && is_array($jsonld))
+            <script type="application/ld+json">{!! json_encode($jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
+        @elseif($schema)
             <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
         @endif
     </head>

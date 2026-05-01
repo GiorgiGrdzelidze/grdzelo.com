@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SocialLink;
 use App\Settings\GeneralSettings;
 use App\Settings\SeoSettings;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 
 abstract class BasePublicController extends Controller
 {
@@ -63,6 +65,14 @@ abstract class BasePublicController extends Controller
                 $payload['canonical'] = $canonical;
             }
 
+            // JSON-LD `url` should match the resolved canonical so crawlers
+            // can tie the structured data back to the rendered page. Models'
+            // `defaultJsonLd()` doesn't know the request URL, so we inject
+            // it here whenever the payload omits one (or carries an empty).
+            if (isset($payload['jsonld']) && is_array($payload['jsonld']) && empty($payload['jsonld']['url'])) {
+                $payload['jsonld']['url'] = $payload['canonical'];
+            }
+
             return $payload;
         }
 
@@ -86,19 +96,46 @@ abstract class BasePublicController extends Controller
     }
 
     /**
+     * 301 to the locale-canonical URL when route binding resolved by
+     * default-locale slug fallback AND a localized slug now exists for the
+     * active locale. Returns null when no redirect is needed (active-locale
+     * slug not yet saved, or binding hit on the active locale already).
+     *
+     * `$segment` is the path segment after the locale prefix —
+     * e.g. 'projects' produces /{locale}/projects/{localized_slug}.
+     */
+    protected function localizedSlugRedirect(Model $model, string $segment): ?RedirectResponse
+    {
+        if (! method_exists($model, 'wasResolvedByFallback') || ! $model->wasResolvedByFallback()) {
+            return null;
+        }
+
+        if (! method_exists($model, 'getTranslations')) {
+            return null;
+        }
+
+        $locale = app()->getLocale();
+        $slugs = $model->getTranslations('slug');
+        $localized = $slugs[$locale] ?? null;
+
+        if (! is_string($localized) || $localized === '') {
+            return null;
+        }
+
+        return redirect("/{$locale}/{$segment}/{$localized}", 301);
+    }
+
+    /**
      * Build the self-canonical URL for the current request.
-     * Root '/' keeps its trailing slash to stay consistent with the en hreflang
-     * self-reference; deeper paths drop the trailing slash so the canonical
-     * matches Laravel's route normalization.
+     *
+     * Every public URL is /{locale}/... post-prefix-mandate, so the canonical
+     * is just `canonical_base + request_path` with any trailing slash trimmed
+     * — there is no longer a bare `/` to special-case.
      */
     protected function canonicalForCurrentRequest(): string
     {
         $base = app(SeoSettings::class)->canonicalBase();
         $path = request()->getPathInfo();
-
-        if ($path === '' || $path === '/') {
-            return $base.'/';
-        }
 
         return rtrim($base.$path, '/');
     }

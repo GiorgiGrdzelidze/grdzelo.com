@@ -4,59 +4,81 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Locale;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * SetLocale — picks the active locale for the request.
  *
  * Order of precedence:
- *   1. URL prefix segment, e.g. /ka/about — read from the path, not from
- *      a route parameter, because the route uses literal /ka and /ru
- *      prefixes (a {locale} param would land positionally in controller
- *      actions like show(Project) and shadow the bound model).
- *   2. Session value (last explicit choice on an unprefixed URL)
- *   3. Cookie value (cross-session memory)
- *   4. Accept-Language header (best-fit match)
- *   5. App default ("en")
+ *   1. URL prefix segment, e.g. /ka/about — read from the path itself so
+ *      it works whether the route param is named {locale} or absent (the
+ *      sitemap, robots, and locale-switch routes have no {locale}).
+ *   2. Session value (last explicit choice on an unprefixed URL).
+ *   3. Cookie value (cross-session memory).
+ *   4. Accept-Language header (best-fit match).
+ *   5. App default from config('app.locale').
  *
- * Once resolved, the locale is set on the App, persisted to session,
- * and dropped into a 1-year cookie so navigation feels sticky.
+ * Once resolved, the locale is set on the App, registered as a default
+ * route parameter (so route('public.home') auto-fills /{locale}/...),
+ * and persisted to session + cookie ONLY when the value changed —
+ * unconditional writes spammed the session and broke caching strategies.
  */
 class SetLocale
 {
-    /** @var array<int, string> */
-    public const SUPPORTED = ['en', 'ka', 'ru'];
-
-    /**
-     * Locales that may appear as a URL prefix segment. 'en' is canonical
-     * at the unprefixed root, so it must NEVER be accepted from /{locale}/...
-     *
-     * @var array<int, string>
-     */
-    private const PREFIX_LOCALES = ['ka', 'ru'];
+    private const SESSION_KEY = 'locale';
 
     private const COOKIE = 'locale';
 
+    private const COOKIE_LIFETIME_MINUTES = 60 * 24 * 365;
+
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $this->resolveLocale($request);
+        $resolved = $this->resolveLocale($request);
 
-        App::setLocale($locale);
-        $request->session()->put('locale', $locale);
+        App::setLocale($resolved);
+        URL::defaults(['locale' => $resolved]);
+
+        $sessionLocale = $request->session()->get(self::SESSION_KEY);
+        if ($sessionLocale !== $resolved) {
+            $request->session()->put(self::SESSION_KEY, $resolved);
+        }
 
         $response = $next($request);
 
-        if (method_exists($response, 'cookie')) {
-            // Re-read session so an explicit switch by LocaleController during
-            // this request wins over the value resolved at handle() time.
-            $final = $request->session()->get('locale', $locale);
-            if (! in_array($final, self::SUPPORTED, true)) {
-                $final = $locale;
+        // Vary: Accept-Language — locale resolution varies by header / cookie /
+        // session, so caches must key responses on it. Merged with whatever
+        // Vary value Inertia (or any later middleware) set, since this runs
+        // post-onion from SetLocale's middleware position.
+        if (method_exists($response, 'getVary') && method_exists($response, 'setVary')) {
+            $existing = $response->getVary();
+            if (! in_array('Accept-Language', $existing, true)) {
+                $response->setVary(array_merge($existing, ['Accept-Language']));
             }
-            $response->cookie(self::COOKIE, $final, 60 * 24 * 365); // 1 year
+        }
+
+        if (method_exists($response, 'cookie')) {
+            // Re-read in case LocaleController switched mid-request.
+            $final = $request->session()->get(self::SESSION_KEY, $resolved);
+            if (! Locale::isSupported($final)) {
+                $final = $resolved;
+            }
+
+            if ($request->cookie(self::COOKIE) !== $final) {
+                // SameSite=Lax: cookie travels on top-level navigations across
+                // origins (the language switcher's GET, post-redirect-get from
+                // /locale/{locale}, etc.) without leaking on cross-site POSTs.
+                $response->cookie(
+                    self::COOKIE,
+                    $final,
+                    self::COOKIE_LIFETIME_MINUTES,
+                    null, null, false, true, false, 'lax',
+                );
+            }
         }
 
         return $response;
@@ -64,36 +86,33 @@ class SetLocale
 
     private function resolveLocale(Request $request): string
     {
-        // 0. URL-prefixed locale segment wins outright — the URL is canonical.
-        //    Read from the path (not a route param) because routes use literal
-        //    /ka and /ru prefixes; a {locale} param would be passed positionally
-        //    by Laravel's dispatcher and break model-bound controller actions.
-        //    Restricted to PREFIX_LOCALES so 'en' can't sneak in via /en/foo
-        //    (which would create a duplicate-content variant of /foo).
+        // 1. URL prefix segment — first path segment if it's a supported locale.
+        //    Read from the path (not a route param) because the sitemap, robots,
+        //    and locale-switch routes don't carry a {locale} parameter.
         $first = explode('/', trim($request->getPathInfo(), '/'), 2)[0] ?? '';
-        if (in_array($first, self::PREFIX_LOCALES, true)) {
+        if ($first !== '' && Locale::isSupported($first)) {
             return $first;
         }
 
-        // 1. Session
-        $session = $request->session()->get('locale');
-        if (in_array($session, self::SUPPORTED, true)) {
+        // 2. Session
+        $session = $request->session()->get(self::SESSION_KEY);
+        if (is_string($session) && Locale::isSupported($session)) {
             return $session;
         }
 
-        // 2. Cookie
+        // 3. Cookie
         $cookie = $request->cookie(self::COOKIE);
-        if (in_array($cookie, self::SUPPORTED, true)) {
+        if (is_string($cookie) && Locale::isSupported($cookie)) {
             return $cookie;
         }
 
-        // 3. Accept-Language header
-        $best = $request->getPreferredLanguage(self::SUPPORTED);
-        if (in_array($best, self::SUPPORTED, true)) {
+        // 4. Accept-Language header
+        $best = $request->getPreferredLanguage(Locale::SUPPORTED);
+        if (is_string($best) && Locale::isSupported($best)) {
             return $best;
         }
 
-        // 4. Default
-        return config('app.fallback_locale', 'en');
+        // 5. Default
+        return Locale::default();
     }
 }

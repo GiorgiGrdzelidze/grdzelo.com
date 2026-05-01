@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Models\Article;
 use App\Models\Repository;
 use App\Settings\SeoSettings;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,8 +43,12 @@ class RepositoryController extends BasePublicController
         ]);
     }
 
-    public function show(Repository $repository): Response
+    public function show(string $locale, Repository $repository): Response|RedirectResponse
     {
+        if ($redirect = $this->localizedSlugRedirect($repository, 'repositories')) {
+            return $redirect;
+        }
+
         abort_unless($repository->is_visible, 404);
 
         $repository->load(['project:id,title,slug,summary,cover_image']);
@@ -112,6 +117,11 @@ class RepositoryController extends BasePublicController
         }
         if (! empty($seo['twitter']['image'])) {
             $seo['twitter']['image_alt'] ??= $seo['og']['image_alt'] ?? $repository->name;
+        }
+
+        // JSON-LD `url` follows the resolved canonical (mirrors BasePublicController::seoFor).
+        if (isset($seo['jsonld']) && is_array($seo['jsonld']) && empty($seo['jsonld']['url'])) {
+            $seo['jsonld']['url'] = $seo['canonical'];
         }
 
         return $seo;

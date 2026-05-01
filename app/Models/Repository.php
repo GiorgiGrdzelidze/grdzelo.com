@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasSeoFields;
+use App\Concerns\HasTranslatableSlug;
 use App\Support\Tiptap;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 
 class Repository extends Model implements HasMedia
 {
-    use HasFactory, HasSeoFields, InteractsWithMedia;
+    use HasFactory, HasSeoFields, HasTranslatableSlug, HasTranslations, InteractsWithMedia;
+
+    /** @var array<int, string> */
+    public array $translatable = [
+        'name', 'summary', 'description', 'slug',
+        'meta_title', 'meta_description', 'canonical_url', 'robots',
+        'og_title', 'og_description', 'og_image_alt',
+        'twitter_title', 'twitter_description', 'twitter_image_alt',
+        'jsonld',
+    ];
 
     protected $guarded = ['id'];
 
@@ -72,5 +83,27 @@ class Repository extends Model implements HasMedia
     protected function description(): Attribute
     {
         return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
+    }
+
+    protected static function translatableSlugSource(): ?string
+    {
+        return 'name';
+    }
+
+    public function defaultJsonLd(): ?array
+    {
+        if (! $this->name) {
+            return null;
+        }
+
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'SoftwareSourceCode',
+            'name' => (string) $this->name,
+            'description' => $this->summary !== null ? strip_tags((string) $this->summary) : null,
+            'inLanguage' => app()->getLocale(),
+            'codeRepository' => $this->url ?: null,
+            'programmingLanguage' => $this->language ?: null,
+        ], fn ($v) => $v !== null && $v !== '');
     }
 }

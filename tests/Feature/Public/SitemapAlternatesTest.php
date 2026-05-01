@@ -11,52 +11,47 @@ beforeEach(function () {
     $seo->save();
 });
 
-it('declares the xhtml namespace on the urlset', function () {
-    $this->get('/sitemap.xml')
+it('declares the xhtml namespace on the per-locale urlset', function () {
+    $this->get('/sitemap-en.xml')
         ->assertOk()
         ->assertSee('xmlns:xhtml="http://www.w3.org/1999/xhtml"', false);
 });
 
-it('emits hreflang alternates for the homepage', function () {
-    $response = $this->get('/sitemap.xml')->assertOk();
+it('emits hreflang alternates for the homepage on the en sitemap', function () {
+    $response = $this->get('/sitemap-en.xml')->assertOk();
 
-    $response->assertSee('<xhtml:link rel="alternate" hreflang="en" href="https://grdzelo.test/"/>', false);
+    $response->assertSee('<xhtml:link rel="alternate" hreflang="en" href="https://grdzelo.test/en"/>', false);
     $response->assertSee('<xhtml:link rel="alternate" hreflang="ka" href="https://grdzelo.test/ka"/>', false);
     $response->assertSee('<xhtml:link rel="alternate" hreflang="ru" href="https://grdzelo.test/ru"/>', false);
-    $response->assertSee('<xhtml:link rel="alternate" hreflang="x-default" href="https://grdzelo.test/"/>', false);
+    $response->assertSee('<xhtml:link rel="alternate" hreflang="x-default" href="https://grdzelo.test/en"/>', false);
 });
 
-it('emits hreflang alternates for inner static pages', function () {
-    $response = $this->get('/sitemap.xml')->assertOk();
+it('emits hreflang alternates for inner static pages on the ka sitemap', function () {
+    $response = $this->get('/sitemap-ka.xml')->assertOk();
 
-    $response->assertSee('<xhtml:link rel="alternate" hreflang="en" href="https://grdzelo.test/about"/>', false);
+    $response->assertSee('<xhtml:link rel="alternate" hreflang="en" href="https://grdzelo.test/en/about"/>', false);
     $response->assertSee('<xhtml:link rel="alternate" hreflang="ka" href="https://grdzelo.test/ka/about"/>', false);
     $response->assertSee('<xhtml:link rel="alternate" hreflang="ru" href="https://grdzelo.test/ru/about"/>', false);
-    $response->assertSee('<xhtml:link rel="alternate" hreflang="x-default" href="https://grdzelo.test/about"/>', false);
+    $response->assertSee('<xhtml:link rel="alternate" hreflang="x-default" href="https://grdzelo.test/en/about"/>', false);
 });
 
-it('emits a separate <url> entry per locale for the homepage', function () {
-    $response = $this->get('/sitemap.xml')->assertOk();
+it('lists only the requested locale URLs on each per-locale sitemap', function () {
+    $en = $this->get('/sitemap-en.xml')->assertOk();
+    $en->assertSee('<loc>https://grdzelo.test/en</loc>', false);
+    $en->assertDontSee('<loc>https://grdzelo.test/ka</loc>', false);
+    $en->assertDontSee('<loc>https://grdzelo.test/ru</loc>', false);
 
-    $response->assertSee('<loc>https://grdzelo.test/</loc>', false);
-    $response->assertSee('<loc>https://grdzelo.test/ka</loc>', false);
-    $response->assertSee('<loc>https://grdzelo.test/ru</loc>', false);
+    $ka = $this->get('/sitemap-ka.xml')->assertOk();
+    $ka->assertSee('<loc>https://grdzelo.test/ka</loc>', false);
+    $ka->assertDontSee('<loc>https://grdzelo.test/en</loc>', false);
 });
 
-it('emits a separate <url> entry per locale for inner static pages', function () {
-    $response = $this->get('/sitemap.xml')->assertOk();
+it('lists the previously-missing static pages on every per-locale sitemap', function () {
+    foreach (['en', 'ka', 'ru'] as $locale) {
+        $response = $this->get("/sitemap-{$locale}.xml")->assertOk();
 
-    $response->assertSee('<loc>https://grdzelo.test/about</loc>', false);
-    $response->assertSee('<loc>https://grdzelo.test/ka/about</loc>', false);
-    $response->assertSee('<loc>https://grdzelo.test/ru/about</loc>', false);
-});
-
-it('lists the previously-missing static pages', function () {
-    $response = $this->get('/sitemap.xml')->assertOk();
-
-    foreach (['/gallery', '/hobbies', '/education', '/certifications'] as $path) {
-        $response->assertSee('<loc>https://grdzelo.test'.$path.'</loc>', false);
-        $response->assertSee('<loc>https://grdzelo.test/ka'.$path.'</loc>', false);
-        $response->assertSee('<loc>https://grdzelo.test/ru'.$path.'</loc>', false);
+        foreach (['/gallery', '/hobbies', '/education', '/certifications'] as $path) {
+            $response->assertSee('<loc>https://grdzelo.test/'.$locale.$path.'</loc>', false);
+        }
     }
 });
