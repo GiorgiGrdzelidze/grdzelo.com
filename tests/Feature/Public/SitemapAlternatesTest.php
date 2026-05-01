@@ -34,3 +34,29 @@ it('emits hreflang alternates for inner static pages', function () {
     $response->assertSee('<xhtml:link rel="alternate" hreflang="ru" href="https://grdzelo.test/ru/about"/>', false);
     $response->assertSee('<xhtml:link rel="alternate" hreflang="x-default" href="https://grdzelo.test/about"/>', false);
 });
+
+it('emits a separate <url> entry per locale for the homepage', function () {
+    $response = $this->get('/sitemap.xml')->assertOk();
+
+    $response->assertSee('<loc>https://grdzelo.test/</loc>', false);
+    $response->assertSee('<loc>https://grdzelo.test/ka</loc>', false);
+    $response->assertSee('<loc>https://grdzelo.test/ru</loc>', false);
+});
+
+it('emits a separate <url> entry per locale for inner static pages', function () {
+    $response = $this->get('/sitemap.xml')->assertOk();
+
+    $response->assertSee('<loc>https://grdzelo.test/about</loc>', false);
+    $response->assertSee('<loc>https://grdzelo.test/ka/about</loc>', false);
+    $response->assertSee('<loc>https://grdzelo.test/ru/about</loc>', false);
+});
+
+it('lists the previously-missing static pages', function () {
+    $response = $this->get('/sitemap.xml')->assertOk();
+
+    foreach (['/gallery', '/hobbies', '/education', '/certifications'] as $path) {
+        $response->assertSee('<loc>https://grdzelo.test'.$path.'</loc>', false);
+        $response->assertSee('<loc>https://grdzelo.test/ka'.$path.'</loc>', false);
+        $response->assertSee('<loc>https://grdzelo.test/ru'.$path.'</loc>', false);
+    }
+});
