@@ -13,7 +13,10 @@ use Symfony\Component\HttpFoundation\Response;
  * SetLocale — picks the active locale for the request.
  *
  * Order of precedence:
- *   1. URL prefix segment ({locale} route param), e.g. /ka/about
+ *   1. URL prefix segment, e.g. /ka/about — read from the path, not from
+ *      a route parameter, because the route uses literal /ka and /ru
+ *      prefixes (a {locale} param would land positionally in controller
+ *      actions like show(Project) and shadow the bound model).
  *   2. Session value (last explicit choice on an unprefixed URL)
  *   3. Cookie value (cross-session memory)
  *   4. Accept-Language header (best-fit match)
@@ -62,11 +65,14 @@ class SetLocale
     private function resolveLocale(Request $request): string
     {
         // 0. URL-prefixed locale segment wins outright — the URL is canonical.
+        //    Read from the path (not a route param) because routes use literal
+        //    /ka and /ru prefixes; a {locale} param would be passed positionally
+        //    by Laravel's dispatcher and break model-bound controller actions.
         //    Restricted to PREFIX_LOCALES so 'en' can't sneak in via /en/foo
         //    (which would create a duplicate-content variant of /foo).
-        $segment = $request->route()?->parameter('locale');
-        if (in_array($segment, self::PREFIX_LOCALES, true)) {
-            return $segment;
+        $first = explode('/', trim($request->getPathInfo(), '/'), 2)[0] ?? '';
+        if (in_array($first, self::PREFIX_LOCALES, true)) {
+            return $first;
         }
 
         // 1. Session

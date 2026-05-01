@@ -16,15 +16,16 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
-| Public surface is registered twice:
-|   1. At the root for the default locale (en) — primary, named `public.*`.
-|   2. Under the {locale} prefix (ka|ru) — same controllers, named
-|      `public.localized.*`. SetLocale middleware reads the {locale}
-|      segment when present and falls back to session/cookie/header.
+| Public surface is registered three times — once at the root for the
+| default locale (en), and once each under literal `/ka` and `/ru`
+| prefixes for the localized variants. Same controllers, same closure.
 |
-| Controller methods don't accept a $locale parameter; Laravel matches
-| route params by name, so the segment is consumed by the router and
-| never reaches the action.
+| The prefixes are LITERAL (not `{locale}`) on purpose: a `{locale}`
+| route parameter would be passed positionally to controller actions
+| via Laravel's dispatcher, breaking signatures like `show(Project)`
+| because the locale segment lands in $project. With literal prefixes
+| the segment never enters the route parameter table — SetLocale reads
+| the locale by inspecting `$request->getPathInfo()` instead.
 */
 
 $publicRoutes = function (): void {
@@ -59,10 +60,11 @@ $publicRoutes = function (): void {
 
 Route::name('public.')->group($publicRoutes);
 
-Route::prefix('{locale}')
-    ->where(['locale' => 'ka|ru'])
-    ->name('public.localized.')
-    ->group($publicRoutes);
+foreach (['ka', 'ru'] as $loc) {
+    Route::prefix($loc)
+        ->name("public.{$loc}.")
+        ->group($publicRoutes);
+}
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
     ->where('locale', 'en|ka|ru')
