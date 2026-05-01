@@ -50,6 +50,17 @@ class SetLocale
 
         $response = $next($request);
 
+        // Vary: Accept-Language — locale resolution varies by header / cookie /
+        // session, so caches must key responses on it. Merged with whatever
+        // Vary value Inertia (or any later middleware) set, since this runs
+        // post-onion from SetLocale's middleware position.
+        if (method_exists($response, 'getVary') && method_exists($response, 'setVary')) {
+            $existing = $response->getVary();
+            if (! in_array('Accept-Language', $existing, true)) {
+                $response->setVary(array_merge($existing, ['Accept-Language']));
+            }
+        }
+
         if (method_exists($response, 'cookie')) {
             // Re-read in case LocaleController switched mid-request.
             $final = $request->session()->get(self::SESSION_KEY, $resolved);
@@ -58,7 +69,15 @@ class SetLocale
             }
 
             if ($request->cookie(self::COOKIE) !== $final) {
-                $response->cookie(self::COOKIE, $final, self::COOKIE_LIFETIME_MINUTES);
+                // SameSite=Lax: cookie travels on top-level navigations across
+                // origins (the language switcher's GET, post-redirect-get from
+                // /locale/{locale}, etc.) without leaking on cross-site POSTs.
+                $response->cookie(
+                    self::COOKIE,
+                    $final,
+                    self::COOKIE_LIFETIME_MINUTES,
+                    null, null, false, true, false, 'lax',
+                );
             }
         }
 

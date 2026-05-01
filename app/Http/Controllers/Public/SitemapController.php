@@ -99,9 +99,17 @@ class SitemapController extends Controller
         ];
 
         if ($seo->indexing_enabled) {
+            // Explicit per-locale Allows make the canonical paths obvious to
+            // crawlers that handle directives line-by-line; the catch-all
+            // Allow keeps non-localised utilities (sitemap, robots) reachable.
             $lines[] = 'Allow: /';
+            foreach (Locale::SUPPORTED as $locale) {
+                $lines[] = 'Allow: /'.$locale.'/';
+            }
             $lines[] = 'Disallow: /admin';
             $lines[] = 'Disallow: /dashboard';
+            $lines[] = 'Disallow: /livewire';
+            $lines[] = 'Disallow: /storage';
         } else {
             $lines[] = 'Disallow: /';
         }

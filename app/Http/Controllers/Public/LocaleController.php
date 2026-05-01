@@ -27,6 +27,7 @@ class LocaleController extends Controller
             self::COOKIE,
             $locale,
             self::COOKIE_LIFETIME_MINUTES,
+            null, null, false, true, false, 'lax',
         );
     }
 

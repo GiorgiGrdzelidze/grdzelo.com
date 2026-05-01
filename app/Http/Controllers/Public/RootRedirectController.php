@@ -18,7 +18,8 @@ class RootRedirectController extends Controller
 {
     public function __invoke(): RedirectResponse
     {
-        return redirect('/'.app()->getLocale(), 302)
-            ->header('Vary', 'Accept-Language');
+        // SetLocale's post-`$next` block adds Accept-Language to Vary on
+        // every response that flows through it — no need to repeat here.
+        return redirect('/'.app()->getLocale(), 302);
     }
 }

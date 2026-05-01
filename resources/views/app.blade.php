@@ -105,6 +105,19 @@
         @if($seoCanonical)
             <meta property="og:url" content="{{ $seoCanonical }}">
         @endif
+        {{-- og:locale + og:locale:alternate. Maps the active short locale
+             code to a Facebook-flavoured tag (en_US / ka_GE / ru_RU); the
+             list of alternates covers every supported non-active locale. --}}
+        @php($ogLocaleMap = ['en' => 'en_US', 'ka' => 'ka_GE', 'ru' => 'ru_RU'])
+        @php($activeLocale = $page['props']['locale'] ?? app()->getLocale())
+        @if(isset($ogLocaleMap[$activeLocale]))
+            <meta property="og:locale" content="{{ $ogLocaleMap[$activeLocale] }}">
+            @foreach($ogLocaleMap as $loc => $ogLoc)
+                @if($loc !== $activeLocale)
+                    <meta property="og:locale:alternate" content="{{ $ogLoc }}">
+                @endif
+            @endforeach
+        @endif
         {{-- Twitter Card --}}
         @if($twitter['card'] ?? null)
             <meta name="twitter:card" content="{{ $twitter['card'] }}">

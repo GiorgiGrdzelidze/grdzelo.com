@@ -62,8 +62,8 @@ class RedirectUnprefixedPathsController extends Controller
             $target .= '?'.$query;
         }
 
-        return redirect($target, 301)
-            ->header('Vary', 'Accept-Language');
+        // SetLocale appends Accept-Language to Vary in its post-response phase.
+        return redirect($target, 301);
     }
 
     private function shouldNotRedirect(string $path): bool
