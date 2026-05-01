@@ -23,6 +23,13 @@ class SitemapController extends Controller
 
         $urls = collect();
 
+        $push = function (string $path, array $extras = []) use ($urls, $base): void {
+            $urls->push(array_merge([
+                'loc' => $base.$path,
+                'alternates' => $this->alternatesFor($base, $path),
+            ], $extras));
+        };
+
         // Static pages
         $staticPages = [
             ['loc' => '/', 'priority' => '1.0', 'changefreq' => 'weekly'],
@@ -39,17 +46,15 @@ class SitemapController extends Controller
         ];
 
         foreach ($staticPages as $page) {
-            $urls->push([
-                'loc' => $base.$page['loc'],
+            $push($page['loc'], [
                 'priority' => $page['priority'],
                 'changefreq' => $page['changefreq'],
             ]);
         }
 
         // Projects
-        Project::published()->visible()->orderBy('sort_order')->each(function ($project) use ($urls, $base) {
-            $urls->push([
-                'loc' => $base.'/projects/'.$project->slug,
+        Project::published()->visible()->orderBy('sort_order')->each(function ($project) use ($push) {
+            $push('/projects/'.$project->slug, [
                 'lastmod' => $project->updated_at->toAtomString(),
                 'priority' => '0.7',
                 'changefreq' => 'monthly',
@@ -57,9 +62,8 @@ class SitemapController extends Controller
         });
 
         // Articles
-        Article::published()->latest('publish_at')->each(function ($article) use ($urls, $base) {
-            $urls->push([
-                'loc' => $base.'/blog/'.$article->slug,
+        Article::published()->latest('publish_at')->each(function ($article) use ($push) {
+            $push('/blog/'.$article->slug, [
                 'lastmod' => $article->updated_at->toAtomString(),
                 'priority' => '0.7',
                 'changefreq' => 'monthly',
@@ -67,9 +71,8 @@ class SitemapController extends Controller
         });
 
         // Repositories
-        Repository::visible()->ordered()->each(function ($repository) use ($urls, $base) {
-            $urls->push([
-                'loc' => $base.'/repositories/'.$repository->slug,
+        Repository::visible()->ordered()->each(function ($repository) use ($push) {
+            $push('/repositories/'.$repository->slug, [
                 'lastmod' => $repository->updated_at->toAtomString(),
                 'priority' => '0.6',
                 'changefreq' => 'monthly',
@@ -108,5 +111,25 @@ class SitemapController extends Controller
         return response(implode("\n", $lines), 200, [
             'Content-Type' => 'text/plain',
         ]);
+    }
+
+    /**
+     * Build hreflang alternates for a sitemap URL. Path is the unprefixed (en) form;
+     * we emit the en self-reference, /ka, /ru, and x-default (= en) per Google guidelines.
+     *
+     * @return array<int, array{hreflang: string, href: string}>
+     */
+    private function alternatesFor(string $base, string $path): array
+    {
+        $en = $base.$path;
+        $kaPath = $path === '/' ? '/ka' : '/ka'.$path;
+        $ruPath = $path === '/' ? '/ru' : '/ru'.$path;
+
+        return [
+            ['hreflang' => 'en', 'href' => $en],
+            ['hreflang' => 'ka', 'href' => $base.$kaPath],
+            ['hreflang' => 'ru', 'href' => $base.$ruPath],
+            ['hreflang' => 'x-default', 'href' => $en],
+        ];
     }
 }
