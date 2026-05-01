@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SocialLink;
 use App\Settings\GeneralSettings;
 use App\Settings\SeoSettings;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 
 abstract class BasePublicController extends Controller
 {
@@ -83,6 +85,36 @@ abstract class BasePublicController extends Controller
                 'card' => 'summary_large_image',
             ],
         ];
+    }
+
+    /**
+     * 301 to the locale-canonical URL when route binding resolved by
+     * default-locale slug fallback AND a localized slug now exists for the
+     * active locale. Returns null when no redirect is needed (active-locale
+     * slug not yet saved, or binding hit on the active locale already).
+     *
+     * `$segment` is the path segment after the locale prefix —
+     * e.g. 'projects' produces /{locale}/projects/{localized_slug}.
+     */
+    protected function localizedSlugRedirect(Model $model, string $segment): ?RedirectResponse
+    {
+        if (! method_exists($model, 'wasResolvedByFallback') || ! $model->wasResolvedByFallback()) {
+            return null;
+        }
+
+        if (! method_exists($model, 'getTranslations')) {
+            return null;
+        }
+
+        $locale = app()->getLocale();
+        $slugs = $model->getTranslations('slug');
+        $localized = $slugs[$locale] ?? null;
+
+        if (! is_string($localized) || $localized === '') {
+            return null;
+        }
+
+        return redirect("/{$locale}/{$segment}/{$localized}", 301);
     }
 
     /**

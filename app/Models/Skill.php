@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Concerns\HasTranslatableSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Translatable\HasTranslations;
 
 class Skill extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslatableSlug, HasTranslations;
+
+    /** @var array<int, string> */
+    public array $translatable = ['name', 'slug'];
 
     protected $guarded = ['id'];
 
@@ -53,5 +58,10 @@ class Skill extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    protected static function translatableSlugSource(): ?string
+    {
+        return 'name';
     }
 }

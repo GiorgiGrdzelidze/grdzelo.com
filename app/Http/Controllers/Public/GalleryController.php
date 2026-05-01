@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Models\Album;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -35,8 +36,12 @@ class GalleryController extends BasePublicController
         ]);
     }
 
-    public function show(string $locale, Album $album): Response
+    public function show(string $locale, Album $album): Response|RedirectResponse
     {
+        if ($redirect = $this->localizedSlugRedirect($album, 'gallery')) {
+            return $redirect;
+        }
+
         if (! $album->isPublished() || ! $album->is_visible) {
             abort(404);
         }

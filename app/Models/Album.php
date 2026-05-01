@@ -4,14 +4,19 @@ namespace App\Models;
 
 use App\Concerns\HasPublishState;
 use App\Concerns\HasSeoFields;
+use App\Concerns\HasTranslatableSlug;
 use App\Support\Tiptap;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Album extends Model
 {
-    use HasFactory, HasPublishState, HasSeoFields;
+    use HasFactory, HasPublishState, HasSeoFields, HasTranslatableSlug, HasTranslations;
+
+    /** @var array<int, string> */
+    public array $translatable = ['title', 'summary', 'description', 'slug'];
 
     protected $guarded = ['id'];
 

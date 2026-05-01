@@ -8,6 +8,7 @@ use App\Models\Experience;
 use App\Models\Hobby;
 use App\Models\Skill;
 use App\Models\SocialLink;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -92,8 +93,12 @@ class AboutController extends BasePublicController
         ]);
     }
 
-    public function hobby(string $locale, Hobby $hobby): Response
+    public function hobby(string $locale, Hobby $hobby): Response|RedirectResponse
     {
+        if ($redirect = $this->localizedSlugRedirect($hobby, 'hobbies')) {
+            return $redirect;
+        }
+
         abort_if(! $hobby->is_visible, 404);
 
         return Inertia::render('Public/Hobbies/Show', [

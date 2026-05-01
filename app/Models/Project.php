@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\HasPublishState;
 use App\Concerns\HasSeoFields;
+use App\Concerns\HasTranslatableSlug;
 use App\Support\Tiptap;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,10 +13,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Tags\HasTags;
+use Spatie\Translatable\HasTranslations;
 
 class Project extends Model implements HasMedia
 {
-    use HasFactory, HasPublishState, HasSeoFields, HasTags, InteractsWithMedia;
+    use HasFactory, HasPublishState, HasSeoFields, HasTags, HasTranslatableSlug, HasTranslations, InteractsWithMedia;
+
+    /** @var array<int, string> */
+    public array $translatable = ['title', 'summary', 'description', 'challenge', 'solution', 'process', 'slug'];
 
     protected $guarded = ['id'];
 

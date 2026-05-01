@@ -3,14 +3,19 @@
 namespace App\Models;
 
 use App\Concerns\HasSeoFields;
+use App\Concerns\HasTranslatableSlug;
 use App\Support\Tiptap;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Service extends Model
 {
-    use HasFactory, HasSeoFields;
+    use HasFactory, HasSeoFields, HasTranslatableSlug, HasTranslations;
+
+    /** @var array<int, string> */
+    public array $translatable = ['title', 'summary', 'description', 'slug'];
 
     protected $guarded = ['id'];
 

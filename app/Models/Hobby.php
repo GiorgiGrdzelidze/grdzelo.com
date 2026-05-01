@@ -3,16 +3,21 @@
 namespace App\Models;
 
 use App\Concerns\HasSeoFields;
+use App\Concerns\HasTranslatableSlug;
 use App\Support\Tiptap;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 
 class Hobby extends Model implements HasMedia
 {
-    use HasFactory, HasSeoFields, InteractsWithMedia;
+    use HasFactory, HasSeoFields, HasTranslatableSlug, HasTranslations, InteractsWithMedia;
+
+    /** @var array<int, string> */
+    public array $translatable = ['title', 'summary', 'description', 'slug'];
 
     protected $guarded = ['id'];
 

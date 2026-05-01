@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Models\Project;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,8 +27,12 @@ class ProjectController extends BasePublicController
         ]);
     }
 
-    public function show(string $locale, Project $project): Response
+    public function show(string $locale, Project $project): Response|RedirectResponse
     {
+        if ($redirect = $this->localizedSlugRedirect($project, 'projects')) {
+            return $redirect;
+        }
+
         abort_unless($project->isPublished() && $project->is_visible, 404);
 
         $project->load(['skills:id,name,slug', 'testimonials:id,author_name,author_role,company,quote,avatar,rating', 'tags']);

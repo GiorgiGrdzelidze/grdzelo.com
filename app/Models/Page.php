@@ -4,16 +4,21 @@ namespace App\Models;
 
 use App\Concerns\HasPublishState;
 use App\Concerns\HasSeoFields;
+use App\Concerns\HasTranslatableSlug;
 use App\Support\Tiptap;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 
 class Page extends Model implements HasMedia
 {
-    use HasFactory, HasPublishState, HasSeoFields, InteractsWithMedia;
+    use HasFactory, HasPublishState, HasSeoFields, HasTranslatableSlug, HasTranslations, InteractsWithMedia;
+
+    /** @var array<int, string> */
+    public array $translatable = ['title', 'summary', 'body', 'excerpt', 'slug'];
 
     protected $guarded = ['id'];
 

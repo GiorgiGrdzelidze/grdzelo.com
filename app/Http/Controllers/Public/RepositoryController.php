@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Models\Article;
 use App\Models\Repository;
 use App\Settings\SeoSettings;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,8 +43,12 @@ class RepositoryController extends BasePublicController
         ]);
     }
 
-    public function show(string $locale, Repository $repository): Response
+    public function show(string $locale, Repository $repository): Response|RedirectResponse
     {
+        if ($redirect = $this->localizedSlugRedirect($repository, 'repositories')) {
+            return $redirect;
+        }
+
         abort_unless($repository->is_visible, 404);
 
         $repository->load(['project:id,title,slug,summary,cover_image']);
