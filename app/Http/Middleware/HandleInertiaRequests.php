@@ -70,13 +70,18 @@ class HandleInertiaRequests extends Middleware
      * "/" + "/about" is the en canonical; "/ka" + "/ka/about" is ka; same for ru.
      * x-default points at the unprefixed (default-locale) URL.
      *
-     * Returns an empty array for non-Inertia surfaces (sitemap, admin, etc.) which
-     * don't render the public Blade root, so this list never reaches them anyway.
+     * Gated to the public.* route group: locale-switch redirects, the sitemap,
+     * and any future non-public Inertia surface get an empty array, so we don't
+     * compute (or leak) hreflang for routes that aren't part of the localized set.
      *
      * @return array<int, array{hreflang: string, href: string}>
      */
     private function hreflangAlternates(Request $request): array
     {
+        if (! $request->routeIs('public.*') || $request->routeIs('public.locale.switch')) {
+            return [];
+        }
+
         $base = app(SeoSettings::class)->canonicalBase();
         $path = '/'.ltrim($request->getPathInfo(), '/');
 
