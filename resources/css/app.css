@@ -243,6 +243,18 @@
         letter-spacing: 0.06em;
     }
 
+    /* Header nav + wordmark — `font-mono` falls through to BPG Boxo for Georgian
+       since JetBrains Mono has no Georgian glyphs. Override with Banner
+       ExtraSquare so the nav has its own voice instead of looking like body
+       copy at smaller size. Tighter tracking — the Latin nav uses 0.12em
+       which is too airy for Georgian Mkhedruli. */
+    :lang(ka) header nav a,
+    :lang(ka) header nav button,
+    :lang(ka) header a[aria-label='grdzelo home'] span {
+        font-family: var(--font-display-ka);
+        letter-spacing: 0.04em;
+    }
+
     /* Manual font swaps — useful for comparing the five BPG families side by side
        without touching markup. e.g. <h1 class="font-bpg-banner-extrasquare">. */
     .font-bpg-banner-extrasquare {
