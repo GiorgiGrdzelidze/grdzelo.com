@@ -47,15 +47,20 @@ abstract class BasePublicController extends Controller
 
     protected function seoFor($model, string $fallbackTitle = ''): array
     {
-        if ($model && method_exists($model, 'toSeoArray')) {
-            return $model->toSeoArray();
-        }
-
         $seo = app(SeoSettings::class);
 
         $canonical = rtrim($seo->canonicalBase().request()->getPathInfo(), '/');
         if ($canonical === '') {
             $canonical = $seo->canonicalBase();
+        }
+
+        if ($model && method_exists($model, 'toSeoArray')) {
+            $payload = $model->toSeoArray();
+            if (empty($payload['canonical'])) {
+                $payload['canonical'] = $canonical;
+            }
+
+            return $payload;
         }
 
         return [
