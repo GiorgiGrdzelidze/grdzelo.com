@@ -1,5 +1,7 @@
 <?php
 
+use App\Support\Locale;
+
 return [
 
     /*
@@ -83,6 +85,16 @@ return [
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+
+    'supported_locales' => Locale::SUPPORTED,
+
+    /*
+    | Stable copy of the configured default locale. App::setLocale() mutates
+    | 'locale' at runtime to track the active request locale, so anything
+    | that needs the configured default (URL-prefix default, x-default
+    | hreflang, sitemap fallback URL) reads from here instead.
+    */
+    'default_locale' => env('APP_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
