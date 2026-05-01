@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@plugin '@tailwindcss/typography';
+
 @import 'tw-animate-css';
 
 /* BPG Georgian webfonts — applied via :lang(ka) and .font-bpg-* utilities below.
