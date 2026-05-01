@@ -65,6 +65,14 @@ abstract class BasePublicController extends Controller
                 $payload['canonical'] = $canonical;
             }
 
+            // JSON-LD `url` should match the resolved canonical so crawlers
+            // can tie the structured data back to the rendered page. Models'
+            // `defaultJsonLd()` doesn't know the request URL, so we inject
+            // it here whenever the payload omits one (or carries an empty).
+            if (isset($payload['jsonld']) && is_array($payload['jsonld']) && empty($payload['jsonld']['url'])) {
+                $payload['jsonld']['url'] = $payload['canonical'];
+            }
+
             return $payload;
         }
 

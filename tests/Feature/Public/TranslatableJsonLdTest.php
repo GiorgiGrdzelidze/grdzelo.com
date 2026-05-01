@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Article;
+use App\Models\Page;
 use App\Models\Project;
 use App\Settings\SeoSettings;
 use Inertia\Testing\AssertableInertia;
@@ -93,6 +94,37 @@ it('returns null jsonld for a page without admin override or default generator',
     $project->save();
 
     expect($project->getJsonLd())->toBeNull();
+});
+
+it('injects the resolved canonical into seo.jsonld.url when defaultJsonLd omitted it', function () {
+    $project = new Project;
+    $project->setTranslations('title', ['en' => 'URL Probe']);
+    $project->setTranslations('slug', ['en' => 'url-probe']);
+    $project->status = 'published';
+    $project->is_visible = true;
+    $project->save();
+
+    $this->get('/en/projects/url-probe')
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('seo.jsonld.url', 'https://grdzelo.test/en/projects/url-probe')
+            ->where('seo.canonical', 'https://grdzelo.test/en/projects/url-probe')
+        );
+});
+
+it('renders a JSON-LD block on a translated Page using the WebPage default', function () {
+    $page = new Page;
+    $page->setTranslations('title', ['en' => 'About Us']);
+    $page->setTranslations('slug', ['en' => 'about-us']);
+    $page->setTranslations('summary', ['en' => 'Who we are.']);
+    $page->status = 'published';
+    $page->save();
+
+    $rendered = $page->getJsonLd();
+
+    expect($rendered)->toBeArray();
+    expect($rendered['@type'])->toBe('WebPage');
+    expect($rendered['name'])->toBe('About Us');
+    expect($rendered['inLanguage'])->toBe('en');
 });
 
 it('parses string JSON stored under the active locale into an array', function () {

@@ -60,4 +60,21 @@ class Page extends Model implements HasMedia
     {
         return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
+
+    public function defaultJsonLd(): ?array
+    {
+        if (! $this->title) {
+            return null;
+        }
+
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+            'name' => (string) $this->title,
+            'description' => $this->summary !== null ? strip_tags((string) $this->summary) : null,
+            'inLanguage' => app()->getLocale(),
+            'datePublished' => $this->publish_at?->toAtomString(),
+            'dateModified' => $this->updated_at?->toAtomString(),
+        ], fn ($v) => $v !== null && $v !== '');
+    }
 }

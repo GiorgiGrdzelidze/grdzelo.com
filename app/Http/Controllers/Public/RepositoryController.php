@@ -119,6 +119,11 @@ class RepositoryController extends BasePublicController
             $seo['twitter']['image_alt'] ??= $seo['og']['image_alt'] ?? $repository->name;
         }
 
+        // JSON-LD `url` follows the resolved canonical (mirrors BasePublicController::seoFor).
+        if (isset($seo['jsonld']) && is_array($seo['jsonld']) && empty($seo['jsonld']['url'])) {
+            $seo['jsonld']['url'] = $seo['canonical'];
+        }
+
         return $seo;
     }
 
