@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableSchema;
+use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\HobbyResource\Pages;
 use App\Models\Hobby;
 use Filament\Actions;
@@ -11,7 +13,6 @@ use Filament\Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class HobbyResource extends Resource
 {
@@ -26,12 +27,24 @@ class HobbyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Forms\Components\TextInput::make('title')->required()->maxLength(255)
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn (Schemas\Components\Utilities\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
-            Forms\Components\TextInput::make('slug')->required()->maxLength(255)->unique(ignoreRecord: true),
-            Forms\Components\Textarea::make('summary')->maxLength(500)->rows(3),
-            Forms\Components\RichEditor::make('description')->columnSpanFull(),
+            TranslatableSchema::tabs(fn (string $locale, bool $isDefault) => [
+                Forms\Components\TextInput::make("title.{$locale}")
+                    ->label('Title')
+                    ->required($isDefault)
+                    ->maxLength(255),
+                Forms\Components\TextInput::make("slug.{$locale}")
+                    ->label('Slug')
+                    ->maxLength(255)
+                    ->unique(table: 'hobbies', column: "slug->{$locale}", ignoreRecord: true)
+                    ->placeholder('Auto-generated from title if blank'),
+                Forms\Components\Textarea::make("summary.{$locale}")
+                    ->label('Summary')
+                    ->maxLength(500)
+                    ->rows(3),
+                Forms\Components\RichEditor::make("description.{$locale}")
+                    ->label('Description')
+                    ->columnSpanFull(),
+            ])->columnSpanFull(),
             Forms\Components\TextInput::make('icon')->maxLength(255),
             Forms\Components\FileUpload::make('image')->image()->directory('hobbies'),
             Forms\Components\FileUpload::make('gallery')->image()->multiple()->directory('hobbies/gallery')->reorderable(),
@@ -54,6 +67,7 @@ class HobbyResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')->circular()->label(''),
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
+                TranslationCompleteness::column('title'),
                 Tables\Columns\IconColumn::make('is_featured')->boolean()->label('Featured'),
                 Tables\Columns\IconColumn::make('is_visible')->boolean()->label('Visible'),
             ])

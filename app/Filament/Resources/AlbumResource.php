@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableSchema;
+use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\AlbumResource\Pages;
 use App\Models\Album;
 use Filament\Actions;
@@ -11,7 +13,6 @@ use Filament\Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class AlbumResource extends Resource
 {
@@ -29,21 +30,27 @@ class AlbumResource extends Resource
     {
         return $schema->schema([
             Schemas\Components\Tabs::make('Album')->tabs([
-                Schemas\Components\Tabs\Tab::make('General')->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->required()
-                        ->maxLength(255)
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (Schemas\Components\Utilities\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
-                    Forms\Components\TextInput::make('slug')
-                        ->required()
-                        ->maxLength(255)
-                        ->unique(ignoreRecord: true),
-                    Forms\Components\Textarea::make('summary')
-                        ->maxLength(500)
-                        ->rows(2),
-                    Forms\Components\RichEditor::make('description')
-                        ->columnSpanFull(),
+                Schemas\Components\Tabs\Tab::make('Translations')->schema([
+                    TranslatableSchema::tabs(fn (string $locale, bool $isDefault) => [
+                        Forms\Components\TextInput::make("title.{$locale}")
+                            ->label('Title')
+                            ->required($isDefault)
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make("slug.{$locale}")
+                            ->label('Slug')
+                            ->maxLength(255)
+                            ->unique(table: 'albums', column: "slug->{$locale}", ignoreRecord: true)
+                            ->placeholder('Auto-generated from title if blank'),
+                        Forms\Components\Textarea::make("summary.{$locale}")
+                            ->label('Summary')
+                            ->maxLength(500)
+                            ->rows(2),
+                        Forms\Components\RichEditor::make("description.{$locale}")
+                            ->label('Description')
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
+                ]),
+                Schemas\Components\Tabs\Tab::make('Settings')->schema([
                     Schemas\Components\Grid::make(2)->schema([
                         Forms\Components\TextInput::make('location')
                             ->maxLength(255)
@@ -107,6 +114,7 @@ class AlbumResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
+                TranslationCompleteness::column('title'),
                 Tables\Columns\TextColumn::make('photo_count')
                     ->label('Photos')
                     ->badge()

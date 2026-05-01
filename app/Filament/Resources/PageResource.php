@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableSchema;
+use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
 use Filament\Actions;
@@ -11,7 +13,6 @@ use Filament\Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -27,22 +28,33 @@ class PageResource extends Resource
     {
         return $schema->schema([
             Schemas\Components\Tabs::make('Page')->tabs([
-                Schemas\Components\Tabs\Tab::make('General')->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->required()
-                        ->maxLength(255)
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (Schemas\Components\Utilities\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
-                    Forms\Components\TextInput::make('slug')
-                        ->required()
-                        ->maxLength(255)
-                        ->unique(ignoreRecord: true),
-                    Forms\Components\Textarea::make('summary')
-                        ->maxLength(500)
-                        ->rows(3),
-                    Forms\Components\Textarea::make('excerpt')
-                        ->maxLength(500)
-                        ->rows(2),
+                Schemas\Components\Tabs\Tab::make('Translations')->schema([
+                    TranslatableSchema::tabs(fn (string $locale, bool $isDefault) => [
+                        Forms\Components\TextInput::make("title.{$locale}")
+                            ->label('Title')
+                            ->required($isDefault)
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make("slug.{$locale}")
+                            ->label('Slug')
+                            ->maxLength(255)
+                            ->unique(table: 'pages', column: "slug->{$locale}", ignoreRecord: true)
+                            ->placeholder('Auto-generated from title if blank'),
+                        Forms\Components\Textarea::make("summary.{$locale}")
+                            ->label('Summary')
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\Textarea::make("excerpt.{$locale}")
+                            ->label('Excerpt')
+                            ->maxLength(500)
+                            ->rows(2),
+                        Forms\Components\RichEditor::make("body.{$locale}")
+                            ->label('Body')
+                            ->columnSpanFull()
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('pages'),
+                    ])->columnSpanFull(),
+                ]),
+                Schemas\Components\Tabs\Tab::make('Settings')->schema([
                     Schemas\Components\Grid::make(2)->schema([
                         Forms\Components\Select::make('status')
                             ->options([
@@ -61,12 +73,6 @@ class PageResource extends Resource
                             ->numeric()
                             ->default(0),
                     ]),
-                ]),
-                Schemas\Components\Tabs\Tab::make('Content')->schema([
-                    Forms\Components\RichEditor::make('body')
-                        ->columnSpanFull()
-                        ->fileAttachmentsDisk('public')
-                        ->fileAttachmentsDirectory('pages'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
                     Forms\Components\FileUpload::make('featured_image')
@@ -165,6 +171,7 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
+                TranslationCompleteness::column('title'),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

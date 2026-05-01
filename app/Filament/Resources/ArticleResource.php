@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableSchema;
+use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\ArticleResource\Pages;
 use App\Models\Article;
 use Filament\Actions;
@@ -11,7 +13,6 @@ use Filament\Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class ArticleResource extends Resource
 {
@@ -29,19 +30,29 @@ class ArticleResource extends Resource
     {
         return $schema->schema([
             Schemas\Components\Tabs::make('Article')->tabs([
-                Schemas\Components\Tabs\Tab::make('General')->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->required()
-                        ->maxLength(255)
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (Schemas\Components\Utilities\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
-                    Forms\Components\TextInput::make('slug')
-                        ->required()
-                        ->maxLength(255)
-                        ->unique(ignoreRecord: true),
-                    Forms\Components\Textarea::make('excerpt')
-                        ->maxLength(500)
-                        ->rows(3),
+                Schemas\Components\Tabs\Tab::make('Translations')->schema([
+                    TranslatableSchema::tabs(fn (string $locale, bool $isDefault) => [
+                        Forms\Components\TextInput::make("title.{$locale}")
+                            ->label('Title')
+                            ->required($isDefault)
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make("slug.{$locale}")
+                            ->label('Slug')
+                            ->maxLength(255)
+                            ->unique(table: 'articles', column: "slug->{$locale}", ignoreRecord: true)
+                            ->placeholder('Auto-generated from title if blank'),
+                        Forms\Components\Textarea::make("excerpt.{$locale}")
+                            ->label('Excerpt')
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\RichEditor::make("body.{$locale}")
+                            ->label('Body')
+                            ->columnSpanFull()
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('articles'),
+                    ])->columnSpanFull(),
+                ]),
+                Schemas\Components\Tabs\Tab::make('Settings')->schema([
                     Schemas\Components\Grid::make(2)->schema([
                         Forms\Components\Select::make('status')
                             ->options([
@@ -75,12 +86,6 @@ class ArticleResource extends Resource
                             ->default(auth()->id())
                             ->label('Author'),
                     ]),
-                ]),
-                Schemas\Components\Tabs\Tab::make('Content')->schema([
-                    Forms\Components\RichEditor::make('body')
-                        ->columnSpanFull()
-                        ->fileAttachmentsDisk('public')
-                        ->fileAttachmentsDirectory('articles'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
                     Forms\Components\FileUpload::make('cover_image')
@@ -130,6 +135,7 @@ class ArticleResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('cover_image')->circular()->label(''),
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
+                TranslationCompleteness::column('title'),
                 Tables\Columns\TextColumn::make('category.name')->sortable()->toggleable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors(['warning' => 'draft', 'success' => 'published']),

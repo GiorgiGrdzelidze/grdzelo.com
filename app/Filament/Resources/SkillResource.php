@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableSchema;
+use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\SkillResource\Pages;
 use App\Models\Skill;
 use Filament\Actions;
@@ -11,7 +13,6 @@ use Filament\Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class SkillResource extends Resource
 {
@@ -26,10 +27,17 @@ class SkillResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Forms\Components\TextInput::make('name')->required()->maxLength(255)
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn (Schemas\Components\Utilities\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
-            Forms\Components\TextInput::make('slug')->required()->maxLength(255)->unique(ignoreRecord: true),
+            TranslatableSchema::tabs(fn (string $locale, bool $isDefault) => [
+                Forms\Components\TextInput::make("name.{$locale}")
+                    ->label('Name')
+                    ->required($isDefault)
+                    ->maxLength(255),
+                Forms\Components\TextInput::make("slug.{$locale}")
+                    ->label('Slug')
+                    ->maxLength(255)
+                    ->unique(table: 'skills', column: "slug->{$locale}", ignoreRecord: true)
+                    ->placeholder('Auto-generated from name if blank'),
+            ])->columnSpanFull(),
             Forms\Components\TextInput::make('category')->maxLength(255)
                 ->helperText('e.g. Backend, Frontend, DevOps, Database, Tools'),
             Schemas\Components\Grid::make(3)->schema([
@@ -51,6 +59,7 @@ class SkillResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
+                TranslationCompleteness::column('name'),
                 Tables\Columns\TextColumn::make('category')->sortable()->badge(),
                 Tables\Columns\TextColumn::make('proficiency_label'),
                 Tables\Columns\TextColumn::make('years_experience')->suffix(' yrs')->sortable(),
