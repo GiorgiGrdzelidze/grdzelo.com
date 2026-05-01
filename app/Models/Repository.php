@@ -71,6 +71,6 @@ class Repository extends Model implements HasMedia
 
     protected function description(): Attribute
     {
-        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 }

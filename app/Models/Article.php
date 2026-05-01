@@ -68,6 +68,6 @@ class Article extends Model implements HasMedia
 
     protected function body(): Attribute
     {
-        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 }

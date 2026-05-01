@@ -9,7 +9,13 @@ use Tiptap\Editor;
 class Tiptap
 {
     /**
-     * Convert a content value to safe HTML for rendering with v-html.
+     * Convert a content value to HTML for rendering with v-html on the public surface.
+     *
+     * Trust boundary: input here is admin-authored. The Filament panel is the only
+     * writer for these columns, gated by canAccessPanel(), so the output is NOT
+     * sanitized against XSS. Do NOT pipe untrusted input (form submissions,
+     * imports from external services) through this method without first running
+     * it through an HTML purifier — the result is rendered with v-html.
      *
      * Why: legacy rows store TipTap JSON documents in plain text columns
      * (the admin form was switched from RichEditor to Textarea, but historical

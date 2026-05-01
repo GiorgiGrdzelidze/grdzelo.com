@@ -74,21 +74,21 @@ class Project extends Model implements HasMedia
     // public surface can drop the value straight into v-html.
     protected function description(): Attribute
     {
-        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 
     protected function challenge(): Attribute
     {
-        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 
     protected function solution(): Attribute
     {
-        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 
     protected function process(): Attribute
     {
-        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value));
+        return Attribute::get(fn (?string $value) => Tiptap::toHtml($value))->shouldCache();
     }
 }
