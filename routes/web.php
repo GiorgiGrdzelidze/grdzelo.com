@@ -16,14 +16,18 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
-| Single locale-agnostic surface. Locale is resolved per-request by the
-| SetLocale middleware (registered in bootstrap/app.php) from session,
-| cookie, or Accept-Language header — see the LanguageSwitcher for the
-| user-facing toggle. Localized URL prefixes (e.g. /ka/about) can be
-| layered on as a separate concern later without renaming routes.
+| Public surface is registered twice:
+|   1. At the root for the default locale (en) — primary, named `public.*`.
+|   2. Under the {locale} prefix (ka|ru) — same controllers, named
+|      `public.localized.*`. SetLocale middleware reads the {locale}
+|      segment when present and falls back to session/cookie/header.
+|
+| Controller methods don't accept a $locale parameter; Laravel matches
+| route params by name, so the segment is consumed by the router and
+| never reaches the action.
 */
 
-Route::name('public.')->group(function () {
+$publicRoutes = function (): void {
     Route::get('/', HomeController::class)->name('home');
 
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
@@ -51,11 +55,18 @@ Route::name('public.')->group(function () {
 
     Route::get('/contact', [ContactController::class, 'show'])->name('contact');
     Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+};
 
-    Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
-        ->where('locale', 'en|ka|ru')
-        ->name('locale.switch');
-});
+Route::name('public.')->group($publicRoutes);
+
+Route::prefix('{locale}')
+    ->where(['locale' => 'ka|ru'])
+    ->name('public.localized.')
+    ->group($publicRoutes);
+
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
+    ->where('locale', 'en|ka|ru')
+    ->name('public.locale.switch');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');

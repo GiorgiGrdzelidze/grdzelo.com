@@ -13,10 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
  * SetLocale — picks the active locale for the request.
  *
  * Order of precedence:
- *   1. Session value (last explicit choice)
- *   2. Cookie value (cross-session memory)
- *   3. Accept-Language header (best-fit match)
- *   4. App default ("en")
+ *   1. URL prefix segment ({locale} route param), e.g. /ka/about
+ *   2. Session value (last explicit choice on an unprefixed URL)
+ *   3. Cookie value (cross-session memory)
+ *   4. Accept-Language header (best-fit match)
+ *   5. App default ("en")
  *
  * Once resolved, the locale is set on the App, persisted to session,
  * and dropped into a 1-year cookie so navigation feels sticky.
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 class SetLocale
 {
     /** @var array<int, string> */
-    private const SUPPORTED = ['en', 'ka', 'ru'];
+    public const SUPPORTED = ['en', 'ka', 'ru'];
 
     private const COOKIE = 'locale';
 
@@ -52,6 +53,12 @@ class SetLocale
 
     private function resolveLocale(Request $request): string
     {
+        // 0. URL-prefixed locale segment wins outright — the URL is canonical.
+        $segment = $request->route()?->parameter('locale');
+        if (in_array($segment, self::SUPPORTED, true)) {
+            return $segment;
+        }
+
         // 1. Session
         $session = $request->session()->get('locale');
         if (in_array($session, self::SUPPORTED, true)) {
