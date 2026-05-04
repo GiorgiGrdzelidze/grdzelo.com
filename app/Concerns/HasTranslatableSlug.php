@@ -84,6 +84,38 @@ trait HasTranslatableSlug
         });
     }
 
+    /**
+     * Spatie's HasTranslations serializes translatable attributes as the full
+     * `{"en": "...", "ka": "..."}` object on `toArray()`. That ships to the
+     * Inertia front-end as raw JSON and renders as `{ "en": "..." }` literal
+     * text in Vue templates that expect a string. Override here so toArray()
+     * returns the active-locale value (with the trait's standard fallback to
+     * the default locale) — the shape every public Vue page assumes.
+     *
+     * Filament admin doesn't depend on toArray() for translatable fields:
+     * `HandlesTranslatableForm::mutateFormDataBeforeFill` calls
+     * `getTranslations($field)` directly to populate the per-locale tab inputs,
+     * so the admin lifecycle isn't affected.
+     */
+    public function attributesToArray(): array
+    {
+        $attributes = parent::attributesToArray();
+
+        if (! method_exists($this, 'getTranslatableAttributes')) {
+            return $attributes;
+        }
+
+        $locale = app()->getLocale();
+        foreach ($this->getTranslatableAttributes() as $field) {
+            if (! array_key_exists($field, $attributes)) {
+                continue;
+            }
+            $attributes[$field] = $this->getTranslation($field, $locale, useFallbackLocale: true);
+        }
+
+        return $attributes;
+    }
+
     public static function bootHasTranslatableSlug(): void
     {
         static::saving(function (Model $model): void {

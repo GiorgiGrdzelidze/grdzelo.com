@@ -111,3 +111,31 @@ it('resolves via Filament-style resolveRouteBindingQuery using default-locale fa
 
     expect($found)->not->toBeNull();
 });
+
+it('serializes translatable attributes to the active-locale string on toArray()', function () {
+    $hobby = new Hobby;
+    $hobby->setTranslations('title', ['en' => 'Photography', 'ka' => 'ფოტოგრაფია']);
+    $hobby->setTranslations('slug', ['en' => 'photography', 'ka' => 'potograpia']);
+    $hobby->is_visible = true;
+    $hobby->save();
+
+    $arr = $hobby->fresh()->toArray();
+    expect($arr['title'])->toBe('Photography');
+    expect($arr['slug'])->toBe('photography');
+
+    app()->setLocale('ka');
+    $arr = $hobby->fresh()->toArray();
+    expect($arr['title'])->toBe('ფოტოგრაფია');
+    expect($arr['slug'])->toBe('potograpia');
+});
+
+it('falls back to default-locale value when toArray serializes a missing locale', function () {
+    $hobby = new Hobby;
+    $hobby->setTranslations('title', ['en' => 'Photography']);
+    $hobby->is_visible = true;
+    $hobby->save();
+
+    app()->setLocale('ru');
+    $arr = $hobby->fresh()->toArray();
+    expect($arr['title'])->toBe('Photography');
+});
