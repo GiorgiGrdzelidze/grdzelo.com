@@ -88,3 +88,54 @@ it('returns null when no slug matches in the active locale or the default locale
 
     expect($resolved)->toBeNull();
 });
+
+it('resolves via Filament-style resolveRouteBindingQuery using active-locale slug', function () {
+    Hobby::create(['title' => 'Photography', 'is_visible' => true]);
+
+    $found = (new Hobby)
+        ->resolveRouteBindingQuery(Hobby::query(), 'photography')
+        ->first();
+
+    expect($found)->not->toBeNull();
+    expect($found->getRouteKey())->toBe('photography');
+});
+
+it('resolves via Filament-style resolveRouteBindingQuery using default-locale fallback when active is non-default', function () {
+    Hobby::create(['title' => 'Photography', 'is_visible' => true]);
+
+    app()->setLocale('ka');
+
+    $found = (new Hobby)
+        ->resolveRouteBindingQuery(Hobby::query(), 'photography')
+        ->first();
+
+    expect($found)->not->toBeNull();
+});
+
+it('serializes translatable attributes to the active-locale string on toArray()', function () {
+    $hobby = new Hobby;
+    $hobby->setTranslations('title', ['en' => 'Photography', 'ka' => 'ფოტოგრაფია']);
+    $hobby->setTranslations('slug', ['en' => 'photography', 'ka' => 'potograpia']);
+    $hobby->is_visible = true;
+    $hobby->save();
+
+    $arr = $hobby->fresh()->toArray();
+    expect($arr['title'])->toBe('Photography');
+    expect($arr['slug'])->toBe('photography');
+
+    app()->setLocale('ka');
+    $arr = $hobby->fresh()->toArray();
+    expect($arr['title'])->toBe('ფოტოგრაფია');
+    expect($arr['slug'])->toBe('potograpia');
+});
+
+it('falls back to default-locale value when toArray serializes a missing locale', function () {
+    $hobby = new Hobby;
+    $hobby->setTranslations('title', ['en' => 'Photography']);
+    $hobby->is_visible = true;
+    $hobby->save();
+
+    app()->setLocale('ru');
+    $arr = $hobby->fresh()->toArray();
+    expect($arr['title'])->toBe('Photography');
+});

@@ -59,6 +59,63 @@ trait HasTranslatableSlug
         return $this->resolvedByFallback;
     }
 
+    /**
+     * Filament v5 (`Resource::resolveRecordRouteBinding`) calls this directly
+     * with a pre-built query, then `->first()`s the result — it does not go
+     * through `resolveRouteBinding()` above. Default Eloquent implementation
+     * does `$query->where($field, $value)`, which on a JSON column never
+     * matches the per-locale shape. This override teaches the query builder
+     * to match either the active-locale slug or the default-locale slug, so
+     * admin edit URLs (and any other consumer of `resolveRouteBindingQuery`)
+     * resolve translated rows. The fallback redirect flag isn't relevant in
+     * the admin context, so it isn't set here.
+     */
+    public function resolveRouteBindingQuery($query, $value, $field = null)
+    {
+        $field = $field ?? $this->getRouteKeyName();
+        $active = app()->getLocale();
+        $default = Locale::default();
+
+        return $query->where(function ($q) use ($field, $value, $active, $default): void {
+            $q->where($field.'->'.$active, $value);
+            if ($active !== $default) {
+                $q->orWhere($field.'->'.$default, $value);
+            }
+        });
+    }
+
+    /**
+     * Spatie's HasTranslations serializes translatable attributes as the full
+     * `{"en": "...", "ka": "..."}` object on `toArray()`. That ships to the
+     * Inertia front-end as raw JSON and renders as `{ "en": "..." }` literal
+     * text in Vue templates that expect a string. Override here so toArray()
+     * returns the active-locale value (with the trait's standard fallback to
+     * the default locale) — the shape every public Vue page assumes.
+     *
+     * Filament admin doesn't depend on toArray() for translatable fields:
+     * `HandlesTranslatableForm::mutateFormDataBeforeFill` calls
+     * `getTranslations($field)` directly to populate the per-locale tab inputs,
+     * so the admin lifecycle isn't affected.
+     */
+    public function attributesToArray(): array
+    {
+        $attributes = parent::attributesToArray();
+
+        if (! method_exists($this, 'getTranslatableAttributes')) {
+            return $attributes;
+        }
+
+        $locale = app()->getLocale();
+        foreach ($this->getTranslatableAttributes() as $field) {
+            if (! array_key_exists($field, $attributes)) {
+                continue;
+            }
+            $attributes[$field] = $this->getTranslation($field, $locale, useFallbackLocale: true);
+        }
+
+        return $attributes;
+    }
+
     public static function bootHasTranslatableSlug(): void
     {
         static::saving(function (Model $model): void {
