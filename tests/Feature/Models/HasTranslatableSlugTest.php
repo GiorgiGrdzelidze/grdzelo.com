@@ -88,3 +88,26 @@ it('returns null when no slug matches in the active locale or the default locale
 
     expect($resolved)->toBeNull();
 });
+
+it('resolves via Filament-style resolveRouteBindingQuery using active-locale slug', function () {
+    Hobby::create(['title' => 'Photography', 'is_visible' => true]);
+
+    $found = (new Hobby)
+        ->resolveRouteBindingQuery(Hobby::query(), 'photography')
+        ->first();
+
+    expect($found)->not->toBeNull();
+    expect($found->getRouteKey())->toBe('photography');
+});
+
+it('resolves via Filament-style resolveRouteBindingQuery using default-locale fallback when active is non-default', function () {
+    Hobby::create(['title' => 'Photography', 'is_visible' => true]);
+
+    app()->setLocale('ka');
+
+    $found = (new Hobby)
+        ->resolveRouteBindingQuery(Hobby::query(), 'photography')
+        ->first();
+
+    expect($found)->not->toBeNull();
+});
