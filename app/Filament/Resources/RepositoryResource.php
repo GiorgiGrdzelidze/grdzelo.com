@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\RepositoryResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class RepositoryResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Repository::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-code-bracket';
@@ -115,6 +118,7 @@ class RepositoryResource extends Resource
                         ->collection('cover')
                         ->image()
                         ->imageEditor(),
+                    static::mediaAltField('cover', 'Cover alt'),
                     Forms\Components\SpatieMediaLibraryFileUpload::make('screenshots')
                         ->collection('screenshots')
                         ->image()

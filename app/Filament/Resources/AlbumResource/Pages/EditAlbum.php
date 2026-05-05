@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AlbumResource\Pages;
 
+use App\Filament\Concerns\HandlesMediaAltState;
 use App\Filament\Concerns\HandlesTranslatableForm;
 use App\Filament\Resources\AlbumResource;
 use Filament\Actions;
@@ -9,9 +10,19 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditAlbum extends EditRecord
 {
-    use HandlesTranslatableForm;
+    use HandlesMediaAltState, HandlesTranslatableForm;
 
     protected static string $resource = AlbumResource::class;
+
+    protected function mediaAltCollections(): array
+    {
+        return ['cover'];
+    }
+
+    protected function afterSave(): void
+    {
+        $this->persistMediaAltState();
+    }
 
     protected function getHeaderActions(): array
     {

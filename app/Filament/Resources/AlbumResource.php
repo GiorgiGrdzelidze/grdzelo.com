@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\AlbumResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class AlbumResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Album::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
@@ -81,6 +84,7 @@ class AlbumResource extends Resource
                         ->collection('cover')
                         ->image()
                         ->imageEditor(),
+                    static::mediaAltField('cover', 'Cover alt'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Photos')->schema([
                     Forms\Components\SpatieMediaLibraryFileUpload::make('photos')

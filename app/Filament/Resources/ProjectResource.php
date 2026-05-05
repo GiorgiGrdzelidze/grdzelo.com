@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\ProjectResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class ProjectResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Project::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -138,9 +141,11 @@ class ProjectResource extends Resource
                         ->collection('cover')
                         ->image()
                         ->imageEditor(),
+                    static::mediaAltField('cover', 'Cover alt'),
                     Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
                         ->collection('logo')
                         ->image(),
+                    static::mediaAltField('logo', 'Logo alt'),
                     Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
                         ->collection('gallery')
                         ->image()

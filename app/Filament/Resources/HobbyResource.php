@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\HobbyResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class HobbyResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Hobby::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-heart';
@@ -49,6 +52,7 @@ class HobbyResource extends Resource
             Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
                 ->collection('cover')
                 ->image(),
+            static::mediaAltField('cover', 'Cover alt'),
             Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
                 ->collection('gallery')
                 ->image()
