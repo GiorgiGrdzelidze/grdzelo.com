@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Models\Certification;
 use App\Models\Education;
 use App\Models\Experience;
@@ -125,7 +126,7 @@ class AboutController extends BasePublicController
                 'cover' => $hobby->getFirstMediaUrl('cover') ?: null,
                 'gallery' => $hobby->getMedia('gallery')->map(fn ($m) => [
                     'url' => $m->getUrl(),
-                    'alt' => $m->getCustomProperty('alt'),
+                    'alt' => TranslatableMediaAlt::resolveAlt($m->getCustomProperty('alt')),
                 ])->all(),
             ],
         ]);

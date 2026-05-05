@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -90,7 +91,7 @@ class ProjectController extends BasePublicController
                 'logo' => $project->getFirstMediaUrl('logo') ?: null,
                 'gallery' => $project->getMedia('gallery')->map(fn ($m) => [
                     'url' => $m->getUrl(),
-                    'alt' => $m->getCustomProperty('alt'),
+                    'alt' => TranslatableMediaAlt::resolveAlt($m->getCustomProperty('alt')),
                 ])->all(),
                 'skills' => $project->skills,
                 'testimonials' => $project->testimonials,

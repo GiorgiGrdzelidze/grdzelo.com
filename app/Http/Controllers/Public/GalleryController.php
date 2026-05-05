@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Models\Album;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -51,7 +52,7 @@ class GalleryController extends BasePublicController
                 'url' => $media->getUrl(),
                 'thumb' => $media->getUrl(),
                 'preview' => $media->getUrl(),
-                'alt' => $media->getCustomProperty('alt'),
+                'alt' => TranslatableMediaAlt::resolveAlt($media->getCustomProperty('alt')),
                 'caption' => null,
             ])
             ->values();

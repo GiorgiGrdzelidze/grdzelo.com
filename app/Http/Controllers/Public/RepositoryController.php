@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Models\Article;
 use App\Models\Repository;
 use App\Settings\SeoSettings;
@@ -56,7 +57,7 @@ class RepositoryController extends BasePublicController
         $screenshots = $repository->getMedia('screenshots')
             ->map(fn ($media) => [
                 'url' => $media->getUrl(),
-                'alt' => $media->getCustomProperty('alt'),
+                'alt' => TranslatableMediaAlt::resolveAlt($media->getCustomProperty('alt')),
             ])
             ->values()
             ->all();
