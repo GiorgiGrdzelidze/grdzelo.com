@@ -34,7 +34,6 @@ class Project extends Model implements HasMedia
     {
         return [
             'tech_stack' => 'array',
-            'gallery' => 'array',
             'case_study_blocks' => 'array',
             'metrics' => 'array',
             'schema_json' => 'array',

@@ -31,7 +31,6 @@ class Album extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'photos' => 'array',
             'publish_at' => 'datetime',
             'taken_at' => 'date',
             'is_featured' => 'boolean',
@@ -67,7 +66,7 @@ class Album extends Model implements HasMedia
 
     public function getPhotoCountAttribute(): int
     {
-        return count($this->photos ?? []);
+        return $this->getMedia('photos')->count();
     }
 
     protected function description(): Attribute

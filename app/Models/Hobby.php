@@ -30,7 +30,6 @@ class Hobby extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'gallery' => 'array',
             'is_featured' => 'boolean',
             'is_visible' => 'boolean',
         ];
