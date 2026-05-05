@@ -15,6 +15,7 @@ import {
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { repositoryStatusClass } from '@/lib/repository-status';
 
 interface RelatedProject {
@@ -66,6 +67,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const localePath = useLocalePath();
 
 function thumbnailUrl(path: string | null): string | null {
     if (!path) {
@@ -392,7 +395,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
             <section v-if="repository.project" class="mt-14">
                 <h2 class="text-2xl font-bold tracking-tight">Built for</h2>
                 <Link
-                    :href="`/projects/${repository.project.slug}`"
+                    :href="localePath(`/projects/${repository.project.slug}`)"
                     class="group mt-5 block overflow-hidden rounded-xl border border-border/60 bg-card/50 p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
                 >
                     <div class="flex items-start justify-between gap-4">
@@ -446,7 +449,7 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                 >
                     <li v-for="article in relatedArticles" :key="article.id">
                         <Link
-                            :href="`/blog/${article.slug}`"
+                            :href="localePath(`/blog/${article.slug}`)"
                             class="group flex items-start justify-between gap-4 p-5 transition-colors hover:bg-muted/40"
                         >
                             <div class="min-w-0">

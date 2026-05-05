@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowUpRight, BookOpen } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface ArticleItem {
@@ -43,6 +44,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const { t, locale } = useT();
+const localePath = useLocalePath();
 
 function formatDate(date: string): string {
     return new Date(date).toLocaleDateString(locale.value || 'en', {
@@ -102,7 +104,7 @@ const totalArticles = computed(() => props.articles.total);
                 <Link
                     v-for="(article, i) in featured"
                     :key="article.id"
-                    :href="`/blog/${article.slug}`"
+                    :href="localePath(`/blog/${article.slug}`)"
                     class="group flex flex-col bg-background p-5 transition-colors hover:bg-muted/30"
                 >
                     <div
@@ -225,7 +227,7 @@ const totalArticles = computed(() => props.articles.total);
                     class="group/row relative grid grid-cols-1 items-start gap-2 border-b border-border py-5 transition-colors hover:bg-muted/30 sm:grid-cols-[32px_minmax(0,1.6fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-6"
                 >
                     <Link
-                        :href="`/blog/${article.slug}`"
+                        :href="localePath(`/blog/${article.slug}`)"
                         class="absolute inset-0 z-0"
                         :aria-label="`Read ${article.title}`"
                     />

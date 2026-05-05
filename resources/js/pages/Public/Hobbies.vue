@@ -19,6 +19,7 @@ import {
     Zap,
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface HobbyItem {
@@ -40,6 +41,7 @@ interface Props {
 defineProps<Props>();
 
 const { t } = useT();
+const localePath = useLocalePath();
 
 const ICON_MAP: Record<string, Component> = {
     'heroicon-o-crosshair': Crosshair,
@@ -131,7 +133,7 @@ function pad(n: number): string {
                 <Link
                     v-for="(hobby, i) in hobbies"
                     :key="hobby.id"
-                    :href="`/hobbies/${hobby.slug}`"
+                    :href="localePath(`/hobbies/${hobby.slug}`)"
                     class="group flex flex-col bg-background p-8 transition-colors hover:bg-muted/30"
                 >
                     <div

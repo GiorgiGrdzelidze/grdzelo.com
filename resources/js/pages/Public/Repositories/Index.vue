@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ArrowUpRight, GitFork, Github, Star } from 'lucide-vue-next';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface RepositoryItem {
@@ -30,6 +31,7 @@ interface Props {
 defineProps<Props>();
 
 const { t } = useT();
+const localePath = useLocalePath();
 
 function pad(n: number): string {
     return String(n).padStart(2, '0');
@@ -92,7 +94,7 @@ function isActive(status: string): boolean {
                     class="group relative flex flex-col bg-background p-8 transition-colors hover:bg-muted/30 sm:p-10"
                 >
                     <Link
-                        :href="`/repositories/${repo.slug}`"
+                        :href="localePath(`/repositories/${repo.slug}`)"
                         class="absolute inset-0 z-0"
                         :aria-label="`View ${repo.name} details`"
                     />
@@ -240,7 +242,7 @@ function isActive(status: string): boolean {
                     class="group/row relative grid grid-cols-1 items-start gap-2 border-b border-border py-4 transition-colors hover:bg-muted/30 sm:grid-cols-[32px_minmax(0,1.4fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-6 sm:py-5"
                 >
                     <Link
-                        :href="`/repositories/${repo.slug}`"
+                        :href="localePath(`/repositories/${repo.slug}`)"
                         class="absolute inset-0 z-0"
                         :aria-label="`View ${repo.name} details`"
                     />
