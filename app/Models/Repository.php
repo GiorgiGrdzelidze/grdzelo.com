@@ -66,7 +66,7 @@ class Repository extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('thumbnail')->singleFile();
+        $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('screenshots');
     }
 

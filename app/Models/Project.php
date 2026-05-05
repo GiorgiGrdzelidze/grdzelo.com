@@ -70,7 +70,7 @@ class Project extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('cover_image')->singleFile();
+        $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('logo')->singleFile();
         $this->addMediaCollection('gallery');
     }
