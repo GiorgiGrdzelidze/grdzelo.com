@@ -3,11 +3,18 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\AlbumResource;
+use App\Filament\Resources\AlbumResource\Pages\EditAlbum;
 use App\Filament\Resources\ArticleResource;
+use App\Filament\Resources\ArticleResource\Pages\EditArticle;
+use App\Filament\Resources\CertificationResource;
+use App\Filament\Resources\CertificationResource\Pages\EditCertification;
 use App\Filament\Resources\HobbyResource;
+use App\Filament\Resources\HobbyResource\Pages\EditHobby;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\ProjectResource\Pages\EditProject;
 use App\Filament\Resources\RepositoryResource;
+use App\Filament\Resources\RepositoryResource\Pages\EditRepository;
 use App\Filament\Resources\ServiceResource;
 use App\Filament\Resources\SkillResource;
 use App\Models\Album;
@@ -99,3 +106,56 @@ it('declares the trait imports on every translatable resource', function (string
     expect($source)->toContain('use App\Filament\Concerns\TranslatableSchema;');
     expect($source)->toContain('use App\Filament\Concerns\TranslationCompleteness;');
 })->with('translatable_resources');
+
+/**
+ * Single-file media collections that carry user-facing imagery and must
+ * expose a per-locale alt-text tab strip via TranslatableMediaAlt::mediaAltField().
+ *
+ * Multi-file collections (gallery / photos / screenshots) defer per-image
+ * alt to a future arc — controllers fall back to a synthesized title-based
+ * alt at render time when media custom_properties->alt is unset.
+ */
+dataset('media_alt_uploaders', [
+    'Project::cover' => [ProjectResource::class, 'cover'],
+    'Project::logo' => [ProjectResource::class, 'logo'],
+    'Article::cover' => [ArticleResource::class, 'cover'],
+    'Hobby::cover' => [HobbyResource::class, 'cover'],
+    'Album::cover' => [AlbumResource::class, 'cover'],
+    'Certification::badge' => [CertificationResource::class, 'badge'],
+    'Repository::cover' => [RepositoryResource::class, 'cover'],
+]);
+
+it('exposes a per-locale alt tab strip for every single-file media collection', function (string $resourceClass, string $collection): void {
+    $source = file_get_contents((new ReflectionClass($resourceClass))->getFileName());
+
+    expect($source)->toContain('use TranslatableMediaAlt;');
+
+    $pattern = '/static::mediaAltField\(\s*[\'"]'.preg_quote($collection, '/').'[\'"]/';
+
+    expect(preg_match($pattern, $source))->toBe(
+        1,
+        "{$resourceClass} must call static::mediaAltField('{$collection}') alongside its SpatieMediaLibraryFileUpload."
+    );
+})->with('media_alt_uploaders');
+
+it('every EditRecord page that owns a media-alt collection wires HandlesMediaAltState', function (): void {
+    $editPages = [
+        EditProject::class => ['cover', 'logo'],
+        EditArticle::class => ['cover'],
+        EditHobby::class => ['cover'],
+        EditAlbum::class => ['cover'],
+        EditCertification::class => ['badge'],
+        EditRepository::class => ['cover'],
+    ];
+
+    foreach ($editPages as $pageClass => $expectedCollections) {
+        $source = file_get_contents((new ReflectionClass($pageClass))->getFileName());
+
+        expect($source)->toContain('HandlesMediaAltState');
+        expect($source)->toContain('persistMediaAltState');
+
+        foreach ($expectedCollections as $collection) {
+            expect($source)->toContain("'{$collection}'");
+        }
+    }
+});
