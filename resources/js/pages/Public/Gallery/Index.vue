@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ArrowUpRight, Camera, MapPin } from 'lucide-vue-next';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface AlbumItem {
@@ -25,6 +26,7 @@ interface Props {
 defineProps<Props>();
 
 const { t } = useT();
+const localePath = useLocalePath();
 
 function pad(n: number): string {
     return String(n).padStart(2, '0');
@@ -80,7 +82,7 @@ function pad(n: number): string {
                 <Link
                     v-for="(album, i) in featured"
                     :key="album.id"
-                    :href="`/gallery/${album.slug}`"
+                    :href="localePath(`/gallery/${album.slug}`)"
                     class="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden bg-background"
                 >
                     <img
@@ -191,7 +193,7 @@ function pad(n: number): string {
                 <Link
                     v-for="(album, i) in albums"
                     :key="album.id"
-                    :href="`/gallery/${album.slug}`"
+                    :href="localePath(`/gallery/${album.slug}`)"
                     class="group flex flex-col bg-background p-5 transition-colors hover:bg-muted/30"
                 >
                     <div

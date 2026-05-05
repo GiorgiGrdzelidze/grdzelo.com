@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowUpRight, Code2, Github, Mail } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface Project {
@@ -65,6 +66,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const { t, locale } = useT();
+const localePath = useLocalePath();
 
 const groupedSkills = computed(() => {
     const groups: Record<string, SkillItem[]> = {};
@@ -242,7 +244,7 @@ function getDeviconClass(icon: string): string | null {
                 <Link
                     v-for="(project, i) in featuredProjects"
                     :key="project.id"
-                    :href="`/projects/${project.slug}`"
+                    :href="localePath(`/projects/${project.slug}`)"
                     class="group flex flex-col bg-background p-8 transition-colors hover:bg-muted/30"
                 >
                     <div
@@ -552,7 +554,7 @@ function getDeviconClass(icon: string): string | null {
                     class="border-b border-border"
                 >
                     <Link
-                        :href="`/blog/${article.slug}`"
+                        :href="localePath(`/blog/${article.slug}`)"
                         class="group grid grid-cols-[40px_1fr_auto] items-baseline gap-6 py-6 transition-colors hover:bg-muted/30 sm:grid-cols-[40px_1fr_auto_auto]"
                     >
                         <span

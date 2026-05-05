@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ArrowUpRight, Code2 } from 'lucide-vue-next';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface Metric {
@@ -31,6 +32,7 @@ interface Props {
 defineProps<Props>();
 
 const { t } = useT();
+const localePath = useLocalePath();
 
 function pad(n: number): string {
     return String(n).padStart(2, '0');
@@ -81,7 +83,7 @@ function firstMetric(metrics: Metric[] | null): Metric | null {
                 <Link
                     v-for="(project, i) in projects"
                     :key="project.id"
-                    :href="`/projects/${project.slug}`"
+                    :href="localePath(`/projects/${project.slug}`)"
                     class="group flex flex-col bg-background p-8 transition-colors hover:bg-muted/30"
                 >
                     <div

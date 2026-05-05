@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowUpRight } from 'lucide-vue-next';
+import { useLocalePath } from '@/composables/useLocalePath';
 import { useT } from '@/composables/useTranslate';
 
 interface ArticleDetail {
@@ -37,6 +38,7 @@ interface Props {
 defineProps<Props>();
 
 const { t, locale } = useT();
+const localePath = useLocalePath();
 
 function formatDate(date: string): string {
     return new Date(date).toLocaleDateString(locale.value || 'en', {
@@ -362,7 +364,7 @@ function pad(n: number): string {
                 <Link
                     v-for="(ra, i) in relatedArticles"
                     :key="ra.id"
-                    :href="`/blog/${ra.slug}`"
+                    :href="localePath(`/blog/${ra.slug}`)"
                     class="group flex flex-col bg-background p-5 transition-colors hover:bg-muted/30"
                 >
                     <div
