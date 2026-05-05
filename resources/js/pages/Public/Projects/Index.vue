@@ -14,7 +14,7 @@ interface Project {
     title: string;
     slug: string;
     summary: string;
-    cover_image: string | null;
+    cover: string | null;
     tech_stack: string[] | null;
     year: number | null;
     is_featured: boolean;
@@ -96,8 +96,8 @@ function firstMetric(metrics: Metric[] | null): Metric | null {
                         class="mt-6 flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted"
                     >
                         <img
-                            v-if="project.cover_image"
-                            :src="`/storage/${project.cover_image}`"
+                            v-if="project.cover"
+                            :src="project.cover"
                             :alt="project.title"
                             class="h-full w-full object-cover"
                         />

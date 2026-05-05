@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowRight, Camera, MapPin, X } from 'lucide-vue-next';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useT } from '@/composables/useTranslate';
 
 interface Photo {
@@ -9,7 +9,7 @@ interface Photo {
     url: string;
     thumb: string;
     preview: string;
-    alt: string;
+    alt: string | null;
     caption: string | null;
 }
 
@@ -89,6 +89,10 @@ function handleKey(e: KeyboardEvent): void {
         prevPhoto();
     }
 }
+
+const currentPhoto = computed<Photo | null>(
+    () => props.photos[currentPhotoIndex.value] ?? null,
+);
 
 onMounted(() => window.addEventListener('keydown', handleKey));
 onBeforeUnmount(() => {
@@ -191,7 +195,7 @@ onBeforeUnmount(() => {
                 >
                     <img
                         :src="photo.thumb"
-                        :alt="photo.alt"
+                        :alt="photo.alt ?? ''"
                         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                         loading="lazy"
                     />
@@ -267,18 +271,19 @@ onBeforeUnmount(() => {
                 </button>
 
                 <div
+                    v-if="currentPhoto"
                     class="flex max-h-[90vh] max-w-[90vw] flex-col items-center justify-center"
                 >
                     <img
-                        :src="photos[currentPhotoIndex].url"
-                        :alt="photos[currentPhotoIndex].alt"
+                        :src="currentPhoto.url"
+                        :alt="currentPhoto.alt ?? ''"
                         class="max-h-[78vh] max-w-[90vw] border border-white/10 object-contain"
                     />
                     <p
-                        v-if="photos[currentPhotoIndex].caption"
+                        v-if="currentPhoto.caption"
                         class="mt-4 max-w-[60ch] text-center text-sm leading-relaxed text-pretty text-white/75"
                     >
-                        {{ photos[currentPhotoIndex].caption }}
+                        {{ currentPhoto.caption }}
                     </p>
                 </div>
 

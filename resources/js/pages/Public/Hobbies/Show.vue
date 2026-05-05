@@ -3,6 +3,11 @@ import { Link } from '@inertiajs/vue3';
 import { ArrowLeft, Heart } from 'lucide-vue-next';
 import { Badge } from '@/components/ui/badge';
 
+interface GalleryItem {
+    url: string;
+    alt: string | null;
+}
+
 interface Hobby {
     id: number;
     title: string;
@@ -10,8 +15,8 @@ interface Hobby {
     summary: string | null;
     description: string | null;
     icon: string | null;
-    image: string | null;
-    gallery: string[] | null;
+    cover: string | null;
+    gallery: GalleryItem[];
     is_featured: boolean;
 }
 
@@ -63,12 +68,8 @@ defineProps<Props>();
             </header>
 
             <!-- Cover Image -->
-            <div v-if="hobby.image" class="mt-10 overflow-hidden rounded-xl">
-                <img
-                    :src="`/storage/${hobby.image}`"
-                    :alt="hobby.title"
-                    class="w-full"
-                />
+            <div v-if="hobby.cover" class="mt-10 overflow-hidden rounded-xl">
+                <img :src="hobby.cover" :alt="hobby.title" class="w-full" />
             </div>
 
             <!-- Description -->
@@ -83,13 +84,13 @@ defineProps<Props>();
                 <h2 class="text-2xl font-bold">Gallery</h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div
-                        v-for="(img, idx) in hobby.gallery"
+                        v-for="(item, idx) in hobby.gallery"
                         :key="idx"
                         class="overflow-hidden rounded-lg"
                     >
                         <img
-                            :src="`/storage/${img}`"
-                            :alt="`${hobby.title} image ${idx + 1}`"
+                            :src="item.url"
+                            :alt="item.alt ?? ''"
                             class="w-full"
                         />
                     </div>

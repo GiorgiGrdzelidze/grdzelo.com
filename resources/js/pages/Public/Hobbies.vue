@@ -28,7 +28,7 @@ interface HobbyItem {
     slug: string;
     summary: string | null;
     description: string | null;
-    image: string | null;
+    cover: string | null;
     icon: string | null;
 }
 
@@ -146,8 +146,8 @@ function pad(n: number): string {
                         class="mt-6 flex aspect-[4/3] items-center justify-center overflow-hidden border border-border bg-muted/40"
                     >
                         <img
-                            v-if="hobby.image"
-                            :src="`/storage/${hobby.image}`"
+                            v-if="hobby.cover"
+                            :src="hobby.cover"
                             :alt="hobby.title"
                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                             loading="lazy"

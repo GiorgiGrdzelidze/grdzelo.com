@@ -9,6 +9,11 @@ interface Metric {
     value: string;
 }
 
+interface GalleryItem {
+    url: string;
+    alt: string | null;
+}
+
 interface Project {
     id: number;
     title: string;
@@ -25,8 +30,9 @@ interface Project {
     year: number | null;
     date_start: string | null;
     date_end: string | null;
-    cover_image: string | null;
-    gallery: string[] | null;
+    cover: string | null;
+    logo: string | null;
+    gallery: GalleryItem[];
     live_url: string | null;
     repo_url: string | null;
     metrics: Metric[] | null;
@@ -48,7 +54,7 @@ interface RelatedProject {
     title: string;
     slug: string;
     summary: string;
-    cover_image: string | null;
+    cover: string | null;
     tech_stack: string[] | null;
 }
 
@@ -182,7 +188,7 @@ function pad(n: number): string {
 
         <!-- ============ COVER ============ -->
         <section
-            v-if="project.cover_image"
+            v-if="project.cover"
             class="px-6 pb-24 sm:px-8 sm:pb-32 lg:px-12"
         >
             <div class="mx-auto max-w-[1200px]">
@@ -190,7 +196,7 @@ function pad(n: number): string {
                     class="aspect-[16/9] w-full overflow-hidden border border-border bg-muted"
                 >
                     <img
-                        :src="`/storage/${project.cover_image}`"
+                        :src="project.cover"
                         :alt="project.title"
                         class="h-full w-full object-cover"
                     />
@@ -388,13 +394,13 @@ function pad(n: number): string {
                     class="mt-12 grid grid-cols-1 gap-px bg-border sm:grid-cols-2"
                 >
                     <div
-                        v-for="(img, idx) in project.gallery"
+                        v-for="(item, idx) in project.gallery"
                         :key="idx"
                         class="aspect-[4/3] overflow-hidden bg-muted"
                     >
                         <img
-                            :src="`/storage/${img}`"
-                            :alt="`${project.title} — ${idx + 1}`"
+                            :src="item.url"
+                            :alt="item.alt ?? `${project.title} — ${idx + 1}`"
                             class="h-full w-full object-cover"
                         />
                     </div>

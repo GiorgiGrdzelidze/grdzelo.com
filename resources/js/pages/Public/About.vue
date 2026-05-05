@@ -40,6 +40,7 @@ interface HobbyItem {
 
 interface Props {
     settings: Record<string, any>;
+    brand: { portrait: string | null };
     seo: Record<string, any>;
     skills: SkillItem[];
     experiences: ExperienceItem[];
@@ -91,17 +92,7 @@ function formatMonthYear(date: string): string {
     });
 }
 
-const portrait = computed<string | null>(() => {
-    const path = props.settings?.about_image;
-
-    if (!path) {
-        return null;
-    }
-
-    return path.startsWith('http') || path.startsWith('/')
-        ? path
-        : `/storage/${path}`;
-});
+const portrait = computed<string | null>(() => props.brand?.portrait ?? null);
 
 const intro = computed<string | null>(
     () => props.settings?.about_intro || null,

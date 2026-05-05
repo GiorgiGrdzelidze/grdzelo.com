@@ -18,7 +18,7 @@ interface RepositoryItem {
     status: string;
     is_featured: boolean;
     demo_url: string | null;
-    thumbnail: string | null;
+    cover: string | null;
 }
 
 interface Props {

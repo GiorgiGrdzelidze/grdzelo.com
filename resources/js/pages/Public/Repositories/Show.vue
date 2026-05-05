@@ -23,7 +23,12 @@ interface RelatedProject {
     title: string;
     slug: string;
     summary: string | null;
-    cover_image: string | null;
+    cover: string | null;
+}
+
+interface Screenshot {
+    url: string;
+    alt: string | null;
 }
 
 interface Repository {
@@ -41,8 +46,8 @@ interface Repository {
     status: string;
     is_featured: boolean;
     demo_url: string | null;
-    thumbnail: string | null;
-    screenshots: string[];
+    cover: string | null;
+    screenshots: Screenshot[];
     project: RelatedProject | null;
 }
 
@@ -51,7 +56,7 @@ interface RelatedArticle {
     title: string;
     slug: string;
     excerpt: string | null;
-    cover_image: string | null;
+    cover: string | null;
     publish_at: string | null;
 }
 
@@ -69,22 +74,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const localePath = useLocalePath();
-
-function thumbnailUrl(path: string | null): string | null {
-    if (!path) {
-        return null;
-    }
-
-    if (
-        path.startsWith('http://') ||
-        path.startsWith('https://') ||
-        path.startsWith('/')
-    ) {
-        return path;
-    }
-
-    return `/storage/${path}`;
-}
 
 function formatNumber(value: number): string {
     if (value >= 1000) {
@@ -302,11 +291,11 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
 
             <!-- Cover -->
             <div
-                v-if="repository.thumbnail"
+                v-if="repository.cover"
                 class="mt-12 aspect-video overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-xl shadow-primary/5"
             >
                 <img
-                    :src="thumbnailUrl(repository.thumbnail) ?? ''"
+                    :src="repository.cover"
                     :alt="`${repository.name} preview`"
                     class="h-full w-full object-cover"
                     fetchpriority="high"
@@ -424,13 +413,16 @@ const { copy, copied } = useClipboard({ legacy: true, copiedDuring: 1500 });
                 <h2 class="text-2xl font-bold tracking-tight">Screenshots</h2>
                 <div class="mt-5 grid gap-4 sm:grid-cols-2">
                     <div
-                        v-for="(src, idx) in repository.screenshots"
+                        v-for="(shot, idx) in repository.screenshots"
                         :key="idx"
                         class="aspect-video overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm transition-shadow hover:shadow-md"
                     >
                         <img
-                            :src="src"
-                            :alt="`${repository.name} screenshot ${idx + 1}`"
+                            :src="shot.url"
+                            :alt="
+                                shot.alt ??
+                                `${repository.name} screenshot ${idx + 1}`
+                            "
                             class="h-full w-full object-cover"
                             loading="lazy"
                             decoding="async"
