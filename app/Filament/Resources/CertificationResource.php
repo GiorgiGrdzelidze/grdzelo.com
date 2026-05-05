@@ -43,7 +43,9 @@ class CertificationResource extends Resource
                 ->multiple()
                 ->preload()
                 ->searchable(),
-            Forms\Components\FileUpload::make('badge_image')->image()->directory('certifications'),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('badge')
+                ->collection('badge')
+                ->image(),
             Schemas\Components\Grid::make(3)->schema([
                 Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
                 Forms\Components\Toggle::make('is_featured')->label('Featured'),

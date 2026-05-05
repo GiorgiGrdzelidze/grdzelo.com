@@ -46,8 +46,14 @@ class HobbyResource extends Resource
                     ->columnSpanFull(),
             ])->columnSpanFull(),
             Forms\Components\TextInput::make('icon')->maxLength(255),
-            Forms\Components\FileUpload::make('image')->image()->directory('hobbies'),
-            Forms\Components\FileUpload::make('gallery')->image()->multiple()->directory('hobbies/gallery')->reorderable(),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                ->collection('cover')
+                ->image(),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
+                ->collection('gallery')
+                ->image()
+                ->multiple()
+                ->reorderable(),
             Schemas\Components\Grid::make(3)->schema([
                 Forms\Components\Toggle::make('is_featured')->label('Featured'),
                 Forms\Components\Toggle::make('is_visible')->label('Visible')->default(true),

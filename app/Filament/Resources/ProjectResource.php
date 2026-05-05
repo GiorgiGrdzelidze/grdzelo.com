@@ -134,17 +134,17 @@ class ProjectResource extends Resource
                         ->collapsible(),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
-                    Forms\Components\FileUpload::make('cover_image')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('projects')
                         ->imageEditor(),
-                    Forms\Components\FileUpload::make('logo')
-                        ->image()
-                        ->directory('projects/logos'),
-                    Forms\Components\FileUpload::make('gallery')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
+                        ->collection('logo')
+                        ->image(),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
+                        ->collection('gallery')
                         ->image()
                         ->multiple()
-                        ->directory('projects/gallery')
                         ->reorderable(),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Relations')->schema([

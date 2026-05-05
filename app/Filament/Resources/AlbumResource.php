@@ -77,17 +77,17 @@ class AlbumResource extends Resource
                         ->default(0),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Cover Image')->schema([
-                    Forms\Components\FileUpload::make('cover_image')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('albums/covers')
                         ->imageEditor(),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Photos')->schema([
-                    Forms\Components\FileUpload::make('photos')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('photos')
+                        ->collection('photos')
                         ->multiple()
                         ->reorderable()
                         ->image()
-                        ->directory('albums/photos')
                         ->helperText('Upload multiple photos. You can drag to reorder.'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([

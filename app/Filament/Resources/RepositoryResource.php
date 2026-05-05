@@ -111,10 +111,16 @@ class RepositoryResource extends Resource
                         ->label('Related Project'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
-                    Forms\Components\FileUpload::make('thumbnail')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('repositories')
                         ->imageEditor(),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('screenshots')
+                        ->collection('screenshots')
+                        ->image()
+                        ->multiple()
+                        ->reorderable()
+                        ->helperText('Screenshots displayed on the repository detail page.'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
                     TranslatableSchema::seoTabs(),

@@ -88,9 +88,9 @@ class ArticleResource extends Resource
                     ]),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
-                    Forms\Components\FileUpload::make('cover_image')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('articles')
                         ->imageEditor(),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Tags')->schema([
