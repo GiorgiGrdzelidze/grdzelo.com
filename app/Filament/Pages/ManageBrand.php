@@ -45,7 +45,6 @@ class ManageBrand extends Page implements HasForms
                 Forms\Components\SpatieMediaLibraryFileUpload::make('about')
                     ->collection('about')
                     ->image()
-                    ->responsiveImages()
                     ->label('About portrait')
                     ->helperText('Square or 4:5 aspect ratio works best.'),
             ]);
