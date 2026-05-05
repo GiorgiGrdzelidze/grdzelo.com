@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Certification extends Model
+class Certification extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $guarded = ['id'];
 
@@ -73,5 +75,10 @@ class Certification extends Model
         }
 
         return $this->is_expired ? 'Expired' : 'Active';
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('badge')->singleFile();
     }
 }

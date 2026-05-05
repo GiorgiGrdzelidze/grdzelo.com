@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Models\Article;
 use App\Models\Repository;
 use App\Settings\SeoSettings;
@@ -30,7 +31,7 @@ class RepositoryController extends BasePublicController
                 'status' => $repo->status,
                 'is_featured' => $repo->is_featured,
                 'demo_url' => $repo->demo_url,
-                'thumbnail' => $repo->thumbnail,
+                'cover' => $repo->getFirstMediaUrl('cover') ?: null,
             ]);
 
         $featured = $repositories->where('is_featured', true)->values();
@@ -51,10 +52,13 @@ class RepositoryController extends BasePublicController
 
         abort_unless($repository->is_visible, 404);
 
-        $repository->load(['project:id,title,slug,summary,cover_image']);
+        $repository->load(['project:id,title,slug,summary']);
 
         $screenshots = $repository->getMedia('screenshots')
-            ->map(fn ($media) => $media->getUrl())
+            ->map(fn ($media) => [
+                'url' => $media->getUrl(),
+                'alt' => TranslatableMediaAlt::resolveAlt($media->getCustomProperty('alt')),
+            ])
             ->values()
             ->all();
 
@@ -78,14 +82,14 @@ class RepositoryController extends BasePublicController
                 'status' => $repository->status,
                 'is_featured' => $repository->is_featured,
                 'demo_url' => $repository->demo_url,
-                'thumbnail' => $repository->thumbnail,
+                'cover' => $repository->getFirstMediaUrl('cover') ?: null,
                 'screenshots' => $screenshots,
                 'project' => $repository->project ? [
                     'id' => $repository->project->id,
                     'title' => $repository->project->title,
                     'slug' => $repository->project->slug,
                     'summary' => $repository->project->summary,
-                    'cover_image' => $repository->project->cover_image,
+                    'cover' => $repository->project->getFirstMediaUrl('cover') ?: null,
                 ] : null,
             ],
             'relatedArticles' => $relatedArticles,
@@ -106,8 +110,10 @@ class RepositoryController extends BasePublicController
             $seo['canonical'] = $self;
         }
 
-        if (empty($seo['og']['image']) && $repository->thumbnail) {
-            $seo['og']['image'] = $this->absoluteImageUrl($repository->thumbnail, $base);
+        $coverUrl = $repository->getFirstMediaUrl('cover') ?: null;
+
+        if (empty($seo['og']['image']) && $coverUrl) {
+            $seo['og']['image'] = $coverUrl;
         }
         if (! empty($seo['og']['image'])) {
             $seo['og']['image_alt'] ??= $repository->name;
@@ -127,22 +133,9 @@ class RepositoryController extends BasePublicController
         return $seo;
     }
 
-    private function absoluteImageUrl(string $path, string $base): string
-    {
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
-        }
-
-        if (str_starts_with($path, '/')) {
-            return $base.$path;
-        }
-
-        return $base.'/storage/'.$path;
-    }
-
     private function relatedArticlesFor(Repository $repository): array
     {
-        $columns = ['id', 'title', 'slug', 'excerpt', 'cover_image', 'publish_at'];
+        $columns = ['id', 'title', 'slug', 'excerpt', 'publish_at'];
         $technologies = array_filter((array) ($repository->technologies ?? []));
 
         $articles = collect();
@@ -176,8 +169,8 @@ class RepositoryController extends BasePublicController
                 'title' => $article->title,
                 'slug' => $article->slug,
                 'excerpt' => $article->excerpt,
-                'cover_image' => $article->cover_image,
                 'publish_at' => $article->publish_at?->toIso8601String(),
+                'cover' => $article->getFirstMediaUrl('cover') ?: null,
             ])
             ->all();
     }

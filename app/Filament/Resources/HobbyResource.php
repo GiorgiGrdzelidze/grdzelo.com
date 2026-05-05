@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\HobbyResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class HobbyResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Hobby::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-heart';
@@ -46,8 +49,15 @@ class HobbyResource extends Resource
                     ->columnSpanFull(),
             ])->columnSpanFull(),
             Forms\Components\TextInput::make('icon')->maxLength(255),
-            Forms\Components\FileUpload::make('image')->image()->directory('hobbies'),
-            Forms\Components\FileUpload::make('gallery')->image()->multiple()->directory('hobbies/gallery')->reorderable(),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                ->collection('cover')
+                ->image(),
+            static::mediaAltField('cover', 'Cover alt'),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
+                ->collection('gallery')
+                ->image()
+                ->multiple()
+                ->reorderable(),
             Schemas\Components\Grid::make(3)->schema([
                 Forms\Components\Toggle::make('is_featured')->label('Featured'),
                 Forms\Components\Toggle::make('is_visible')->label('Visible')->default(true),

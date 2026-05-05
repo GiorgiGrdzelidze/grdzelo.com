@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Models\Certification;
 use App\Models\Education;
 use App\Models\Experience;
@@ -34,7 +35,8 @@ class AboutController extends BasePublicController
             ->visible()
             ->ordered()
             ->with('skills:id,name,slug')
-            ->get();
+            ->get()
+            ->map(fn (Certification $cert) => $this->certificationPayload($cert));
 
         $hobbies = Hobby::query()
             ->visible()
@@ -84,7 +86,16 @@ class AboutController extends BasePublicController
         $hobbies = Hobby::query()
             ->visible()
             ->ordered()
-            ->get();
+            ->get()
+            ->map(fn (Hobby $hobby) => [
+                'id' => $hobby->id,
+                'title' => $hobby->title,
+                'slug' => $hobby->slug,
+                'summary' => $hobby->summary,
+                'icon' => $hobby->icon,
+                'is_featured' => $hobby->is_featured,
+                'cover' => $hobby->getFirstMediaUrl('cover') ?: null,
+            ]);
 
         return Inertia::render('Public/Hobbies', [
             ...$this->sharedProps(),
@@ -104,7 +115,20 @@ class AboutController extends BasePublicController
         return Inertia::render('Public/Hobbies/Show', [
             ...$this->sharedProps(),
             'seo' => $this->seoFor($hobby),
-            'hobby' => $hobby,
+            'hobby' => [
+                'id' => $hobby->id,
+                'title' => $hobby->title,
+                'slug' => $hobby->slug,
+                'summary' => $hobby->summary,
+                'description' => $hobby->description,
+                'icon' => $hobby->icon,
+                'is_featured' => $hobby->is_featured,
+                'cover' => $hobby->getFirstMediaUrl('cover') ?: null,
+                'gallery' => $hobby->getMedia('gallery')->map(fn ($m) => [
+                    'url' => $m->getUrl(),
+                    'alt' => TranslatableMediaAlt::resolveAlt($m->getCustomProperty('alt')),
+                ])->all(),
+            ],
         ]);
     }
 
@@ -142,12 +166,35 @@ class AboutController extends BasePublicController
             ->visible()
             ->ordered()
             ->with('skills:id,name,slug')
-            ->get();
+            ->get()
+            ->map(fn (Certification $cert) => $this->certificationPayload($cert));
 
         return Inertia::render('Public/Certifications', [
             ...$this->sharedProps(),
             'seo' => $this->seoFor(null, 'Certifications'),
             'certifications' => $certifications,
         ]);
+    }
+
+    private function certificationPayload(Certification $cert): array
+    {
+        return [
+            'id' => $cert->id,
+            'title' => $cert->title,
+            'issuing_organization' => $cert->issuing_organization,
+            'description' => $cert->description,
+            'issue_date' => $cert->issue_date?->toIso8601String(),
+            'expiry_date' => $cert->expiry_date?->toIso8601String(),
+            'no_expiry' => $cert->no_expiry,
+            'credential_id' => $cert->credential_id,
+            'credential_url' => $cert->credential_url,
+            'is_featured' => $cert->is_featured,
+            'is_visible' => $cert->is_visible,
+            'sort_order' => $cert->sort_order,
+            'is_expired' => $cert->is_expired,
+            'status' => $cert->status,
+            'skills' => $cert->relationLoaded('skills') ? $cert->skills : [],
+            'badge' => $cert->getFirstMediaUrl('badge') ?: null,
+        ];
     }
 }

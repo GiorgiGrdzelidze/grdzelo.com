@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\RepositoryResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class RepositoryResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Repository::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-code-bracket';
@@ -111,10 +114,17 @@ class RepositoryResource extends Resource
                         ->label('Related Project'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
-                    Forms\Components\FileUpload::make('thumbnail')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('repositories')
                         ->imageEditor(),
+                    static::mediaAltField('cover', 'Cover alt'),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('screenshots')
+                        ->collection('screenshots')
+                        ->image()
+                        ->multiple()
+                        ->reorderable()
+                        ->helperText('Screenshots displayed on the repository detail page.'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('SEO')->schema([
                     TranslatableSchema::seoTabs(),

@@ -23,10 +23,11 @@ class ArticleController extends BasePublicController
             ))
             ->latest('publish_at')
             ->paginate(12, [
-                'id', 'title', 'slug', 'excerpt', 'cover_image',
+                'id', 'title', 'slug', 'excerpt',
                 'article_category_id', 'publish_at', 'reading_time', 'is_featured',
             ])
-            ->withQueryString();
+            ->withQueryString()
+            ->through(fn (Article $article) => $this->articleCard($article));
 
         $categories = ArticleCategory::query()
             ->withCount(['articles' => fn ($q) => $q->published()])
@@ -37,7 +38,8 @@ class ArticleController extends BasePublicController
             ->featured()
             ->latest('publish_at')
             ->limit(3)
-            ->get(['id', 'title', 'slug', 'excerpt', 'cover_image', 'publish_at', 'reading_time']);
+            ->get(['id', 'title', 'slug', 'excerpt', 'publish_at', 'reading_time'])
+            ->map(fn (Article $article) => $this->articleCard($article));
 
         return Inertia::render('Public/Blog/Index', [
             ...$this->sharedProps(),
@@ -64,13 +66,42 @@ class ArticleController extends BasePublicController
             ->when($article->article_category_id, fn ($q) => $q->where('article_category_id', $article->article_category_id))
             ->latest('publish_at')
             ->limit(3)
-            ->get(['id', 'title', 'slug', 'excerpt', 'cover_image', 'publish_at', 'reading_time']);
+            ->get(['id', 'title', 'slug', 'excerpt', 'publish_at', 'reading_time'])
+            ->map(fn (Article $a) => $this->articleCard($a));
 
         return Inertia::render('Public/Blog/Show', [
             ...$this->sharedProps(),
             'seo' => $this->seoFor($article),
-            'article' => $article,
+            'article' => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'slug' => $article->slug,
+                'excerpt' => $article->excerpt,
+                'body' => $article->body,
+                'publish_at' => $article->publish_at?->toIso8601String(),
+                'reading_time' => $article->reading_time,
+                'is_featured' => $article->is_featured,
+                'cover' => $article->getFirstMediaUrl('cover') ?: null,
+                'category' => $article->category,
+                'author' => $article->author,
+                'tags' => $article->tags,
+            ],
             'relatedArticles' => $relatedArticles,
         ]);
+    }
+
+    private function articleCard(Article $article): array
+    {
+        return [
+            'id' => $article->id,
+            'title' => $article->title,
+            'slug' => $article->slug,
+            'excerpt' => $article->excerpt,
+            'category' => $article->relationLoaded('category') ? $article->category : null,
+            'publish_at' => $article->publish_at?->toIso8601String(),
+            'reading_time' => $article->reading_time,
+            'is_featured' => $article->is_featured ?? false,
+            'cover' => $article->getFirstMediaUrl('cover') ?: null,
+        ];
     }
 }

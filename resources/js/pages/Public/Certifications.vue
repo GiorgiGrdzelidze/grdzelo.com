@@ -18,7 +18,7 @@ interface CertificationItem {
     credential_id: string | null;
     credential_url: string | null;
     description: string | null;
-    badge_image: string | null;
+    badge: string | null;
     is_featured: boolean;
     skills: SkillItem[];
 }
@@ -69,9 +69,9 @@ function isExpired(cert: CertificationItem): boolean {
                     class="group relative rounded-xl border border-border/40 bg-card p-6 transition-all hover:border-border hover:shadow-sm"
                 >
                     <div class="flex items-start gap-4">
-                        <div v-if="cert.badge_image" class="shrink-0">
+                        <div v-if="cert.badge" class="shrink-0">
                             <img
-                                :src="`/storage/${cert.badge_image}`"
+                                :src="cert.badge"
                                 :alt="cert.title"
                                 class="h-14 w-14 rounded-lg object-contain"
                             />

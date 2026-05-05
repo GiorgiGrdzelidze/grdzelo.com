@@ -29,12 +29,15 @@ trait HandlesTranslatableForm
     {
         $record = $this->getRecord();
 
-        if (! method_exists($record, 'getTranslations')) {
-            return $data;
+        if (method_exists($record, 'getTranslations')) {
+            foreach ($this->translatableFields() as $field) {
+                $data[$field] = $record->getTranslations($field);
+            }
         }
 
-        foreach ($this->translatableFields() as $field) {
-            $data[$field] = $record->getTranslations($field);
+        // Compose media-alt fill when the page mixed in HandlesMediaAltState.
+        if (method_exists($this, 'fillMediaAltState')) {
+            $data = $this->fillMediaAltState($data);
         }
 
         return $data;
@@ -42,7 +45,13 @@ trait HandlesTranslatableForm
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        return $this->filterTranslatableLocales($data);
+        $data = $this->filterTranslatableLocales($data);
+
+        if (method_exists($this, 'stripMediaAltFromSave')) {
+            $data = $this->stripMediaAltFromSave($data);
+        }
+
+        return $data;
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array

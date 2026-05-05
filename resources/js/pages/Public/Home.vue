@@ -10,7 +10,7 @@ interface Project {
     title: string;
     slug: string;
     summary: string;
-    cover_image: string | null;
+    cover: string | null;
     tech_stack: string[] | null;
     year: number | null;
 }
@@ -20,7 +20,7 @@ interface ArticleItem {
     title: string;
     slug: string;
     excerpt: string;
-    cover_image: string | null;
+    cover: string | null;
     publish_at: string;
     reading_time: number;
 }
@@ -257,8 +257,8 @@ function getDeviconClass(icon: string): string | null {
                         class="mt-6 flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted"
                     >
                         <img
-                            v-if="project.cover_image"
-                            :src="`/storage/${project.cover_image}`"
+                            v-if="project.cover"
+                            :src="project.cover"
                             :alt="project.title"
                             class="h-full w-full object-cover"
                         />

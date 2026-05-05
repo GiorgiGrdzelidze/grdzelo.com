@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\ProjectResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class ProjectResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Project::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -134,17 +137,19 @@ class ProjectResource extends Resource
                         ->collapsible(),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
-                    Forms\Components\FileUpload::make('cover_image')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('projects')
                         ->imageEditor(),
-                    Forms\Components\FileUpload::make('logo')
-                        ->image()
-                        ->directory('projects/logos'),
-                    Forms\Components\FileUpload::make('gallery')
+                    static::mediaAltField('cover', 'Cover alt'),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
+                        ->collection('logo')
+                        ->image(),
+                    static::mediaAltField('logo', 'Logo alt'),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
+                        ->collection('gallery')
                         ->image()
                         ->multiple()
-                        ->directory('projects/gallery')
                         ->reorderable(),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Relations')->schema([

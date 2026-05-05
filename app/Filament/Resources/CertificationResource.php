@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Resources\CertificationResource\Pages;
 use App\Models\Certification;
 use Filament\Actions;
@@ -14,6 +15,8 @@ use Filament\Tables\Table;
 
 class CertificationResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Certification::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-check-badge';
@@ -43,7 +46,10 @@ class CertificationResource extends Resource
                 ->multiple()
                 ->preload()
                 ->searchable(),
-            Forms\Components\FileUpload::make('badge_image')->image()->directory('certifications'),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('badge')
+                ->collection('badge')
+                ->image(),
+            static::mediaAltField('badge', 'Badge alt'),
             Schemas\Components\Grid::make(3)->schema([
                 Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
                 Forms\Components\Toggle::make('is_featured')->label('Featured'),

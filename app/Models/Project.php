@@ -34,7 +34,6 @@ class Project extends Model implements HasMedia
     {
         return [
             'tech_stack' => 'array',
-            'gallery' => 'array',
             'case_study_blocks' => 'array',
             'metrics' => 'array',
             'schema_json' => 'array',
@@ -70,7 +69,7 @@ class Project extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('cover_image')->singleFile();
+        $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('logo')->singleFile();
         $this->addMediaCollection('gallery');
     }

@@ -30,7 +30,6 @@ class Hobby extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'gallery' => 'array',
             'is_featured' => 'boolean',
             'is_visible' => 'boolean',
         ];
@@ -53,7 +52,9 @@ class Hobby extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('image')->singleFile();
+        // Legacy column is `image`; collection name is `cover` for
+        // cross-model consistency with Project / Article / Album / Repository.
+        $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('gallery');
     }
 

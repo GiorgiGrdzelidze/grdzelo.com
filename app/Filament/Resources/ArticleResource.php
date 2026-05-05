@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\TranslatableMediaAlt;
 use App\Filament\Concerns\TranslatableSchema;
 use App\Filament\Concerns\TranslationCompleteness;
 use App\Filament\Resources\ArticleResource\Pages;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class ArticleResource extends Resource
 {
+    use TranslatableMediaAlt;
+
     protected static ?string $model = Article::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
@@ -88,10 +91,11 @@ class ArticleResource extends Resource
                     ]),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Media')->schema([
-                    Forms\Components\FileUpload::make('cover_image')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                        ->collection('cover')
                         ->image()
-                        ->directory('articles')
                         ->imageEditor(),
+                    static::mediaAltField('cover', 'Cover alt'),
                 ]),
                 Schemas\Components\Tabs\Tab::make('Tags')->schema([
                     Forms\Components\Select::make('tags')

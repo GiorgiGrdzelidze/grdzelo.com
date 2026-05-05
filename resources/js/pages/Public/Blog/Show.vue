@@ -10,7 +10,7 @@ interface ArticleDetail {
     slug: string;
     excerpt: string;
     body: string;
-    cover_image: string | null;
+    cover: string | null;
     publish_at: string;
     reading_time: number;
     category: { id: number; name: string; slug: string } | null;
@@ -23,7 +23,7 @@ interface RelatedArticle {
     title: string;
     slug: string;
     excerpt: string;
-    cover_image: string | null;
+    cover: string | null;
     publish_at: string;
     reading_time: number;
 }
@@ -296,16 +296,13 @@ function pad(n: number): string {
     </section>
 
     <!-- ============ COVER ============ -->
-    <section
-        v-if="article.cover_image"
-        class="px-6 pb-12 sm:px-8 sm:pb-16 lg:px-12"
-    >
+    <section v-if="article.cover" class="px-6 pb-12 sm:px-8 sm:pb-16 lg:px-12">
         <div class="mx-auto max-w-[1100px]">
             <div
                 class="aspect-[16/9] overflow-hidden border border-border bg-muted/40"
             >
                 <img
-                    :src="`/storage/${article.cover_image}`"
+                    :src="article.cover"
                     :alt="article.title"
                     class="h-full w-full object-cover"
                     fetchpriority="high"
@@ -375,11 +372,11 @@ function pad(n: number): string {
                     </div>
 
                     <div
-                        v-if="ra.cover_image"
+                        v-if="ra.cover"
                         class="mt-3 aspect-[4/3] overflow-hidden border border-border bg-muted/40"
                     >
                         <img
-                            :src="`/storage/${ra.cover_image}`"
+                            :src="ra.cover"
                             :alt="ra.title"
                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                             loading="lazy"

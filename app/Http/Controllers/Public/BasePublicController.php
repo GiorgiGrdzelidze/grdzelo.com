@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\SocialLink;
 use App\Settings\GeneralSettings;
 use App\Settings\SeoSettings;
@@ -32,8 +33,10 @@ abstract class BasePublicController extends Controller
                 'logo' => $general->logo,
                 'logo_dark' => $general->logo_dark,
                 'logo_icon' => $general->logo_icon,
-                'about_image' => $general->about_image,
                 'about_intro' => $general->about_intro,
+            ],
+            'brand' => [
+                'portrait' => Brand::current()->getFirstMediaUrl('about') ?: null,
             ],
             'socialLinks' => SocialLink::visible()->ordered()->get(['platform', 'label', 'url', 'username', 'icon']),
             'seoDefaults' => [
